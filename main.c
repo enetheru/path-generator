@@ -1,85 +1,93 @@
 #include <Elementary.h>
 
-on_done(void *data, Evas_Object *obj, void *event_info)
-
+static void 
+_on_done(void *data, Evas_Object *obj, void *event_info)
 {
-
    // quit the mainloop (elm_run function will return)
-
    elm_exit();
+}
 
+/* hook on the file,chosen smart callback */
+
+static void 
+_file_chosen(void *data, Evas_Object *obj, void *event_info)
+{
+   const char *file = event_info;
+
+   if (file) printf("File chosen: %s\n", file);
+   else
+   {
+      printf("File selection canceled.\n");
+      return;
+   }
+   Evas *evas = evas_object_evas_get(obj);
+   Evas_Object *image = evas_object_image_add(evas);
+   evas_object_image_file_set(image, file, "");
+   evas_object_move(image, 0, 0);
+   evas_object_resize(image, 10000, 10000);
+   evas_object_image_fill_set(image, 0,0,10000,10000);
+
+   Evas_Object *scroller;
+   scroller = evas_object_name_find(evas, "scroller");
+   elm_object_content_set(scroller, image);
+//   evas_object_show(image);
+/* FIXME, load up the image file here into an evas object and put it in the scroll frame */
+   
 }
 
 EAPI_MAIN int
 
 elm_main(int argc, char **argv)
 {
-   Evas_Object *win, *box, *lab, *btn;
+   Evas_Object *win, *bg, *vbox, *hbox, *fs_entry, *sep, *btn, *scroll;
 
-   // new window - do the usual and give it a name (hello) and title (Hello)
+   win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
+   elm_win_title_set(win, "path-generator");
 
-   win = elm_win_util_standard_add("hello", "Hello");
+   evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
 
-   // when the user clicks "close" on a window there is a request to delete
+   /* set background */
+   bg = elm_bg_add(win);
+   elm_win_resize_object_add(win, bg);
+   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_show(bg);
 
-   evas_object_smart_callback_add(win, "delete,request", on_done, NULL);
+   /* primary divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   elm_win_resize_object_add(win, hbox);
+   evas_object_show(hbox);
 
+   /* scroll frame for map view */
+   scroll = elm_scroller_add(win);
+   evas_object_name_set(scroll, "scroller");
+   evas_object_size_hint_weight_set(scroll, 0.8, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_start(hbox, scroll);
+   evas_object_show(scroll);
 
-   // add a box object - default is vertical. a box holds children in a row,
+   /* button divider */
+   vbox = elm_box_add(win);
+   evas_object_size_hint_weight_set(vbox, 0.2, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_homogeneous_set(vbox, EINA_TRUE);
+   elm_box_pack_end(hbox, vbox);
+   evas_object_show(vbox);
 
-   // either horizontally or vertically. nothing more.
+   /* file selector entry */
+   fs_entry = elm_fileselector_entry_add(win);
+   evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
+   elm_fileselector_entry_path_set(fs_entry, "select height map");
+   elm_fileselector_entry_expandable_set(fs_entry, EINA_FALSE);
+   elm_object_text_set(fs_entry, "Select height map");
+   elm_box_pack_end(vbox, fs_entry);
+   evas_object_show(fs_entry);
 
-   box = elm_box_add(win);
-
-   // make the box horizontal
-
-   elm_box_horizontal_set(box, EINA_TRUE);
-
-   // add object as a resize object for the window (controls window minimum
-
-   // size as well as gets resized if window is resized)
-
-   elm_win_resize_object_add(win, box);
-
-   evas_object_show(box);
-
-
-   // add a label widget, set the text and put it in the pad frame
-
-   lab = elm_label_add(win);
-
-   // set default text of the label
-
-   elm_object_text_set(lab, "Hello out there world!");
-
-   // pack the label at the end of the box
-
-   elm_box_pack_end(box, lab);
-
-   evas_object_show(lab);
-
-
-   // add an ok button
-
-   btn = elm_button_add(win);
-
-   // set default text of button to "OK"
-
-   elm_object_text_set(btn, "OK");
-
-   // pack the button at the end of the box
-
-   elm_box_pack_end(box, btn);
-
-   evas_object_show(btn);
-
-   // call on_done when button is clicked
-
-   evas_object_smart_callback_add(btn, "clicked", on_done, NULL);
-
-
+   evas_object_smart_callback_add(fs_entry, "file,chosen", _file_chosen, NULL);
    // now we are done, show the window
 
+   evas_object_resize(win, 400, 400);
    evas_object_show(win);
 
    // create window(s) here and do any application init
