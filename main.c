@@ -24,13 +24,11 @@ _file_chosen(void *data, Evas_Object *obj, void *event_info)
    Evas_Object *image = evas_object_image_add(evas);
    evas_object_image_file_set(image, file, "");
    evas_object_move(image, 0, 0);
-   evas_object_resize(image, 10000, 10000);
-   evas_object_image_fill_set(image, 0,0,10000,10000);
+   evas_object_image_filled_set(image, EINA_TRUE);
 
    Evas_Object *scroller;
    scroller = evas_object_name_find(evas, "scroller");
    elm_object_content_set(scroller, image);
-//   evas_object_show(image);
 /* FIXME, load up the image file here into an evas object and put it in the scroll frame */
    
 }
@@ -64,6 +62,7 @@ elm_main(int argc, char **argv)
    evas_object_name_set(scroll, "scroller");
    evas_object_size_hint_weight_set(scroll, 0.8, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_scroller_policy_set(scroll, ELM_SCROLLER_POLICY_ON, ELM_SCROLLER_POLICY_ON);
    elm_box_pack_start(hbox, scroll);
    evas_object_show(scroll);
 
