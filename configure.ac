@@ -1,4 +1,4 @@
-AC_INIT(myapp, 0.0.0, myname@mydomain.com)
+AC_INIT(pathgen, 0.0.0, nicholas.samuel@gmail.com)
 
 AC_PREREQ(2.52)
 

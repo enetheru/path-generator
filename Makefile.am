@@ -6,11 +6,11 @@ MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.h.in configure depcomp inst
 INCLUDES = -I$(top_srcdir)
 
 
-bin_PROGRAMS = myapp
+bin_PROGRAMS = pathgen
 
 
-myapp_SOURCES = main.c
+pathgen_SOURCES = main.c
 
-myapp_LDADD = @ELEMENTARY_LIBS@
+pathgen_LDADD = @ELEMENTARY_LIBS@
 
-myapp_CFLAGS = @ELEMENTARY_CFLAGS@
+pathgen_CFLAGS = @ELEMENTARY_CFLAGS@
