@@ -9,7 +9,7 @@ INCLUDES = -I$(top_srcdir)
 bin_PROGRAMS = pathgen
 
 
-pathgen_SOURCES = main.c
+pathgen_SOURCES = main.c world.h
 
 pathgen_LDADD = @ELEMENTARY_LIBS@
 

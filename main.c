@@ -1,4 +1,5 @@
 #include <Elementary.h>
+#include "world.h"
 
 static void 
 _on_done(void *data, Evas_Object *obj, void *event_info)
@@ -21,15 +22,23 @@ _file_chosen(void *data, Evas_Object *obj, void *event_info)
       return;
    }
    Evas *evas = evas_object_evas_get(obj);
-   Evas_Object *image = evas_object_image_add(evas);
+   Evas_Object *scroller;
+   scroller = evas_object_name_find(evas, "scroller");
+
+
+/*   Evas_Object *image = evas_object_image_add(evas);
    evas_object_image_file_set(image, file, "");
    evas_object_move(image, 0, 0);
    evas_object_image_filled_set(image, EINA_TRUE);
+   evas_object_size_hint_min_set(image, 500, 500);
+   evas_object_size_hint_align_set(image, 0.5, 0.5);
+   elm_object_content_set(scroller, image); */
 
-   Evas_Object *scroller;
-   scroller = evas_object_name_find(evas, "scroller");
-   elm_object_content_set(scroller, image);
-/* FIXME, load up the image file here into an evas object and put it in the scroll frame */
+   Evas_Object *world;
+   world = pathgen_world_add(evas);
+//   FIXME some function to set the base object in the smart object as our image we have chosen.
+   elm_object_content_set(scroller, world);
+   
    
 }
 
