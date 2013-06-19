@@ -1,14 +1,23 @@
 #include <Ecore_Evas.h>
+
 #define __UNUSED__
-
-static const char *border_img_path = "";
-
 #define _pathgen_world_type "Pathgen_World"
 #define EVT_CHILDREN_NUMBER_CHANGED "children,changed"
+#define EVT_ZOOM_IN "zoom,in"
+#define EVT_ZOOM_OUT "zoom,out"
+
+#define PG_BASE 0
+#define PG_HEIGHT 1
+#define PG_INTEREST 2
+#define PG_PATH 3
+#define PG_TELEPORT 4
+#define PG_HEAT 5
 
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {
    {EVT_CHILDREN_NUMBER_CHANGED, "i"},
+   {EVT_ZOOM_IN, "i"},
+   {EVT_ZOOM_OUT, "i"},
    {NULL, NULL}
 };
 
@@ -21,7 +30,7 @@ typedef struct _Pathgen_World_Data Pathgen_World_Data;
 struct _Pathgen_World_Data
 {
    Evas_Object_Smart_Clipped_Data base;
-   Evas_Object *children[5], *border;
+   Evas_Object *children[6], *border;
    int child_count;
 };
 
@@ -55,15 +64,32 @@ EVAS_SMART_SUBCLASS_NEW(_pathgen_world_type, _pathgen_world,
    evas_object_smart_clipped_class_get, _smart_callbacks);
 
 static void
+_pathgen_world_zoom(
+   void *data __UNUSED__,
+   Evas_Object *o,
+   void *event_info )
+{
+   int w,h, mult = 10;
+   Evas_Event_Mouse_Wheel *info = event_info;
+
+   evas_object_geometry_get(o, NULL, NULL, &w, &h);
+
+   if(evas_key_modifier_is_set(info->modifiers, "Alt"))mult=100;
+   if(evas_key_modifier_is_set(info->modifiers, "Control"))
+      evas_object_size_hint_min_set(o, (w+(w/mult)*info->z), (h+(h/mult)*info->z));
+}
+
+
+static void
 _on_child_del(void *data,
               Evas *evas __UNUSED__,
               Evas_Object *o,
               void *einfo __UNUSED__)
 {
-   Evas_Object *example_smart = data;
+   Evas_Object *pathgen_world = data;
    long idx;
 
-   PATHGEN_WORLD_DATA_GET(example_smart, priv);
+   PATHGEN_WORLD_DATA_GET(pathgen_world, priv);
 
    idx = (long)evas_object_data_get(o, "index");
    idx--;
@@ -71,7 +97,7 @@ _on_child_del(void *data,
    priv->children[idx] = NULL;
 
    evas_object_smart_member_del(o);
-   evas_object_smart_changed(example_smart);
+   evas_object_smart_changed(pathgen_world);
 }
 
 
@@ -98,11 +124,8 @@ _pathgen_world_smart_add(Evas_Object *o)
 {
    EVAS_SMART_DATA_ALLOC(o, Pathgen_World_Data);
 
-   priv->border = evas_object_image_filled_add(evas_object_evas_get(o));
-   evas_object_image_file_set(priv->border, border_img_path, NULL);
-   evas_object_image_border_set(priv->border, 3, 3, 3, 3);
-   evas_object_image_border_center_fill_set(
-      priv->border, EVAS_BORDER_FILL_NONE);
+   priv->border = evas_object_rectangle_add(evas_object_evas_get(o));
+   evas_object_color_set(priv->border, 200, 200, 200, 255);
    evas_object_smart_member_add(priv->border, o);
 
    _pathgen_world_parent_sc->add(o);
@@ -177,17 +200,20 @@ _pathgen_world_smart_calculate(Evas_Object *o)
    evas_object_resize(priv->border, w, h);
    evas_object_move(priv->border, x, y);
 
-   if (priv->children[0])
-     {
-        evas_object_move(priv->children[0], x + 3, y + 3);
-        evas_object_resize(priv->children[0], (w / 2) - 3, (h / 2) - 3);
-     }
+   evas_object_resize(priv->children[PG_HEIGHT], w, h);
+   evas_object_move(priv->children[PG_HEIGHT], x, y);
 
-   if (priv->children[1])
-     {
-        evas_object_move(priv->children[1], x + (w / 2), y + (h / 2));
-        evas_object_resize(priv->children[1], (w / 2) - 3, (h / 2) - 3);
-     }
+//   if (priv->children[0])
+//     {
+//        evas_object_move(priv->children[0], x + 3, y + 3);
+//        evas_object_resize(priv->children[0], (w / 2) - 3, (h / 2) - 3);
+//     }
+//
+//   if (priv->children[1])
+//     {
+//        evas_object_move(priv->children[1], x + (w / 2), y + (h / 2));
+//        evas_object_resize(priv->children[1], (w / 2) - 3, (h / 2) - 3);
+//     }
 }
 
 /* setting our smart interface */
@@ -204,12 +230,34 @@ _pathgen_world_smart_set_user(Evas_Smart_Class *sc)
   sc->calculate = _pathgen_world_smart_calculate;
 }
 
+/* BEGINS example smart object's own interface */
 
 /* add a new world to canvas */
 Evas_Object *
 pathgen_world_add( Evas *evas)
 {
-   return evas_object_smart_add(evas, _pathgen_world_smart_class_new());
+   const Evas_Smart_Cb_Description **descriptions;
+   unsigned int count;
+
+   Evas_Object * world = evas_object_smart_add(evas, _pathgen_world_smart_class_new());
+
+   evas_object_smart_callbacks_descriptions_get(
+     world, &descriptions, &count, NULL, NULL);
+
+   for (; *descriptions; descriptions++)
+   {
+      fprintf(stdout, "We've found a smart callback on the smart object!"
+         "\n\tname: %s\n\ttype: %s\n", (*descriptions)->name,
+         (*descriptions)->type);
+
+      if (strcmp((*descriptions)->type, "i")) continue;
+   }
+   evas_object_smart_callback_add(
+      world, "zoom,in",
+      _pathgen_world_zoom, NULL);
+
+   
+   return world;
 }
 
 static void
@@ -231,13 +279,19 @@ pathgen_world_remove(Evas_Object *o, Evas_Object *child)
 
    PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
 
-   if (priv->children[0] != child && priv->children[1] != child)
+   int i=0;
+   while(EINA_TRUE)
    {
-      fprintf(stderr, "you are trying to remove something not belonging to"
-         " the example smart object!\n");
-      return NULL;
+      if (i > 5)
+      {
+         fprintf(stderr, "you are trying to remove something not belonging to"
+            " the example smart object!\n");
+         return NULL;
+      }
+      if (priv->children[i] == child) break;
+      i++;
    }
-
+      
    idx = (long)evas_object_data_get(child, "index");
    idx--;
 
@@ -249,4 +303,45 @@ pathgen_world_remove(Evas_Object *o, Evas_Object *child)
 
    return child;
 }
-   
+
+/* set to return any previous object set to the height of the
+ * world or NULL, if any (or on errors) */
+Evas_Object *
+pathgen_world_set_height(Evas_Object *o, Evas_Object *height)
+{
+   Evas_Object *ret;
+
+   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
+   if(!height)
+      return NULL;
+
+   if(priv->children[PG_HEIGHT] == height)
+   {
+      fprintf(stderr, "Maps must be unique objects\n");
+      return NULL;
+   }
+
+   if (priv->children[PG_HEIGHT])
+   {
+      if (priv->children[PG_HEIGHT] != height)
+      {
+         ret = priv->children[PG_HEIGHT];
+         _pathgen_world_remove_do(priv, priv->children[PG_HEIGHT], PG_HEIGHT);
+      }
+      else return height;
+   }
+
+   priv->children[PG_HEIGHT] = height;
+   _pathgen_world_child_callbacks_register(o, height, PG_HEIGHT);
+   evas_object_smart_member_add(height, o);
+   evas_object_smart_changed(o);
+
+   priv->child_count++;
+   if (!ret)
+   {
+      evas_object_smart_callback_call(
+      o, EVT_CHILDREN_NUMBER_CHANGED, (void *)(long)priv->child_count);
+   }
+
+   return ret;
+}

@@ -10,6 +10,13 @@ _on_done(void *data, Evas_Object *obj, void *event_info)
 
 /* hook on the file,chosen smart callback */
 
+static void
+_wheel( void *data, Evas *evas, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world = evas_object_name_find(evas, "world");
+   evas_object_smart_callback_call( world, EVT_ZOOM_IN, event_info);
+}
+
 static void 
 _file_chosen(void *data, Evas_Object *obj, void *event_info)
 {
@@ -22,24 +29,16 @@ _file_chosen(void *data, Evas_Object *obj, void *event_info)
       return;
    }
    Evas *evas = evas_object_evas_get(obj);
-   Evas_Object *scroller;
-   scroller = evas_object_name_find(evas, "scroller");
+   Evas_Object *world = evas_object_name_find(evas, "world");
+   Evas_Object *image, *old;
 
+   image = evas_object_image_filled_add(evas);
+   evas_object_image_file_set(image, file, NULL);
+   evas_object_image_smooth_scale_set(image, EINA_FALSE);
+   evas_object_show(image);
 
-/*   Evas_Object *image = evas_object_image_add(evas);
-   evas_object_image_file_set(image, file, "");
-   evas_object_move(image, 0, 0);
-   evas_object_image_filled_set(image, EINA_TRUE);
-   evas_object_size_hint_min_set(image, 500, 500);
-   evas_object_size_hint_align_set(image, 0.5, 0.5);
-   elm_object_content_set(scroller, image); */
-
-   Evas_Object *world;
-   world = pathgen_world_add(evas);
-//   FIXME some function to set the base object in the smart object as our image we have chosen.
-   elm_object_content_set(scroller, world);
-   
-   
+   old = pathgen_world_set_height(world, image);
+   evas_object_del(old);
 }
 
 EAPI_MAIN int
@@ -71,9 +70,18 @@ elm_main(int argc, char **argv)
    evas_object_name_set(scroll, "scroller");
    evas_object_size_hint_weight_set(scroll, 0.8, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_scroller_policy_set(scroll, ELM_SCROLLER_POLICY_ON, ELM_SCROLLER_POLICY_ON);
    elm_box_pack_start(hbox, scroll);
    evas_object_show(scroll);
+
+   evas_object_event_callback_add(scroll,
+      EVAS_CALLBACK_MOUSE_WHEEL, _wheel, NULL);
+
+   /* add our pathgen_world smart object */
+   Evas_Object *world;
+   world = pathgen_world_add(evas_object_evas_get(win));
+   evas_object_name_set(world, "world");
+   evas_object_size_hint_min_set(world, 500, 500);
+   elm_object_content_set(scroll, world);
 
    /* button divider */
    vbox = elm_box_add(win);
@@ -93,12 +101,10 @@ elm_main(int argc, char **argv)
    evas_object_show(fs_entry);
 
    evas_object_smart_callback_add(fs_entry, "file,chosen", _file_chosen, NULL);
-   // now we are done, show the window
 
+   // now we are done, show the window
    evas_object_resize(win, 400, 400);
    evas_object_show(win);
-
-   // create window(s) here and do any application init
 
    elm_run(); // run main loop
 
