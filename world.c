@@ -20,9 +20,13 @@ pathgen_world_add( Evas *evas)
 
       if (strcmp((*descriptions)->type, "i")) continue;
    }
-   evas_object_smart_callback_add(
-      world, "zoom",
-      _pathgen_world_zoom, NULL);
+
+   /* add callbacks */
+   evas_object_smart_callback_add( world, "zoom", _pathgen_world_zoom, NULL);
+
+   evas_object_smart_callback_add( world, "heat,reset", _pathgen_world_heatmap_reset, NULL);
+
+   evas_object_smart_callback_add( world, "heat,clear", _pathgen_world_heatmap_clear, NULL);
 
    
    return world;
@@ -89,20 +93,18 @@ pathgen_world_set_height(Evas_Object *o, Evas_Object *height)
       else return height;
    }
 
+   // Assign new object
    priv->children[PG_HEIGHT] = height;
    evas_object_image_size_get(height, &w, &h);
    evas_object_size_hint_min_set(o, w, h);
-
+   
+   
    _pathgen_world_child_callbacks_register(o, height, PG_HEIGHT);
    evas_object_smart_member_add(height, o);
    evas_object_smart_changed(o);
 
    priv->child_count++;
-   if (!ret)
-   {
-      evas_object_smart_callback_call(
-      o, EVT_CHILDREN_NUMBER_CHANGED, (void *)(long)priv->child_count);
-   }
+      evas_object_smart_callback_call(o, EVT_HEAT_RESET, height);
 
    return ret;
 }

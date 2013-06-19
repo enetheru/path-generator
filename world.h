@@ -4,6 +4,8 @@
 #define _pathgen_world_type "Pathgen_World"
 #define EVT_CHILDREN_NUMBER_CHANGED "children,changed"
 #define EVT_ZOOM "zoom"
+#define EVT_HEAT_RESET "heat,reset"
+#define EVT_HEAT_CLEAR "heat,clear"
 
 #define PG_BASE 0
 #define PG_HEIGHT 1
@@ -15,6 +17,8 @@
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {
    {EVT_CHILDREN_NUMBER_CHANGED, "i"},
+   {EVT_HEAT_RESET, "i"}, //deletes object and creates a now one
+   {EVT_HEAT_CLEAR, "i"}, //zeroes data
    {EVT_ZOOM, "i"},
    {NULL, NULL}
 };
@@ -77,6 +81,65 @@ _pathgen_world_zoom(
       evas_object_size_hint_min_set(o, (w+(w/mult)*info->z), (h+(h/mult)*info->z));
 }
 
+/* create a heat map object */
+static void *
+_pathgen_world_heatmap_reset(
+   void *event_data __UNUSED__,
+   Evas_Object *o,
+   void *event_info __UNUSED__)
+{
+   Evas_Object *heat, *height;
+   int w,h,i,j;
+   void *data;
+   fprintf(stderr, "heat reset callback called\n");
+
+   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
+   heat = priv->children[PG_HEAT];
+   height = priv->children[PG_HEIGHT];
+
+   if(!height)
+      return NULL;
+
+   if(heat)
+   {
+      data = evas_object_image_data_get(heat, EINA_FALSE);
+      evas_object_del(heat);
+      free(data);
+   }
+
+   /* calculate data requirements */
+   evas_object_image_size_get(height, &w, &h);
+   int *mem = malloc(w*h*4);
+   
+   heat = evas_object_image_filled_add(evas_object_evas_get(o));
+   evas_object_image_size_set(heat, w, h);
+   evas_object_image_data_set(heat, mem);
+   evas_object_show(heat);
+
+   priv->children[PG_HEAT] = heat;
+
+   for(i=0; i< w*h*4; i++)
+   {
+      j = rand() % 4;
+      if(j == 0) mem[i] = 0xFFFF0000;
+      if(j == 1) mem[i] = 0xFF00FF00;
+      if(j == 2) mem[i] = 0xFF0000FF;
+   }
+
+   return heat;
+}
+
+static void *
+_pathgen_world_heatmap_clear(
+   void *event_data __UNUSED__,
+   Evas_Object *o,
+   void *event_info __UNUSED__)
+{
+   return;
+}
+
+static void
+_clear_heat_map();
 
 static void
 _on_child_del(void *data,
@@ -200,6 +263,9 @@ _pathgen_world_smart_calculate(Evas_Object *o)
 
    evas_object_resize(priv->children[PG_HEIGHT], w, h);
    evas_object_move(priv->children[PG_HEIGHT], x, y);
+
+   evas_object_resize(priv->children[PG_HEAT], w, h);
+   evas_object_move(priv->children[PG_HEAT], x, y);
 
 //   if (priv->children[0])
 //     {
