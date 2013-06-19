@@ -67,6 +67,7 @@ Evas_Object *
 pathgen_world_set_height(Evas_Object *o, Evas_Object *height)
 {
    Evas_Object *ret;
+   int w, h;
 
    PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
    if(!height)
@@ -89,6 +90,9 @@ pathgen_world_set_height(Evas_Object *o, Evas_Object *height)
    }
 
    priv->children[PG_HEIGHT] = height;
+   evas_object_image_size_get(height, &w, &h);
+   evas_object_size_hint_min_set(o, w, h);
+
    _pathgen_world_child_callbacks_register(o, height, PG_HEIGHT);
    evas_object_smart_member_add(height, o);
    evas_object_smart_changed(o);
