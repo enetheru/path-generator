@@ -3,8 +3,7 @@
 #define __UNUSED__
 #define _pathgen_world_type "Pathgen_World"
 #define EVT_CHILDREN_NUMBER_CHANGED "children,changed"
-#define EVT_ZOOM_IN "zoom,in"
-#define EVT_ZOOM_OUT "zoom,out"
+#define EVT_ZOOM "zoom"
 
 #define PG_BASE 0
 #define PG_HEIGHT 1
@@ -16,8 +15,7 @@
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {
    {EVT_CHILDREN_NUMBER_CHANGED, "i"},
-   {EVT_ZOOM_IN, "i"},
-   {EVT_ZOOM_OUT, "i"},
+   {EVT_ZOOM, "i"},
    {NULL, NULL}
 };
 

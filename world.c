@@ -21,7 +21,7 @@ pathgen_world_add( Evas *evas)
       if (strcmp((*descriptions)->type, "i")) continue;
    }
    evas_object_smart_callback_add(
-      world, "zoom,in",
+      world, "zoom",
       _pathgen_world_zoom, NULL);
 
    

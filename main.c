@@ -14,7 +14,7 @@ static void
 _wheel( void *data, Evas *evas, Evas_Object *o, void *event_info)
 {
    Evas_Object *world = evas_object_name_find(evas, "world");
-   evas_object_smart_callback_call( world, EVT_ZOOM_IN, event_info);
+   evas_object_smart_callback_call( world, EVT_ZOOM, event_info);
 }
 
 static void 
