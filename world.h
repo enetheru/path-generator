@@ -66,6 +66,25 @@ EVAS_SMART_SUBCLASS_NEW(_pathgen_world_type, _pathgen_world,
    evas_object_smart_clipped_class_get, _smart_callbacks);
 
 static void
+_pathgen_world_remove_do(Pathgen_World_Data *priv,
+                              Evas_Object *child,
+                              int idx);
+
+/* remove child element, return its pointer( or NULL on errors) */
+Evas_Object *
+pathgen_world_remove(Evas_Object *o, Evas_Object *child);
+
+/* set to return any previous object set to the height of the
+ * world or NULL, if any (or on errors) */
+Evas_Object *
+pathgen_world_set_height(Evas_Object *o, Evas_Object *height);
+
+/* add a new world to canvas */
+Evas_Object *
+pathgen_world_add( Evas *evas);
+
+
+static void
 _pathgen_world_zoom(
    void *data __UNUSED__,
    Evas_Object *o,
@@ -102,29 +121,28 @@ _pathgen_world_heatmap_reset(
 
    if(heat)
    {
-      data = evas_object_image_data_get(heat, EINA_FALSE);
+      fprintf(stderr, "deleting old heatmap\n");
+      _pathgen_world_remove_do(priv, priv->children[PG_HEAT], PG_HEAT);
       evas_object_del(heat);
-      free(data);
    }
 
    /* calculate data requirements */
    evas_object_image_size_get(height, &w, &h);
    int *mem = malloc(w*h*4);
-   
+   // homogenise memory
+   for(i=0; i< w*h; i++) mem[i] = 0x00000000;
+
    heat = evas_object_image_filled_add(evas_object_evas_get(o));
+   evas_object_image_alpha_set(heat, EINA_TRUE);
    evas_object_image_size_set(heat, w, h);
    evas_object_image_data_set(heat, mem);
+   evas_object_image_smooth_scale_set(heat, EINA_FALSE);
    evas_object_show(heat);
 
    priv->children[PG_HEAT] = heat;
 
-   for(i=0; i< w*h*4; i++)
-   {
-      j = rand() % 4;
-      if(j == 0) mem[i] = 0xFFFF0000;
-      if(j == 1) mem[i] = 0xFF00FF00;
-      if(j == 2) mem[i] = 0xFF0000FF;
-   }
+   evas_object_smart_member_add(heat, o);
+   evas_object_smart_changed(o);
 
    return heat;
 }
@@ -296,9 +314,6 @@ _pathgen_world_smart_set_user(Evas_Smart_Class *sc)
 
 /* BEGINS example smart object's own interface */
 
-/* add a new world to canvas */
-Evas_Object *
-pathgen_world_add( Evas *evas);
 
 static void
 _pathgen_world_remove_do(Pathgen_World_Data *priv,
@@ -311,11 +326,4 @@ _pathgen_world_remove_do(Pathgen_World_Data *priv,
    evas_object_smart_member_del(child);
 }
 
-/* remove child element, return its pointer( or NULL on errors) */
-Evas_Object *
-pathgen_world_remove(Evas_Object *o, Evas_Object *child);
 
-/* set to return any previous object set to the height of the
- * world or NULL, if any (or on errors) */
-Evas_Object *
-pathgen_world_set_height(Evas_Object *o, Evas_Object *height);

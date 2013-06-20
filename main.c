@@ -1,5 +1,6 @@
 #include <Elementary.h>
 #include "world.h"
+#include "node.h"
 
 static void 
 _on_done(void *data, Evas_Object *obj, void *event_info)
@@ -101,6 +102,8 @@ elm_main(int argc, char **argv)
    evas_object_show(fs_entry);
 
    evas_object_smart_callback_add(fs_entry, "file,chosen", _file_chosen, NULL);
+
+   ecore_timer_add(1.0, simulate, NULL);
 
    // now we are done, show the window
    evas_object_resize(win, 400, 400);

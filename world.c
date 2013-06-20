@@ -24,9 +24,9 @@ pathgen_world_add( Evas *evas)
    /* add callbacks */
    evas_object_smart_callback_add( world, "zoom", _pathgen_world_zoom, NULL);
 
-   evas_object_smart_callback_add( world, "heat,reset", _pathgen_world_heatmap_reset, NULL);
+   evas_object_smart_callback_add( world, "heat,reset", (Evas_Smart_Cb) _pathgen_world_heatmap_reset, NULL);
 
-   evas_object_smart_callback_add( world, "heat,clear", _pathgen_world_heatmap_clear, NULL);
+   evas_object_smart_callback_add( world, "heat,clear", (Evas_Smart_Cb) _pathgen_world_heatmap_clear, NULL);
 
    
    return world;
