@@ -1,4 +1,5 @@
 #include <Eina.h>
+#include <Ecore.h>
 #include <limits.h>
 
 typedef struct node node;
@@ -12,7 +13,12 @@ typedef struct sim sim;
 struct sim {
    Eina_List *open, *closed;
    node *start, *fin, *best, *current;
+   Evas_Object *height;
 };
+
+typedef struct sim_step sim_step;
+struct sim_step {
+   sim *mysim
 
 node *
 node_create(node *parent, int x, int y)
@@ -66,7 +72,9 @@ Eina_Bool simulate(void *data)
       EINA_LIST_FOREACH(open, l, list_data)
       {
          current = (node *)list_data;
-         if(current->x == best->x+1
+         if(current->x == best->x+1)
+         {
+         }
       }
       EINA_LIST_FOREACH(closed, l, list_data)
       {
@@ -77,11 +85,16 @@ Eina_Bool simulate(void *data)
    return EINA_TRUE;
 }
 
-sim *
-sim_create()
+Eina_Bool sim_start(void *data)
 {
-   sim *ret = malloc(sizeof(sim));
-   ret->open = NULL;
-   ret->closed = NULL;
-   return ret;
+   sim *path;
+   path = malloc(sizeof(sim));
+   
+   
+   return EINA_TRUE;
+}
+
+Eina_Bool sim_step(void *data)
+{
+   return EINA_TRUE;
 }
