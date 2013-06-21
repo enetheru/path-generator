@@ -170,9 +170,8 @@ pathgen_path_step_next(void *data)
 
       /* change the F value based on the height map */
       int *data = pathgen_world_height_get(path->parent_map->parent_world);
-      if(data[nesw[i]->m] % 0xFF000000)nesw[i]->f=next->f+1;
-      else nesw[i]->f=next->f+10;
-//      nesw[i]->f = next->f + data[nesw[i]->m];
+      int value = data[nesw[i]->m] & 0x000000FF;
+      nesw[i]->f = next->f + (value *value * value)/100;
 
       /* add the node to the open list */
       path->open = eina_list_append(path->open, nesw[i]);

@@ -45,12 +45,14 @@ pathgen_world_add( Evas *evas)
    evas_object_image_data_set(image, data);
    evas_object_image_pixels_dirty_set(image, EINA_TRUE);
    int i = 0;
-   int number;
+   int value;
+   int blue_mask = 0x000000FF;
    for(; i < 100*100; i++)
    {
-      number = rand() % 3;
-      if(number == 0) data[i] = 0xFF000000;
-      else data[i] = 0xFFFFFFFF;
+      /* build random grey image */
+      value = rand() & blue_mask;
+      value = value | 0xFF000000 | (value * 0x00010000) | (value * 0x00000100);
+      data[i] = value;
    }
 
    /* sorting out the smart object bullshit(i think) */
