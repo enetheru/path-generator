@@ -1,4 +1,5 @@
 #include <Ecore_Evas.h>
+#include "pathgen.h"
 
 #define __UNUSED__
 #define _pathgen_world_type "Pathgen_World"
@@ -13,6 +14,7 @@
 #define PG_PATH 3
 #define PG_TELEPORT 4
 #define PG_HEAT 5
+#define PG_VISUAL 6
 
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {
@@ -32,7 +34,9 @@ typedef struct _Pathgen_World_Data Pathgen_World_Data;
 struct _Pathgen_World_Data
 {
    Evas_Object_Smart_Clipped_Data base;
-   Evas_Object *children[6], *border;
+   Evas_Object *children[7], *border;
+   Pathgen_Map *pathmap;
+   int w,h;
    int child_count;
 };
 
@@ -82,6 +86,10 @@ pathgen_world_set_height(Evas_Object *o, Evas_Object *height);
 /* add a new world to canvas */
 Evas_Object *
 pathgen_world_add( Evas *evas);
+
+/* get some attributes */
+void
+pathgen_world_size_get(Evas_Object *world, int *w, int *h);
 
 
 static void
@@ -284,6 +292,9 @@ _pathgen_world_smart_calculate(Evas_Object *o)
 
    evas_object_resize(priv->children[PG_HEAT], w, h);
    evas_object_move(priv->children[PG_HEAT], x, y);
+
+   evas_object_resize(priv->children[PG_VISUAL], w, h);
+   evas_object_move(priv->children[PG_VISUAL], x, y);
 
 //   if (priv->children[0])
 //     {

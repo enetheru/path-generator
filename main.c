@@ -1,6 +1,6 @@
 #include <Elementary.h>
 #include "world.h"
-#include "node.h"
+#include "pathgen.h"
 
 static void 
 _on_done(void *data, Evas_Object *obj, void *event_info)
@@ -103,7 +103,19 @@ elm_main(int argc, char **argv)
 
    evas_object_smart_callback_add(fs_entry, "file,chosen", _file_chosen, NULL);
 
-   ecore_timer_add(1.0, simulate, NULL);
+   /* new pathmap */
+   Pathgen_Map *pathmap = pathgen_map_create(world);
+   pathgen_world_pathmap_set(world, pathmap);
+
+   /* create start and end points */
+   Pathgen_Node *start = pathgen_node_create(pathmap, NULL, 10, 10, 0);
+   Pathgen_Node *end = pathgen_node_create(pathmap, NULL, 50, 50, 0);
+
+   /* new path */
+   Pathgen_Path *path = pathgen_path_create(pathmap, start, end);
+
+   /* walk the path */
+   ecore_timer_add(2.0, pathgen_path_walk, path);
 
    // now we are done, show the window
    evas_object_resize(win, 400, 400);
