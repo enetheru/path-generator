@@ -91,6 +91,10 @@ pathgen_world_add( Evas *evas);
 void
 pathgen_world_size_get(Evas_Object *world, int *w, int *h);
 
+/* get the image data for the heightmap */
+void *
+pathgen_world_height_get(Evas_Object *world);
+
 
 static void
 _pathgen_world_zoom(
@@ -98,7 +102,7 @@ _pathgen_world_zoom(
    Evas_Object *o,
    void *event_info )
 {
-   int w,h, mult = 10;
+   int w,h, mult = -10;
    Evas_Event_Mouse_Wheel *info = event_info;
 
    evas_object_geometry_get(o, NULL, NULL, &w, &h);

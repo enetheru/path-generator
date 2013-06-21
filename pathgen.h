@@ -11,7 +11,7 @@ typedef struct pathgen_path Pathgen_Path;
 typedef struct pathgen_node Pathgen_Node;
 
 struct pathgen_map {
-   Evas_Object *world;
+   Evas_Object *parent_world;
    Evas_Object *visual;
    Evas_Object *result;
    int w,h;
@@ -19,9 +19,10 @@ struct pathgen_map {
 
 struct pathgen_path {
    Pathgen_Map *parent_map;// the pathmap that this path belongs to
-   Pathgen_Node *start, *end;
+   Pathgen_Node *start, *end, *current;
    Eina_List *open, *closed;
-   int step_counter;
+   int step_counter, step_count;
+   float step_speed;
 };
 
 struct pathgen_node {

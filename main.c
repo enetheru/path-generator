@@ -113,12 +113,14 @@ elm_main(int argc, char **argv)
 
    /* new path */
    Pathgen_Path *path = pathgen_path_create(pathmap, start, end);
+   path->step_count = 10000;
+   path->step_speed = 0.0001;
 
    /* walk the path */
    ecore_timer_add(2.0, pathgen_path_walk, path);
 
    // now we are done, show the window
-   evas_object_resize(win, 400, 400);
+   evas_object_resize(win, 800, 600);
    evas_object_show(win);
 
    elm_run(); // run main loop

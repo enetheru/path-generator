@@ -177,7 +177,7 @@ pathgen_world_pathmap_set(Evas_Object *world, Pathgen_Map *map)
    priv->children[PG_VISUAL] = map->visual;
 
    //set the map to have the world as parent
-   map->world = world;
+   map->parent_world = world;
    
    
    _pathgen_world_child_callbacks_register(world, map->visual, PG_VISUAL);
@@ -188,4 +188,12 @@ pathgen_world_pathmap_set(Evas_Object *world, Pathgen_Map *map)
 
    return ret;
  
+}
+
+void *
+pathgen_world_height_get(Evas_Object *world)
+{
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   void * data = evas_object_image_data_get(priv->children[PG_HEIGHT], EINA_FALSE);
+   return data;
 }
