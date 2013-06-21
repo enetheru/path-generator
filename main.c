@@ -156,8 +156,8 @@ elm_main(int argc, char **argv)
    pathgen_world_pathmap_set(world, pathmap);
 
    /* create start and end points */
-   Pathgen_Node *start = pathgen_node_create(pathmap, NULL, 10, 10, 0);
-   Pathgen_Node *end = pathgen_node_create(pathmap, NULL, 50, 50, 0);
+   Pathgen_Node *start = pathgen_node_create(pathmap, NULL, rand() % 100,rand() % 100, 0);
+   Pathgen_Node *end = pathgen_node_create(pathmap, NULL, rand() % 100, rand() % 100, 0);
 
    /* new path */
    Pathgen_Path *path = pathgen_path_create(pathmap, start, end);

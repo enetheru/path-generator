@@ -156,9 +156,9 @@ pathgen_path_step_next(void *data)
          continue;
       }
       /* if it is out of bounds, skip */
-           if(next->x+1 > path->parent_map->w) continue;
+           if(next->x+1 > path->parent_map->w-1) continue;
       else if(next->x-1 < 0) continue;
-      else if(next->y+1 > path->parent_map->h) continue;
+      else if(next->y+1 > path->parent_map->h-1) continue;
       else if(next->y-1 < 0) continue;
       /* setup new coordinates changes */
               if(i==0){ x = next->x  ; y = next->y-1;}//north
