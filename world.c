@@ -4,22 +4,7 @@
 Evas_Object *
 pathgen_world_add( Evas *evas)
 {
-   const Evas_Smart_Cb_Description **descriptions;
-   unsigned int count;
-
    Evas_Object * world = evas_object_smart_add(evas, _pathgen_world_smart_class_new());
-
-   evas_object_smart_callbacks_descriptions_get(
-     world, &descriptions, &count, NULL, NULL);
-
-   for (; *descriptions; descriptions++)
-   {
-      fprintf(stdout, "We've found a smart callback on the smart object!"
-         "\n\tname: %s\n\ttype: %s\n", (*descriptions)->name,
-         (*descriptions)->type);
-
-      if (strcmp((*descriptions)->type, "i")) continue;
-   }
 
    /* add callbacks */
    evas_object_smart_callback_add( world, "zoom", _pathgen_world_zoom, NULL);
