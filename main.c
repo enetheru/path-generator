@@ -18,6 +18,27 @@ _wheel( void *data, Evas *evas, Evas_Object *o, void *event_info)
    evas_object_smart_callback_call( world, EVT_ZOOM, event_info);
 }
 
+static void
+_btn_sim_start(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "want to start sim\n");
+   return;
+}
+
+static void
+_btn_sim_stop(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "want to stop sim\n");
+   return;
+}
+
+static void
+_btn_sim_reset(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "want to reset sim\n");
+   return;
+}
+
 static void 
 _file_chosen(void *data, Evas_Object *obj, void *event_info)
 {
@@ -102,6 +123,33 @@ elm_main(int argc, char **argv)
    evas_object_show(fs_entry);
 
    evas_object_smart_callback_add(fs_entry, "file,chosen", _file_chosen, NULL);
+
+   /* add button to start sim */
+   btn = elm_button_add(win);
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(btn, "Start Sim");
+   elm_box_pack_end(vbox, btn);
+   evas_object_show(btn);
+
+   evas_object_smart_callback_add(btn, "clicked", _btn_sim_start, NULL);
+
+   /* add button to Stop sim */
+   btn = elm_button_add(win);
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(btn, "Stop Sim");
+   elm_box_pack_end(vbox, btn);
+   evas_object_show(btn);
+
+   evas_object_smart_callback_add(btn, "clicked", _btn_sim_stop, NULL);
+
+   /* add button to reset sim */
+   btn = elm_button_add(win);
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(btn, "Reset Sim");
+   elm_box_pack_end(vbox, btn);
+   evas_object_show(btn);
+
+   evas_object_smart_callback_add(btn, "clicked", _btn_sim_reset, NULL);
 
    /* new pathmap */
    Pathgen_Map *pathmap = pathgen_map_create(world);
