@@ -13,7 +13,14 @@ pathgen_world_add( Evas *evas)
 
    evas_object_smart_callback_add( world, "heat,clear", (Evas_Smart_Cb) _pathgen_world_heatmap_clear, NULL);
 
+   /* get the private data struct */
    PATHGEN_WORLD_DATA_GET(world, priv);
+
+   /* add the background object */
+   priv->border = evas_object_rectangle_add(evas);
+   evas_object_color_set(priv->border, 200, 200, 200, 255);
+   evas_object_smart_member_add(priv->border, world);
+
    /* create default 100x100 randomly generated maze */
    Evas_Object *image = evas_object_image_filled_add(evas);
    evas_object_name_set(image, "maze");

@@ -214,11 +214,6 @@ static void
 _pathgen_world_smart_add(Evas_Object *o)
 {
    EVAS_SMART_DATA_ALLOC(o, Pathgen_World_Data);
-
-   priv->border = evas_object_rectangle_add(evas_object_evas_get(o));
-   evas_object_color_set(priv->border, 200, 200, 200, 255);
-   evas_object_smart_member_add(priv->border, o);
-
    _pathgen_world_parent_sc->add(o);
 }
 
