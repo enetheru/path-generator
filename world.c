@@ -7,11 +7,24 @@ pathgen_world_add( Evas *evas)
    Evas_Object * world = evas_object_smart_add(evas, _pathgen_world_smart_class_new());
 
    /* add callbacks */
-   evas_object_smart_callback_add( world, "zoom", _pathgen_world_zoom, NULL);
+   evas_object_smart_callback_add( world, "zoom",
+      _pathgen_world_zoom, NULL);
 
-   evas_object_smart_callback_add( world, "heat,reset", (Evas_Smart_Cb) _pathgen_world_heatmap_reset, NULL);
+   evas_object_smart_callback_add( world, "heat,reset",
+      (Evas_Smart_Cb) _pathgen_world_heatmap_reset, NULL);
 
-   evas_object_smart_callback_add( world, "heat,clear", (Evas_Smart_Cb) _pathgen_world_heatmap_clear, NULL);
+   evas_object_smart_callback_add( world, "heat,clear",
+      (Evas_Smart_Cb) _pathgen_world_heatmap_clear, NULL);
+
+   /* add callbacks to sim start/stop/reset functions */
+   evas_object_smart_callback_add( world, "sim,start",
+      (Evas_Smart_Cb) _pathgen_sim_start, NULL);
+
+   evas_object_smart_callback_add( world, "sim,stop",
+      (Evas_Smart_Cb) _pathgen_sim_stop, NULL);
+
+   evas_object_smart_callback_add( world, "sim,reset",
+      (Evas_Smart_Cb) _pathgen_sim_reset, NULL);
 
    /* get the private data struct */
    PATHGEN_WORLD_DATA_GET(world, priv);

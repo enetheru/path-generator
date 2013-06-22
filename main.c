@@ -21,6 +21,8 @@ _wheel( void *data, Evas *evas, Evas_Object *o, void *event_info)
 static void
 _btn_sim_start(void *data, Evas_Object *o, void *event_info)
 {
+   Evas_Object *world = evas_object_name_find(evas_object_evas_get(o), "world");
+   evas_object_smart_callback_call( world, EVT_SIM_START, event_info);
    fprintf(stderr, "want to start sim\n");
    return;
 }
@@ -154,18 +156,6 @@ elm_main(int argc, char **argv)
    /* new pathmap */
    Pathgen_Map *pathmap = pathgen_map_create(world);
    pathgen_world_pathmap_set(world, pathmap);
-
-   /* create start and end points */
-   Pathgen_Node *start = pathgen_node_create(pathmap, NULL, rand() % 100,rand() % 100, 0);
-   Pathgen_Node *end = pathgen_node_create(pathmap, NULL, rand() % 100, rand() % 100, 0);
-
-   /* new path */
-   Pathgen_Path *path = pathgen_path_create(pathmap, start, end);
-   path->step_count = 10000;
-   path->step_speed = 0.0001;
-
-   /* walk the path */
-   ecore_timer_add(2.0, pathgen_path_walk, path);
 
    // now we are done, show the window
    evas_object_resize(win, 800, 600);

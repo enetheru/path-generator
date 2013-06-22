@@ -7,6 +7,9 @@
 #define EVT_ZOOM "zoom"
 #define EVT_HEAT_RESET "heat,reset"
 #define EVT_HEAT_CLEAR "heat,clear"
+#define EVT_SIM_START "sim,start"
+#define EVT_SIM_STOP "sim,stop"
+#define EVT_SIM_RESET "sim,reset"
 
 #define PG_BASE 0
 #define PG_HEIGHT 1
@@ -22,6 +25,9 @@ static const Evas_Smart_Cb_Description _smart_callbacks[] =
    {EVT_HEAT_RESET, "i"}, //deletes object and creates a now one
    {EVT_HEAT_CLEAR, "i"}, //zeroes data
    {EVT_ZOOM, "i"},
+   {EVT_SIM_START, "i"},
+   {EVT_SIM_STOP, "i"},
+   {EVT_SIM_RESET, "i"},
    {NULL, NULL}
 };
 
@@ -95,6 +101,42 @@ pathgen_world_size_get(Evas_Object *world, int *w, int *h);
 void *
 pathgen_world_height_get(Evas_Object *world);
 
+static void
+_pathgen_sim_start( void *data, Evas_Object *o, void *event_info )
+{
+   fprintf(stderr, "want to start sim\n");
+   PATHGEN_WORLD_DATA_GET(o, priv);
+
+   /* create start and end points */
+   Pathgen_Node *start =
+      pathgen_node_create(priv->pathmap, NULL, rand() % 100,rand() % 100, 0);
+   Pathgen_Node *end =
+      pathgen_node_create(priv->pathmap, NULL, rand() % 100, rand() % 100, 0);
+
+   /* new path */
+   Pathgen_Path *path = pathgen_path_create(priv->pathmap, start, end);
+   path->step_count = 10000;
+   path->step_speed = 0.0001;
+
+   /* walk the path */
+   ecore_timer_add(2.0, pathgen_path_walk, path);
+
+   return;
+}
+
+static void
+_pathgen_sim_stop( void *data, Evas_Object *o, void *event_info )
+{
+   fprintf(stderr, "want to stop sim\n");
+   return;
+}
+
+static void
+_pathgen_sim_reset( void *data, Evas_Object *o, void *event_info )
+{
+   fprintf(stderr, "want to reset sim\n");
+   return;
+}
 
 static void
 _pathgen_world_zoom(
