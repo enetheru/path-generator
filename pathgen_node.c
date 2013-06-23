@@ -14,7 +14,7 @@ pathgen_node_create(Pathgen_Map *parent_map, Pathgen_Node *parent_node, int x, i
 }
 
 void
-_pathgen_node_paint(Pathgen_Node *node, int color)
+pathgen_node_paint(Pathgen_Node *node, int color)
 {
    Pathgen_Map *map = node->parent_map;
    int *data = (int *)evas_object_image_data_get(map->visual, EINA_TRUE);

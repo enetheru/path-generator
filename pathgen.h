@@ -7,7 +7,4 @@
 #include "pathgen_map.h"
 #include "pathgen_path.h"
 #include "pathgen_node.h"
-
-
-
 #endif

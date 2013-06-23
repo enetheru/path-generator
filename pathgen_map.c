@@ -1,7 +1,7 @@
 #include "pathgen_map.h"
 
 Pathgen_Map *
-_pathgen_map_create(Evas_Object *world)
+pathgen_map_create(Evas_Object *world)
 {
    if(!world)return NULL;
    Pathgen_Map *map = malloc(sizeof(Pathgen_Map));

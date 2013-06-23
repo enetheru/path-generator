@@ -7,9 +7,9 @@ pathgen_path_create(Pathgen_Map *map, Pathgen_Node *start, Pathgen_Node *end)
    path->parent_map = map;
 
    path->start = start;
-   _pathgen_node_paint(start, 0xFF00FF00);
+   pathgen_node_paint(start, 0xFF00FF00);
    path->end = end;
-   _pathgen_node_paint(end, 0xFF0000FF);
+   pathgen_node_paint(end, 0xFF0000FF);
 
    path->open = NULL;
    path->open = eina_list_append(path->open, path->start);
@@ -70,7 +70,7 @@ pathgen_path_step_next(void *data)
    /* move the node to the closed list */
    path->open = eina_list_remove(path->open, next);
    path->closed = eina_list_append(path->closed, next);
-   _pathgen_node_paint(next, 0x88000000);
+   pathgen_node_paint(next, 0x88000000);
 
    /* examine the neighbours */
    /* clear any data */
@@ -126,7 +126,7 @@ pathgen_path_step_next(void *data)
       path->open = eina_list_append(path->open, nesw[i]);
 
       /* paint the node */
-      _pathgen_node_paint(nesw[i], 0x88008888);
+      pathgen_node_paint(nesw[i], 0x88008888);
    }
    
    evas_object_image_pixels_dirty_set(path->parent_map->visual, EINA_TRUE);
@@ -141,7 +141,7 @@ pathgen_path_step_trace(void *data)
    Pathgen_Path *path = (Pathgen_Path *)data;
    if(path->current != path->start)
    {
-      _pathgen_node_paint(path->current, 0xFFFF00FF);
+      pathgen_node_paint(path->current, 0xFFFF00FF);
       path->current = path->current->parent_node;
    }
    else return EINA_FALSE;
