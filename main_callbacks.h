@@ -61,3 +61,10 @@ _file_chosen(void *data, Evas_Object *obj, void *event_info)
    evas_object_del(old);
 }
 
+static void
+_btn_generate(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "want to generate world\n");
+   Evas_Object *world = evas_object_name_find(evas_object_evas_get(o), "world");
+   evas_object_smart_callback_call( world, EVT_WORLD_GENERATE, event_info);
+}

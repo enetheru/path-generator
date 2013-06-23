@@ -27,6 +27,9 @@ pathgen_world_add( Evas *evas)
    evas_object_smart_callback_add( world, "sim,reset",
       (Evas_Smart_Cb) _pathgen_sim_reset, NULL);
 
+   evas_object_smart_callback_add( world, "world,generate",
+      (Evas_Smart_Cb) _pathgen_world_generate, NULL);
+
    /* get the private data struct */
    PATHGEN_WORLD_DATA_GET(world, priv);
 
@@ -205,3 +208,128 @@ pathgen_world_height_get(Evas_Object *world)
    void * data = evas_object_image_data_get(priv->children[PG_HEIGHT], EINA_FALSE);
    return data;
 }
+
+
+/************************
+* World Smart Callbacks *
+************************/
+
+static void
+_pathgen_world_generate( void *data, Evas_Object *o, void *event_info )
+{
+   fprintf(stderr, "generating world\n");
+   return;
+}
+
+static void
+_pathgen_world_zoom(
+   void *data __UNUSED__,
+   Evas_Object *o,
+   void *event_info )
+{
+   int w,h, mult = -10;
+   Evas_Event_Mouse_Wheel *info = event_info;
+
+   evas_object_geometry_get(o, NULL, NULL, &w, &h);
+
+   if(evas_key_modifier_is_set(info->modifiers, "Alt"))mult=100;
+   if(evas_key_modifier_is_set(info->modifiers, "Control"))
+      evas_object_size_hint_min_set(o, (w+(w/mult)*info->z), (h+(h/mult)*info->z));
+}
+
+/* create a heat map object */
+static void *
+_pathgen_world_heatmap_reset(
+   void *event_data __UNUSED__,
+   Evas_Object *o,
+   void *event_info __UNUSED__)
+{
+   Evas_Object *heat, *height;
+   int w,h,i,j;
+   void *data;
+   fprintf(stderr, "heat reset callback called\n");
+
+   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
+   heat = priv->children[PG_HEAT];
+   height = priv->children[PG_HEIGHT];
+
+   if(!height)
+      return NULL;
+
+   if(heat)
+   {
+      fprintf(stderr, "deleting old heatmap\n");
+      _pathgen_world_remove_do(priv, priv->children[PG_HEAT], PG_HEAT);
+      evas_object_del(heat);
+   }
+
+   /* calculate data requirements */
+   evas_object_image_size_get(height, &w, &h);
+   int *mem = malloc(w*h*4);
+   // homogenise memory
+   for(i=0; i< w*h; i++) mem[i] = 0x00000000;
+
+   heat = evas_object_image_filled_add(evas_object_evas_get(o));
+   evas_object_image_alpha_set(heat, EINA_TRUE);
+   evas_object_image_size_set(heat, w, h);
+   evas_object_image_data_set(heat, mem);
+   evas_object_image_smooth_scale_set(heat, EINA_FALSE);
+   evas_object_show(heat);
+
+   priv->children[PG_HEAT] = heat;
+
+   evas_object_smart_member_add(heat, o);
+   evas_object_smart_changed(o);
+
+   return heat;
+}
+
+static void *
+_pathgen_world_heatmap_clear(
+   void *event_data __UNUSED__,
+   Evas_Object *o,
+   void *event_info __UNUSED__)
+{
+   return;
+}
+
+/**********************
+* Sim Smart Callbacks *
+***********************/
+static void
+_pathgen_sim_start( void *data, Evas_Object *o, void *event_info )
+{
+   fprintf(stderr, "want to start sim\n");
+   PATHGEN_WORLD_DATA_GET(o, priv);
+
+   /* create start and end points */
+   Pathgen_Node *start =
+      pathgen_node_create(priv->pathmap, NULL, rand() % 100,rand() % 100, 0);
+   Pathgen_Node *end =
+      pathgen_node_create(priv->pathmap, NULL, rand() % 100, rand() % 100, 0);
+
+   /* new path */
+   Pathgen_Path *path = pathgen_path_create(priv->pathmap, start, end);
+   path->step_count = 10000;
+   path->step_speed = 0.0001;
+
+   /* walk the path */
+   ecore_timer_add(2.0, pathgen_path_walk, path);
+
+   return;
+}
+
+static void
+_pathgen_sim_stop( void *data, Evas_Object *o, void *event_info )
+{
+   fprintf(stderr, "want to stop sim\n");
+   return;
+}
+
+static void
+_pathgen_sim_reset( void *data, Evas_Object *o, void *event_info )
+{
+   fprintf(stderr, "want to reset sim\n");
+   return;
+}
+

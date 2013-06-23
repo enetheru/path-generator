@@ -1,13 +1,14 @@
 #include <Elementary.h>
 #include "world.h"
 #include "pathgen.h"
-#include "mail_callbacks.h"
+#include "main_callbacks.h"
 
 EAPI_MAIN int
 
 elm_main(int argc, char **argv)
 {
-   Evas_Object *win, *bg, *vbox, *hbox, *fs_entry, *sep, *btn, *scroll;
+   Evas_Object *win, *bg, *vbox, *hbox, *fs_entry, *sep, *btn, *scroll,
+      *label;
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
    elm_win_title_set(win, "path-generator");
@@ -48,21 +49,16 @@ elm_main(int argc, char **argv)
    /* button divider */
    vbox = elm_box_add(win);
    evas_object_size_hint_weight_set(vbox, 0.2, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, 0.0);
    elm_box_homogeneous_set(vbox, EINA_TRUE);
    elm_box_pack_end(hbox, vbox);
    evas_object_show(vbox);
 
-   /* file selector entry */
-   fs_entry = elm_fileselector_entry_add(win);
-   evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
-   elm_fileselector_entry_path_set(fs_entry, "select height map");
-   elm_fileselector_entry_expandable_set(fs_entry, EINA_FALSE);
-   elm_object_text_set(fs_entry, "Select height map");
-   elm_box_pack_end(vbox, fs_entry);
-   evas_object_show(fs_entry);
-
-   evas_object_smart_callback_add(fs_entry, "file,chosen", _file_chosen, NULL);
+   /* == Begin SIM Options == */
+   label = elm_label_add(win);
+   elm_object_text_set(label, "Sim Options");
+   elm_box_pack_end(vbox, label);
+   evas_object_show(label);
 
    /* add button to start sim */
    btn = elm_button_add(win);
@@ -77,8 +73,8 @@ elm_main(int argc, char **argv)
    btn = elm_button_add(win);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(btn, "Stop Sim");
-   elm_box_pack_end(vbox, btn);
-   evas_object_show(btn);
+//   elm_box_pack_end(vbox, btn);
+//   evas_object_show(btn);
 
    evas_object_smart_callback_add(btn, "clicked", _btn_sim_stop, NULL);
 
@@ -86,10 +82,45 @@ elm_main(int argc, char **argv)
    btn = elm_button_add(win);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(btn, "Reset Sim");
+//   elm_box_pack_end(vbox, btn);
+//   evas_object_show(btn);
+
+   evas_object_smart_callback_add(btn, "clicked", _btn_sim_reset, NULL);
+
+   /* == Begin World Options == */
+   label = elm_label_add(win);
+   elm_object_text_set(label, "World Options");
+   elm_box_pack_end(vbox, label);
+   evas_object_show(label);
+   
+
+   /* file selector entry */
+   fs_entry = elm_fileselector_entry_add(win);
+   evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
+   elm_fileselector_entry_path_set(fs_entry, "select height map");
+   elm_fileselector_entry_expandable_set(fs_entry, EINA_FALSE);
+   elm_object_text_set(fs_entry, "Select height map");
+   elm_box_pack_end(vbox, fs_entry);
+   evas_object_show(fs_entry);
+
+   evas_object_smart_callback_add(fs_entry, "file,chosen", _file_chosen, NULL);
+
+   /* == Begin WorldGen Options == */
+   label = elm_label_add(win);
+   elm_object_text_set(label, "World Generation Options");
+   elm_box_pack_end(vbox, label);
+   evas_object_show(label);
+
+   /* add button to reset sim */
+   btn = elm_button_add(win);
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(btn, "Generate Random World");
    elm_box_pack_end(vbox, btn);
    evas_object_show(btn);
 
-   evas_object_smart_callback_add(btn, "clicked", _btn_sim_reset, NULL);
+   evas_object_smart_callback_add(btn, "clicked", _btn_generate, NULL);
+
+
 
    /* new pathmap */
    Pathgen_Map *pathmap = pathgen_map_create(world);

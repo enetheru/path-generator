@@ -10,6 +10,7 @@
 #define EVT_SIM_START "sim,start"
 #define EVT_SIM_STOP "sim,stop"
 #define EVT_SIM_RESET "sim,reset"
+#define EVT_WORLD_GENERATE "world,generate"
 
 #define PG_BASE 0
 #define PG_HEIGHT 1
@@ -28,6 +29,7 @@ static const Evas_Smart_Cb_Description _smart_callbacks[] =
    {EVT_SIM_START, "i"},
    {EVT_SIM_STOP, "i"},
    {EVT_SIM_RESET, "i"},
+   {EVT_WORLD_GENERATE, "i"},
    {NULL, NULL}
 };
 
@@ -75,143 +77,56 @@ EVAS_SMART_SUBCLASS_NEW(_pathgen_world_type, _pathgen_world,
    Evas_Smart_Class, Evas_Smart_Class,
    evas_object_smart_clipped_class_get, _smart_callbacks);
 
-static void
-_pathgen_world_remove_do(Pathgen_World_Data *priv,
-                              Evas_Object *child,
-                              int idx);
+/************************
+* World Functions *
+************************/
+Evas_Object *
+pathgen_world_add( Evas *evas);
+void *
+pathgen_world_height_get(Evas_Object *world);
+void
+pathgen_world_size_get(Evas_Object *world, int *w, int *h);
+Evas_Object *
+pathgen_world_set_height(Evas_Object *o, Evas_Object *height);
 
 /* remove child element, return its pointer( or NULL on errors) */
 Evas_Object *
 pathgen_world_remove(Evas_Object *o, Evas_Object *child);
 
-/* set to return any previous object set to the height of the
- * world or NULL, if any (or on errors) */
-Evas_Object *
-pathgen_world_set_height(Evas_Object *o, Evas_Object *height);
+static void
+_pathgen_world_remove_do(Pathgen_World_Data *priv,
+   Evas_Object *child, int idx);
 
-/* add a new world to canvas */
-Evas_Object *
-pathgen_world_add( Evas *evas);
-
-/* get some attributes */
-void
-pathgen_world_size_get(Evas_Object *world, int *w, int *h);
-
-/* get the image data for the heightmap */
-void *
-pathgen_world_height_get(Evas_Object *world);
+/************************
+* World Smart Callbacks *
+************************/
+static void
+_pathgen_world_generate( void *data, Evas_Object *o, void *event_info );
 
 static void
-_pathgen_sim_start( void *data, Evas_Object *o, void *event_info )
-{
-   fprintf(stderr, "want to start sim\n");
-   PATHGEN_WORLD_DATA_GET(o, priv);
+_pathgen_world_zoom( void *data, Evas_Object *o, void *event_info );
 
-   /* create start and end points */
-   Pathgen_Node *start =
-      pathgen_node_create(priv->pathmap, NULL, rand() % 100,rand() % 100, 0);
-   Pathgen_Node *end =
-      pathgen_node_create(priv->pathmap, NULL, rand() % 100, rand() % 100, 0);
-
-   /* new path */
-   Pathgen_Path *path = pathgen_path_create(priv->pathmap, start, end);
-   path->step_count = 10000;
-   path->step_speed = 0.0001;
-
-   /* walk the path */
-   ecore_timer_add(2.0, pathgen_path_walk, path);
-
-   return;
-}
-
-static void
-_pathgen_sim_stop( void *data, Evas_Object *o, void *event_info )
-{
-   fprintf(stderr, "want to stop sim\n");
-   return;
-}
-
-static void
-_pathgen_sim_reset( void *data, Evas_Object *o, void *event_info )
-{
-   fprintf(stderr, "want to reset sim\n");
-   return;
-}
-
-static void
-_pathgen_world_zoom(
-   void *data __UNUSED__,
-   Evas_Object *o,
-   void *event_info )
-{
-   int w,h, mult = -10;
-   Evas_Event_Mouse_Wheel *info = event_info;
-
-   evas_object_geometry_get(o, NULL, NULL, &w, &h);
-
-   if(evas_key_modifier_is_set(info->modifiers, "Alt"))mult=100;
-   if(evas_key_modifier_is_set(info->modifiers, "Control"))
-      evas_object_size_hint_min_set(o, (w+(w/mult)*info->z), (h+(h/mult)*info->z));
-}
-
-/* create a heat map object */
 static void *
 _pathgen_world_heatmap_reset(
-   void *event_data __UNUSED__,
-   Evas_Object *o,
-   void *event_info __UNUSED__)
-{
-   Evas_Object *heat, *height;
-   int w,h,i,j;
-   void *data;
-   fprintf(stderr, "heat reset callback called\n");
-
-   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
-   heat = priv->children[PG_HEAT];
-   height = priv->children[PG_HEIGHT];
-
-   if(!height)
-      return NULL;
-
-   if(heat)
-   {
-      fprintf(stderr, "deleting old heatmap\n");
-      _pathgen_world_remove_do(priv, priv->children[PG_HEAT], PG_HEAT);
-      evas_object_del(heat);
-   }
-
-   /* calculate data requirements */
-   evas_object_image_size_get(height, &w, &h);
-   int *mem = malloc(w*h*4);
-   // homogenise memory
-   for(i=0; i< w*h; i++) mem[i] = 0x00000000;
-
-   heat = evas_object_image_filled_add(evas_object_evas_get(o));
-   evas_object_image_alpha_set(heat, EINA_TRUE);
-   evas_object_image_size_set(heat, w, h);
-   evas_object_image_data_set(heat, mem);
-   evas_object_image_smooth_scale_set(heat, EINA_FALSE);
-   evas_object_show(heat);
-
-   priv->children[PG_HEAT] = heat;
-
-   evas_object_smart_member_add(heat, o);
-   evas_object_smart_changed(o);
-
-   return heat;
-}
+   void *event_data, Evas_Object *o, void *event_info);
 
 static void *
 _pathgen_world_heatmap_clear(
-   void *event_data __UNUSED__,
-   Evas_Object *o,
-   void *event_info __UNUSED__)
-{
-   return;
-}
+   void *event_data, Evas_Object *o, void *event_info);
+
+
+/**********************
+* Sim Smart Callbacks *
+***********************/
 
 static void
-_clear_heat_map();
+_pathgen_sim_start( void *data, Evas_Object *o, void *event_info );
+
+static void
+_pathgen_sim_stop( void *data, Evas_Object *o, void *event_info );
+
+static void
+_pathgen_sim_reset( void *data, Evas_Object *o, void *event_info );
 
 static void
 _on_child_del(void *data,
