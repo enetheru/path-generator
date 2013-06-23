@@ -1,55 +1,4 @@
-#include "pathgen.h"
-
-//#define VERBOSE
-
-Pathgen_Map *
-pathgen_map_create(Evas_Object *world)
-{
-   if(!world)return NULL;
-   Pathgen_Map *map = malloc(sizeof(Pathgen_Map));
-
-   pathgen_world_size_get(world, &map->w, &map->h);
-
-   /* create image for visual */
-   map->visual = evas_object_image_filled_add(evas_object_evas_get(world));
-   evas_object_image_size_set(map->visual, map->w, map->h);
-   evas_object_image_smooth_scale_set(map->visual, EINA_FALSE);
-   evas_object_image_alpha_set(map->visual, EINA_TRUE);
-   evas_object_show(map->visual);
-
-   /* create data */
-   int *data = malloc(map->w * map->h *4);
-   evas_object_image_data_set(map->visual, data);
-   evas_object_image_pixels_dirty_set(map->visual, EINA_TRUE);
-   int i=0;
-   int number;
-   for(; i < map->w * map->h; i++)
-   {
-      data[i] = 0x00000000;
-   }
-   evas_object_resize(map->visual, 100, 100);
-
-   return map;
-}
-
-Eina_Bool
-pathgen_pathmap_del(Pathgen_Map *map)
-{
-   return EINA_TRUE;
-}
-
-Pathgen_Node *
-pathgen_node_create(Pathgen_Map *parent_map, Pathgen_Node *parent_node, int x, int y, int f)
-{
-   Pathgen_Node *n = malloc(sizeof(Pathgen_Node));
-   n->parent_map = (Pathgen_Map *)parent_map;
-   n->parent_node = (Pathgen_Node *)parent_node;
-   n->x = x;
-   n->y = y;
-   n->m = x + parent_map->w * y;
-   n->f = f;
-   return n;
-}
+#include "pathgen_path.h"
 
 Pathgen_Path *
 pathgen_path_create(Pathgen_Map *map, Pathgen_Node *start, Pathgen_Node *end)
@@ -203,31 +152,6 @@ pathgen_path_step_trace(void *data)
    return EINA_TRUE;
 }
 
-static void
-_pathgen_node_paint(Pathgen_Node *node, int color)
-{
-   Pathgen_Map *map = node->parent_map;
-   int *data = (int *)evas_object_image_data_get(map->visual, EINA_TRUE);
-   data[node->m] = color;
-}
-
-void
-pathgen_map_info(Pathgen_Map *map)
-{
-   fprintf(stderr,
-      "==== Map Info ====\n"
-      "Address\t%p\n"
-      "visual\t%p\n"
-      "world\t%p\n"
-      "size\t%ix%i\n",
-      map,
-      map->visual,
-      map->parent_world,
-      map->w, map->h);
-
-   return;
-}
-
 void
 pathgen_path_info(Pathgen_Path *path)
 {
@@ -244,13 +168,4 @@ pathgen_path_info(Pathgen_Path *path)
    return;
 }
 
-void
-pathgen_node_info(Pathgen_Node *node, char *prefix)
-{
-#ifdef VERBOSE
-   fprintf(stderr, "%sn:%p, %p, %p, (%3i,%3i), m:%6i, f:%lo\n", prefix,
-      node->parent_map, node->parent_node, node,
-      node->x, node->y, node->m, node->f);      
-#endif
-   return;
-}
+

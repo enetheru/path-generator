@@ -1,4 +1,5 @@
 #include "world.h"
+#include "pathgen_map.h"
 
 /* add a new world to canvas */
 Evas_Object *
