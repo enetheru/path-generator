@@ -104,9 +104,6 @@ _pathgen_world_remove_do(Pathgen_World_Data *priv,
 * World Smart Callbacks *
 ************************/
 static void
-_pathgen_world_generate( void *data, Evas_Object *world, void *event_info );
-
-static void
 _pathgen_world_zoom( void *data, Evas_Object *o, void *event_info );
 
 static void *

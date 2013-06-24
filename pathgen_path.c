@@ -62,7 +62,7 @@ pathgen_path_step_next(void *data)
       fprintf(stderr, "Goal reached.\n");
       path->end->parent_node = next->parent_node;
       path->current = path->end;
-      ecore_timer_add(path->step_speed*10, pathgen_path_step_trace, path);
+      ecore_timer_add(path->step_speed*5, pathgen_path_step_trace, path);
       return EINA_FALSE;
    }
 
@@ -143,10 +143,15 @@ pathgen_path_step_trace(void *data)
       pathgen_node_paint(path->current, 0xFFFF00FF);
       path->current = path->current->parent_node;
    }
-   else return EINA_FALSE;
+   else
+   {
+      pathgen_map_paint_path(path->parent_map, path);
+      return EINA_FALSE;
+   }
 
    evas_object_image_pixels_dirty_set(path->parent_map->visual, EINA_TRUE);
    evas_object_smart_changed(path->parent_map->parent_world);
+
       
    return EINA_TRUE;
 }

@@ -1,4 +1,7 @@
 #include "pathgen_map.h"
+#include "pathgen_path.h"
+#include "pathgen_node.h"
+
 
 Pathgen_Map *
 pathgen_map_create(Evas_Object *world)
@@ -62,4 +65,19 @@ pathgen_map_paint(Pathgen_Map *map, unsigned int x, unsigned int y,
    mem = x + map->w * y;
    pixels[mem] = color;
   
+}
+
+void
+pathgen_map_paint_path(Pathgen_Map *map, Pathgen_Path *path)
+{
+   Pathgen_Node *current;
+   current = path->end;
+   while(current != path->start)
+   {
+      current = current->parent_node;
+      pathgen_map_paint(map, current->x, current->y, 0xFFFF0000);
+   }
+   evas_object_image_pixels_dirty_set(map->visual, EINA_TRUE);
+   evas_object_smart_changed(map->parent_world);
+   return;
 }

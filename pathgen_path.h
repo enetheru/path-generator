@@ -11,6 +11,7 @@ struct pathgen_path {
    Eina_List *open, *closed;
    int step_counter, step_count;
    float step_speed;
+   Evas_Object *visual;
 };
 
 Eina_Bool

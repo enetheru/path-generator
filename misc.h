@@ -19,7 +19,6 @@ generate_random_image(Evas *evas, int w, int h)
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
 
    /* generating the contents of the image */   
-   evas_object_image_data_set(image, pixels);
    for(i = 0; i < w * h; i++)
    {
       /* build random grey image */
@@ -27,8 +26,7 @@ generate_random_image(Evas *evas, int w, int h)
       value = value | 0xFF000000 | (value * 0x00010000) | (value * 0x00000100);
       pixels[i] = value;
    }
-
-   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
+   evas_object_image_data_set(image, pixels);
 
    return image;
 }

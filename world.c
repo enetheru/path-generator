@@ -28,9 +28,6 @@ pathgen_world_add( Evas *evas)
    evas_object_smart_callback_add( world, "sim,reset",
       (Evas_Smart_Cb) _pathgen_sim_reset, NULL);
 
-   evas_object_smart_callback_add( world, "world,generate",
-      (Evas_Smart_Cb) _pathgen_world_generate, NULL);
-
    /* get the private data struct */
    PATHGEN_WORLD_DATA_GET(world, priv);
 
@@ -78,46 +75,47 @@ pathgen_world_remove(Evas_Object *o, Evas_Object *child)
 /* set to return any previous object set to the height of the
  * world or NULL, if any (or on errors) */
 Evas_Object *
-pathgen_world_set_height(Evas_Object *o, Evas_Object *height)
+pathgen_world_set_height(Evas_Object *world, Evas_Object *new)
 {
-   Evas_Object *ret;
+   fprintf(stderr, "setting new height map.\n");
+   Evas_Object *old;
 
-   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
-   if(!height)
+   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(world, priv, NULL);
+   old = priv->children[PG_HEIGHT];
+
+   if(!new)
+   {
+      fprintf(stderr, "no heightmap specefied.\n");
       return NULL;
+   }
 
-   if(priv->children[PG_HEIGHT] == height)
+   if(old == new)
    {
       fprintf(stderr, "Maps must be unique objects\n");
       return NULL;
    }
 
-   if (priv->children[PG_HEIGHT])
+   if(old)
    {
-      if (priv->children[PG_HEIGHT] != height)
-      {
-         ret = priv->children[PG_HEIGHT];
-         _pathgen_world_remove_do(priv, priv->children[PG_HEIGHT], PG_HEIGHT);
-      }
-      else return height;
+      fprintf(stderr, "Deleting old heightmap.\n");
+      /* delete existing height */
+      _pathgen_world_remove_do(priv, old, PG_HEIGHT);
+      evas_object_del(old);
    }
 
    // Assign new object
-   priv->children[PG_HEIGHT] = height;
-   evas_object_image_size_get(height, &(priv->w), &(priv->h));
-   evas_object_size_hint_min_set(o, priv->w, priv->h);
+   priv->children[PG_HEIGHT] = new;
+   evas_object_image_size_get(new, &(priv->w), &(priv->h));
+   evas_object_size_hint_min_set(world, priv->w, priv->h);
+   evas_object_show(new);
    
    
-   _pathgen_world_child_callbacks_register(o, height, PG_HEIGHT);
-   evas_object_smart_member_add(height, o);
-   evas_object_smart_changed(o);
+   _pathgen_world_child_callbacks_register(world, new, PG_HEIGHT);
+   evas_object_smart_member_add(new, world);
+   evas_object_smart_changed(world);
 
    priv->child_count++;
-      evas_object_smart_callback_call(o, EVT_HEAT_RESET, height);
-
-   
-
-   return ret;
+      evas_object_smart_callback_call(world, EVT_HEAT_RESET, new);   
 }
 
 void
@@ -178,38 +176,6 @@ pathgen_world_height_get(Evas_Object *world)
 /************************
 * World Smart Callbacks *
 ************************/
-
-static void
-_pathgen_world_generate( void *data, Evas_Object *world, void *event_info )
-{
-   Evas *evas;
-   Evas_Object *image;
-   fprintf(stderr, "generating world\n");
-
-   /* get the private data struct */
-   PATHGEN_WORLD_DATA_GET(world, priv);
-
-   /* FIXME make this independent */
-   priv->w = 100;
-   priv->h = 100;
-
-   evas = evas_object_evas_get(world);
-   image =  generate_random_image(evas, priv->w, priv->h);
-   evas_object_name_set(image, "maze");
-   evas_object_show(image);
-
-   /* sorting out the smart object bullshit(i think) */
-   priv->children[PG_HEIGHT] = image;
-
-   _pathgen_world_child_callbacks_register(world, image, PG_HEIGHT);
-   evas_object_smart_member_add(image, world);
-   evas_object_smart_changed(world);
-
-   priv->child_count++;
-      evas_object_smart_callback_call(world, EVT_HEAT_RESET, image);
-
-   return;
-}
 
 static void
 _pathgen_world_zoom(
