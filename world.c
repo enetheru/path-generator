@@ -1,5 +1,6 @@
 #include "world.h"
 #include "pathgen_map.h"
+#include "misc.h"
 
 /* add a new world to canvas */
 Evas_Object *
@@ -38,42 +39,6 @@ pathgen_world_add( Evas *evas)
    evas_object_color_set(priv->border, 200, 200, 200, 255);
    evas_object_smart_member_add(priv->border, world);
 
-   /* create default 100x100 randomly generated maze */
-   Evas_Object *image = evas_object_image_filled_add(evas);
-   evas_object_name_set(image, "maze");
-   evas_object_image_size_set(image, 100, 100);
-   evas_object_image_smooth_scale_set(image, EINA_FALSE);
-   evas_object_show(image);
-
-   /* setting the world dimensions */
-   priv->w = 100;
-   priv->h = 100;
-
-   /* generating the contents of the image */   
-   int *data = malloc(100*100*4);
-   evas_object_image_data_set(image, data);
-   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
-   int i = 0;
-   int value;
-   int blue_mask = 0x000000FF;
-   for(; i < 100*100; i++)
-   {
-      /* build random grey image */
-      value = rand() & blue_mask;
-      value = value | 0xFF000000 | (value * 0x00010000) | (value * 0x00000100);
-      data[i] = value;
-   }
-
-   /* sorting out the smart object bullshit(i think) */
-   priv->children[PG_HEIGHT] = image;
-
-   _pathgen_world_child_callbacks_register(world, image, PG_HEIGHT);
-   evas_object_smart_member_add(image, world);
-   evas_object_smart_changed(world);
-
-   priv->child_count++;
-      evas_object_smart_callback_call(world, EVT_HEAT_RESET, image);
-   
    return world;
 }
 
@@ -186,13 +151,14 @@ pathgen_world_pathmap_set(Evas_Object *world, Pathgen_Map *map)
    // Assign new object
    priv->pathmap = map;
    priv->children[PG_VISUAL] = map->visual;
+   int number;
 
    //set the map to have the world as parent
-   map->parent_world = world;
-   
+   map->parent_world = world;   
    
    _pathgen_world_child_callbacks_register(world, map->visual, PG_VISUAL);
    evas_object_smart_member_add(map->visual, world);
+   evas_object_show(map->visual);
    evas_object_smart_changed(world);
 
    priv->child_count++;
@@ -209,15 +175,39 @@ pathgen_world_height_get(Evas_Object *world)
    return data;
 }
 
-
 /************************
 * World Smart Callbacks *
 ************************/
 
 static void
-_pathgen_world_generate( void *data, Evas_Object *o, void *event_info )
+_pathgen_world_generate( void *data, Evas_Object *world, void *event_info )
 {
+   Evas *evas;
+   Evas_Object *image;
    fprintf(stderr, "generating world\n");
+
+   /* get the private data struct */
+   PATHGEN_WORLD_DATA_GET(world, priv);
+
+   /* FIXME make this independent */
+   priv->w = 100;
+   priv->h = 100;
+
+   evas = evas_object_evas_get(world);
+   image =  generate_random_image(evas, priv->w, priv->h);
+   evas_object_name_set(image, "maze");
+   evas_object_show(image);
+
+   /* sorting out the smart object bullshit(i think) */
+   priv->children[PG_HEIGHT] = image;
+
+   _pathgen_world_child_callbacks_register(world, image, PG_HEIGHT);
+   evas_object_smart_member_add(image, world);
+   evas_object_smart_changed(world);
+
+   priv->child_count++;
+      evas_object_smart_callback_call(world, EVT_HEAT_RESET, image);
+
    return;
 }
 
@@ -297,21 +287,34 @@ _pathgen_world_heatmap_clear(
 * Sim Smart Callbacks *
 ***********************/
 static void
-_pathgen_sim_start( void *data, Evas_Object *o, void *event_info )
+_pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 {
    fprintf(stderr, "want to start sim\n");
-   PATHGEN_WORLD_DATA_GET(o, priv);
+   Pathgen_Map *map;
+   Pathgen_Node *start, *end;
+   Pathgen_Path *path;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+
+   if(!priv->children[PG_HEIGHT])
+   {
+      fprintf(stderr, "cannot run sim, no height map.\n");
+      return;
+   }
+
+   /* create a pathmap */
+   map = pathgen_map_create(world);
+   pathgen_world_pathmap_set(world, map);
 
    /* create start and end points */
-   Pathgen_Node *start =
-      pathgen_node_create(priv->pathmap, NULL, rand() % 100,rand() % 100, 0);
-   Pathgen_Node *end =
-      pathgen_node_create(priv->pathmap, NULL, rand() % 100, rand() % 100, 0);
+   start = pathgen_node_create(priv->pathmap, NULL,
+      rand() % priv->w, rand() % priv->h, 0);
+   end = pathgen_node_create(priv->pathmap, NULL,
+      rand() % priv->w, rand() % priv->h, 0);
 
    /* new path */
-   Pathgen_Path *path = pathgen_path_create(priv->pathmap, start, end);
-   path->step_count = 10000;
-   path->step_speed = 0.0001;
+   path = pathgen_path_create(priv->pathmap, start, end);
+   path->step_count = 10000; //FIXME
+   path->step_speed = 0.0001;//FIXME
 
    /* walk the path */
    ecore_timer_add(2.0, pathgen_path_walk, path);

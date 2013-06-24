@@ -82,10 +82,13 @@ EVAS_SMART_SUBCLASS_NEW(_pathgen_world_type, _pathgen_world,
 ************************/
 Evas_Object *
 pathgen_world_add( Evas *evas);
+
 void *
 pathgen_world_height_get(Evas_Object *world);
+
 void
 pathgen_world_size_get(Evas_Object *world, int *w, int *h);
+
 Evas_Object *
 pathgen_world_set_height(Evas_Object *o, Evas_Object *height);
 
@@ -101,7 +104,7 @@ _pathgen_world_remove_do(Pathgen_World_Data *priv,
 * World Smart Callbacks *
 ************************/
 static void
-_pathgen_world_generate( void *data, Evas_Object *o, void *event_info );
+_pathgen_world_generate( void *data, Evas_Object *world, void *event_info );
 
 static void
 _pathgen_world_zoom( void *data, Evas_Object *o, void *event_info );
@@ -127,6 +130,11 @@ _pathgen_sim_stop( void *data, Evas_Object *o, void *event_info );
 
 static void
 _pathgen_sim_reset( void *data, Evas_Object *o, void *event_info );
+
+
+/********
+* Other *
+********/
 
 static void
 _on_child_del(void *data,
@@ -164,7 +172,6 @@ _pathgen_world_child_callbacks_register(Evas_Object *o,
    evas_object_event_callback_add(child, EVAS_CALLBACK_FREE, _on_child_del, o);
    evas_object_data_set(child, "index", (void *)(++idx));
 }
-
 
 /* create and setup our pathgen_world internals*/
 static void
@@ -242,27 +249,19 @@ _pathgen_world_smart_calculate(Evas_Object *o)
 
    evas_object_resize(priv->border, w, h);
    evas_object_move(priv->border, x, y);
+   evas_object_lower(priv->border);
 
    evas_object_resize(priv->children[PG_HEIGHT], w, h);
    evas_object_move(priv->children[PG_HEIGHT], x, y);
+   evas_object_stack_above(priv->children[PG_HEIGHT], priv->border);
 
    evas_object_resize(priv->children[PG_HEAT], w, h);
    evas_object_move(priv->children[PG_HEAT], x, y);
+   evas_object_stack_above(priv->children[PG_HEAT], priv->children[PG_HEIGHT]);
 
    evas_object_resize(priv->children[PG_VISUAL], w, h);
    evas_object_move(priv->children[PG_VISUAL], x, y);
-
-//   if (priv->children[0])
-//     {
-//        evas_object_move(priv->children[0], x + 3, y + 3);
-//        evas_object_resize(priv->children[0], (w / 2) - 3, (h / 2) - 3);
-//     }
-//
-//   if (priv->children[1])
-//     {
-//        evas_object_move(priv->children[1], x + (w / 2), y + (h / 2));
-//        evas_object_resize(priv->children[1], (w / 2) - 3, (h / 2) - 3);
-//     }
+   evas_object_stack_above(priv->children[PG_VISUAL], priv->children[PG_HEAT]);
 }
 
 /* setting our smart interface */

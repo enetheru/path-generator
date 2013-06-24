@@ -120,12 +120,6 @@ elm_main(int argc, char **argv)
 
    evas_object_smart_callback_add(btn, "clicked", _btn_generate, NULL);
 
-
-
-   /* new pathmap */
-   Pathgen_Map *pathmap = pathgen_map_create(world);
-   pathgen_world_pathmap_set(world, pathmap);
-
    // now we are done, show the window
    evas_object_resize(win, 800, 600);
    evas_object_show(win);

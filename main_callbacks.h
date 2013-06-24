@@ -17,9 +17,9 @@ _wheel( void *data, Evas *evas, Evas_Object *o, void *event_info)
 static void
 _btn_sim_start(void *data, Evas_Object *o, void *event_info)
 {
+   fprintf(stderr, "want to start sim\n");
    Evas_Object *world = evas_object_name_find(evas_object_evas_get(o), "world");
    evas_object_smart_callback_call( world, EVT_SIM_START, event_info);
-   fprintf(stderr, "want to start sim\n");
    return;
 }
 

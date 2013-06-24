@@ -3,6 +3,7 @@
 Pathgen_Map *
 pathgen_map_create(Evas_Object *world)
 {
+   int *pixels, i;
    if(!world)return NULL;
    Pathgen_Map *map = malloc(sizeof(Pathgen_Map));
 
@@ -13,20 +14,15 @@ pathgen_map_create(Evas_Object *world)
    evas_object_image_size_set(map->visual, map->w, map->h);
    evas_object_image_smooth_scale_set(map->visual, EINA_FALSE);
    evas_object_image_alpha_set(map->visual, EINA_TRUE);
-   evas_object_show(map->visual);
 
    /* create data */
-   int *data = malloc(map->w * map->h *4);
-   evas_object_image_data_set(map->visual, data);
+   pixels = malloc(map->w * map->h *4);
+   evas_object_image_data_set(map->visual, pixels);
    evas_object_image_pixels_dirty_set(map->visual, EINA_TRUE);
-   int i=0;
-   int number;
-   for(; i < map->w * map->h; i++)
+   for(i=0; i < map->w * map->h; i++)
    {
-      data[i] = 0x00000000;
+      pixels[i] = 0x00000000;
    }
-   evas_object_resize(map->visual, 100, 100);
-
    return map;
 }
 
@@ -51,4 +47,19 @@ pathgen_map_info(Pathgen_Map *map)
       map->w, map->h);
 
    return;
+}
+
+void
+pathgen_map_paint(Pathgen_Map *map, unsigned int x, unsigned int y,
+   unsigned int color)
+{
+   int *pixels;
+   int mem;
+   /* check that the coordinates are within bounds */
+   if( !(0 < x < map->w && 0 < y < map->h) )return;
+
+   pixels = (int *)evas_object_image_data_get(map->visual, EINA_TRUE);
+   mem = x + map->w * y;
+   pixels[mem] = color;
+  
 }

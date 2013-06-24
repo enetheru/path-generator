@@ -5,7 +5,6 @@ pathgen_path_create(Pathgen_Map *map, Pathgen_Node *start, Pathgen_Node *end)
 {
    Pathgen_Path *path = malloc(sizeof(Pathgen_Path));
    path->parent_map = map;
-
    path->start = start;
    pathgen_node_paint(start, 0xFF00FF00);
    path->end = end;
