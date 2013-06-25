@@ -4,6 +4,111 @@
 #include "pathgen_node.h"
 #include "misc.h"
 
+static const Evas_Smart_Cb_Description _smart_callbacks[] = 
+{
+   {EVT_CHILDREN_NUMBER_CHANGED, "i"},
+   {EVT_HEAT_RESET, "i"}, //deletes object and creates a now one
+   {EVT_HEAT_CLEAR, "i"}, //zeroes data
+   {EVT_ZOOM, "i"},
+   {EVT_SIM_START, "i"},
+   {EVT_SIM_STOP, "i"},
+   {EVT_SIM_RESET, "i"},
+   {EVT_WORLD_GENERATE, "i"},
+   {NULL, NULL}
+};
+
+EVAS_SMART_SUBCLASS_NEW(_pathgen_world_type, _pathgen_world,
+   Evas_Smart_Class, Evas_Smart_Class,
+   evas_object_smart_clipped_class_get, _smart_callbacks);
+
+/***********************
+* evas smart functions *
+************************/
+
+/* create and setup our pathgen_world internals*/
+static void
+_pathgen_world_smart_add(Evas_Object *o)
+{
+   EVAS_SMART_DATA_ALLOC(o, Pathgen_World_Data);
+   _pathgen_world_parent_sc->add(o);
+}
+
+static void
+_pathgen_world_smart_del(Evas_Object *o)
+{
+   PATHGEN_WORLD_DATA_GET(o, priv);
+   _pathgen_world_parent_sc->del(o);
+}
+
+static void
+_pathgen_world_smart_show(Evas_Object *o)
+{
+   PATHGEN_WORLD_DATA_GET(o, priv);
+
+   _pathgen_world_parent_sc->show(o);
+}
+
+static void
+_pathgen_world_smart_hide(Evas_Object *o)
+{
+   PATHGEN_WORLD_DATA_GET(o, priv);
+
+   _pathgen_world_parent_sc->hide(o);
+}
+
+static void
+_pathgen_world_smart_resize(Evas_Object *o,
+                                 Evas_Coord w,
+                                 Evas_Coord h)
+{
+   Evas_Coord ow, oh;
+   evas_object_geometry_get(o, NULL, NULL, &ow, &oh);
+   if ((ow == w) && (oh == h)) return;
+
+   /* this will trigger recalculation */
+   evas_object_smart_changed(o);
+}
+
+/* act on child objects' properties, before rendering */
+static void
+_pathgen_world_smart_calculate(Evas_Object *o)
+{
+   Evas_Coord x, y, w, h;
+
+   PATHGEN_WORLD_DATA_GET_OR_RETURN(o, priv);
+   evas_object_geometry_get(o, &x, &y, &w, &h);
+
+   evas_object_resize(priv->border, w, h);
+   evas_object_move(priv->border, x, y);
+   evas_object_lower(priv->border);
+
+   evas_object_resize(priv->children[PG_HEIGHT], w, h);
+   evas_object_move(priv->children[PG_HEIGHT], x, y);
+   evas_object_stack_above(priv->children[PG_HEIGHT], priv->border);
+
+   evas_object_resize(priv->children[PG_HEAT], w, h);
+   evas_object_move(priv->children[PG_HEAT], x, y);
+   evas_object_stack_above(priv->children[PG_HEAT], priv->children[PG_HEIGHT]);
+
+   evas_object_resize(priv->children[PG_VISUAL], w, h);
+   evas_object_move(priv->children[PG_VISUAL], x, y);
+   evas_object_stack_above(priv->children[PG_VISUAL], priv->children[PG_HEAT]);
+}
+
+/* setting our smart interface */
+static void
+_pathgen_world_smart_set_user(Evas_Smart_Class *sc)
+{
+  /* specializing these two */
+  sc->add = _pathgen_world_smart_add;
+  sc->del = _pathgen_world_smart_del;
+  sc->show = _pathgen_world_smart_show;
+  sc->hide = _pathgen_world_smart_hide;
+  /* clipped smart object has no hook on resizing or calculations */
+  sc->resize = _pathgen_world_smart_resize;
+  sc->calculate = _pathgen_world_smart_calculate;
+}
+
 /* add a new world to canvas */
 Evas_Object *
 pathgen_world_add( Evas *evas)
@@ -41,39 +146,6 @@ pathgen_world_add( Evas *evas)
    return world;
 }
 
-/* remove child element, return its pointer( or NULL on errors) */
-Evas_Object *
-pathgen_world_remove(Evas_Object *o, Evas_Object *child)
-{
-   long idx;
-
-   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
-
-   int i=0;
-   while(EINA_TRUE)
-   {
-      if (i > 5)
-      {
-         fprintf(stderr, "you are trying to remove something not belonging to"
-            " the example smart object!\n");
-         return NULL;
-      }
-      if (priv->children[i] == child) break;
-      i++;
-   }
-      
-   idx = (long)evas_object_data_get(child, "index");
-   idx--;
-
-   _pathgen_world_remove_do(priv, child, idx);
-
-   evas_object_smart_callback_call(
-      o, EVT_CHILDREN_NUMBER_CHANGED, (void *)(long)priv->child_count);
-   evas_object_smart_changed(o);
-
-   return child;
-}
-
 /* set to return any previous object set to the height of the
  * world or NULL, if any (or on errors) */
 Evas_Object *
@@ -101,7 +173,6 @@ pathgen_world_set_height(Evas_Object *world, Evas_Object *new)
    {
       fprintf(stderr, "Deleting old heightmap.\n");
       /* delete existing height */
-      _pathgen_world_remove_do(priv, old, PG_HEIGHT);
       evas_object_del(old);
    }
 
@@ -112,7 +183,6 @@ pathgen_world_set_height(Evas_Object *world, Evas_Object *new)
    evas_object_show(new);
    
    
-   _pathgen_world_child_callbacks_register(world, new, PG_HEIGHT);
    evas_object_smart_member_add(new, world);
    evas_object_smart_changed(world);
 
@@ -145,7 +215,6 @@ pathgen_world_pathmap_set(Evas_Object *world, Pathgen_Map *map)
    if (priv->pathmap)
    {
          ret = priv->pathmap;
-         _pathgen_world_remove_do(priv, priv->children[PG_VISUAL], PG_VISUAL);
    }
 
    // Assign new object
@@ -156,7 +225,6 @@ pathgen_world_pathmap_set(Evas_Object *world, Pathgen_Map *map)
    //set the map to have the world as parent
    map->parent_world = world;   
    
-   _pathgen_world_child_callbacks_register(world, map->visual, PG_VISUAL);
    evas_object_smart_member_add(map->visual, world);
    evas_object_show(map->visual);
    evas_object_smart_changed(world);
@@ -217,7 +285,6 @@ _pathgen_world_heatmap_reset(
    if(heat)
    {
       fprintf(stderr, "deleting old heatmap\n");
-      _pathgen_world_remove_do(priv, priv->children[PG_HEAT], PG_HEAT);
       evas_object_del(heat);
    }
 
