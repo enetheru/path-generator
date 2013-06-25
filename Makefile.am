@@ -9,7 +9,8 @@ INCLUDES = -I$(top_srcdir)
 bin_PROGRAMS = pathgen
 
 
-pathgen_SOURCES = main.c world.c world.h pathgen.h \
+pathgen_SOURCES = main.c\
+   pathgen_world.h pathgen_world.c \
    pathgen_map.h pathgen_map.c \
    pathgen_node.h pathgen_node.c \
    pathgen_path.h pathgen_path.c

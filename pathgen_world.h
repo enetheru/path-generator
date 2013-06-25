@@ -1,5 +1,8 @@
+#ifndef PATHGEN_WORLD_H
+#define PATHGEN_WORLD_H
+#include "pathgen_map.h"
 #include <Ecore_Evas.h>
-#include "pathgen.h"
+
 
 #define __UNUSED__
 #define _pathgen_world_type "Pathgen_World"
@@ -289,4 +292,4 @@ _pathgen_world_remove_do(Pathgen_World_Data *priv,
    evas_object_smart_member_del(child);
 }
 
-
+#endif /*PATHGEN_WORLD*/

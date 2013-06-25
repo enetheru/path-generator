@@ -1,5 +1,7 @@
-#include "world.h"
+#include "pathgen_world.h"
 #include "pathgen_map.h"
+#include "pathgen_path.h"
+#include "pathgen_node.h"
 #include "misc.h"
 
 /* add a new world to canvas */

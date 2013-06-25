@@ -1,6 +1,5 @@
 #include <Elementary.h>
-#include "world.h"
-#include "pathgen.h"
+#include "pathgen_world.h"
 #include "misc.h"
 #include "main_callbacks.h"
 
