@@ -1,5 +1,7 @@
 #ifndef PATHGEN_MISC_H
 #define PATHGEN_MISC_H
+#include "pathgen_path.h"
+#include "pathgen_node.h"
 
 #include <Evas.h>
 
@@ -44,6 +46,7 @@ image_generate_color(Evas *evas, int w, int h, int color)
    image = evas_object_image_filled_add(evas);
    evas_object_image_size_set(image, w, h);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
+   evas_object_image_alpha_set(image, EINA_TRUE);
 
    /* generating the contents of the image */   
    for(i = 0; i < w * h; i++)
@@ -68,5 +71,36 @@ image_fill_color(Evas_Object *image, int color)
    {
       pixels[i] = color;
    }
+}
+
+static void
+image_paint_pixel(Evas_Object *image, int x, int y, int color)
+{
+   int w, h, *pixels;
+   if(!image)return;
+   evas_object_image_size_get(image, &w, &h);
+   if(!(0 < x < w && 0 < y < h))return;
+   pixels = evas_object_image_data_get(image, EINA_TRUE);
+   pixels[x+w*y] = color;
+   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
+}
+
+static void
+image_paint_path(Evas_Object *image, Pathgen_Path *path, int color)
+{
+   Pathgen_Node *current;
+   current = path->end;
+   while(current != path->start)
+   {
+      current = current->parent;
+      image_paint_pixel(image, current->x, current->y, color);
+   }
+}
+
+static void
+image_paint_node(Evas_Object *image, Pathgen_Node *node, int color)
+{
+   if(!image || !node)return;
+   image_paint_pixel(image, node->x, node->y, color);
 }
 #endif /*PATHGEN_MISC_H*/

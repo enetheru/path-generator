@@ -6,12 +6,11 @@
 
 typedef struct pathgen_path Pathgen_Path;
 struct pathgen_path {
-   Pathgen_Map *parent_map;// the pathmap that this path belongs to
+   Evas_Object *world;
    Pathgen_Node *start, *end, *current;
    Eina_List *open, *closed;
    int step_counter, step_count;
    float step_speed;
-   Evas_Object *visual;
 };
 
 Eina_Bool
@@ -21,7 +20,7 @@ Eina_Bool
 pathgen_path_step_trace(void *data);
 
 Pathgen_Path *
-pathgen_path_create(Pathgen_Map *map, Pathgen_Node *start, Pathgen_Node *end); 
+pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end); 
 
 Eina_Bool
 pathgen_path_walk(void *data);

@@ -135,6 +135,10 @@ _pathgen_world_smart_set_user(Evas_Smart_Class *sc)
   sc->calculate = _pathgen_world_smart_calculate;
 }
 
+/*******************
+* Public Interface *
+*******************/
+
 /* add a new world to canvas */
 Evas_Object *
 pathgen_world_add( Evas *evas)
@@ -172,27 +176,35 @@ pathgen_world_add( Evas *evas)
    return world;
 }
 
+void
+pathgen_world_info(Evas_Object *world)
+{
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   fprintf(stderr, "w: b=%p, h=%p, i=%p, p=%p, t=%p ,h=%p, v=%p, w=%i, h=%i\n",
+      priv->background, priv->height, priv->interest, priv->path,
+      priv->teleport, priv->heat, priv->visual, priv->w, priv->h);
+}
 /* set to return any previous object set to the height of the
  * world or NULL, if any (or on errors) */
-Evas_Object *
-pathgen_world_set_height(Evas_Object *world, Evas_Object *new)
+void
+pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
 {
    fprintf(stderr, "setting new height map.\n");
    Evas_Object *old;
 
-   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(world, priv, NULL);
+   PATHGEN_WORLD_DATA_GET(world, priv);
    old = priv->height;
 
    if(!new)
    {
       fprintf(stderr, "no heightmap specefied.\n");
-      return NULL;
+      return;
    }
 
    if(old == new)
    {
       fprintf(stderr, "Maps must be unique objects\n");
-      return NULL;
+      return;
    }
 
    if(old)
@@ -205,9 +217,52 @@ pathgen_world_set_height(Evas_Object *world, Evas_Object *new)
    // Assign new object
    priv->height = new;
    evas_object_image_size_get(new, &(priv->w), &(priv->h));
-//   evas_object_size_hint_min_set(world, priv->w, priv->h);
    evas_object_show(new);
    
+   
+   evas_object_smart_member_add(new, world);
+   evas_object_smart_changed(world);
+
+   evas_object_smart_callback_call(world, EVT_HEAT_RESET, new);   
+}
+
+Evas_Object *
+pathgen_world_visual_get(Evas_Object *world)
+{
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   return priv->visual;
+}
+void
+pathgen_world_visual_set(Evas_Object *world, Evas_Object *new)
+{
+   fprintf(stderr, "setting new visual map.\n");
+   Evas_Object *old;
+
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   old = priv->visual;
+
+   if(!new)
+   {
+      fprintf(stderr, "no visual specefied.\n");
+      return;
+   }
+
+   if(old == new)
+   {
+      fprintf(stderr, "Maps must be unique objects\n");
+      return;
+   }
+
+   if(old)
+   {
+      fprintf(stderr, "Deleting old visual.\n");
+      /* delete existing height */
+      evas_object_del(old);
+   }
+
+   // Assign new object
+   priv->visual = new;
+   evas_object_show(new);
    
    evas_object_smart_member_add(new, world);
    evas_object_smart_changed(world);
@@ -224,46 +279,17 @@ pathgen_world_size_get(Evas_Object *world, int *w, int *h)
    *h = priv->h;   
 }
 
-Pathgen_Map *
-pathgen_world_pathmap_set(Evas_Object *world, Pathgen_Map *map)
+int
+pathgen_world_height_get_xy(Evas_Object *world, int x, int y)
 {
-   Pathgen_Map *ret;
-   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(world, priv, NULL);
-   if(!map) return NULL;
-
-   if(priv->pathmap == map)
-   {
-      fprintf(stderr, "Maps must be unique objects\n");
-      return NULL;
-   }
-
-   if (priv->pathmap)
-   {
-         ret = priv->pathmap;
-   }
-
-   // Assign new object
-   priv->pathmap = map;
-   priv->visual = map->visual;
-   int number;
-
-   //set the map to have the world as parent
-   map->parent_world = world;   
-   
-   evas_object_smart_member_add(map->visual, world);
-   evas_object_show(map->visual);
-   evas_object_smart_changed(world);
-
-   return ret;
- 
-}
-
-void *
-pathgen_world_height_get(Evas_Object *world)
-{
+   int w, h, *pixels;
+   if(!world)return 0;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   void * data = evas_object_image_data_get(priv->height, EINA_FALSE);
-   return data;
+   if(!priv->height)return 0;
+   evas_object_image_size_get(priv->height, &w, &h);
+   if(!(0 < x < w && 0 < y < y))return 0; 
+   pixels = evas_object_image_data_get(priv->height, EINA_FALSE);
+   return pixels[x+w*y] & 0x000000FF;
 }
 
 /************************
@@ -348,6 +374,8 @@ static void
 _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 {
    fprintf(stderr, "want to start sim\n");
+   Evas *evas;
+   Evas_Object *visual;
    Pathgen_Map *map;
    Pathgen_Node *start, *end;
    Pathgen_Path *path;
@@ -355,22 +383,32 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 
    if(!priv->height)
    {
-      fprintf(stderr, "cannot run sim, no height map.\n");
+      fprintf(stderr, "no height map, cannot run sim.\n");
       return;
    }
+   else
+   {
+      pathgen_world_info(world);
+   }
 
-   /* create a pathmap */
-   map = pathgen_map_create(world);
-   pathgen_world_pathmap_set(world, map);
+   if(!priv->visual)
+   {
+      fprintf(stderr, "no vis map, creating.\n");
+      evas = evas_object_evas_get(world);
+      visual = image_generate_color(evas, priv->w, priv->h, 0x00000000);
+      pathgen_world_visual_set(world, visual);
+   }
+   else
+   {
+      visual = priv->visual;
+   }
 
    /* create start and end points */
-   start = pathgen_node_create(priv->pathmap, NULL,
-      rand() % priv->w, rand() % priv->h, 0);
-   end = pathgen_node_create(priv->pathmap, NULL,
-      rand() % priv->w, rand() % priv->h, 0);
+   start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
+   end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
 
    /* new path */
-   path = pathgen_path_create(priv->pathmap, start, end);
+   path = pathgen_path_create(world, start, end);
    path->step_count = 10000; //FIXME
    path->step_speed = 0.0001;//FIXME
 

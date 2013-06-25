@@ -27,7 +27,6 @@ struct _Pathgen_World_Data
    Evas_Object *background, *height, *interest, *path, *teleport, *heat, *visual;
    Pathgen_Map *pathmap;
    int w,h;
-   int child_count;
 };
 
 #define PATHGEN_WORLD_DATA_GET(o, ptr) \
@@ -62,15 +61,20 @@ struct _Pathgen_World_Data
 Evas_Object *
 pathgen_world_add( Evas *evas);
 
-void *
-pathgen_world_height_get(Evas_Object *world);
-
 void
 pathgen_world_size_get(Evas_Object *world, int *w, int *h);
 
-Evas_Object *
-pathgen_world_set_height(Evas_Object *o, Evas_Object *height);
+void
+pathgen_world_height_set(Evas_Object *o, Evas_Object *height);
 
+int
+pathgen_world_height_get_xy(Evas_Object *world, int x, int y);
+
+void
+pathgen_world_visual_set(Evas_Object *world, Evas_Object *new);
+
+Evas_Object *
+pathgen_world_visual_get(Evas_Object *world);
 /************************
 * World Smart Callbacks *
 ************************/

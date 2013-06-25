@@ -58,7 +58,7 @@ _fs_load_height(void *data, Evas_Object *obj, void *event_info)
    evas_object_image_file_set(image, file, NULL);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
 
-   pathgen_world_set_height(world, image);
+   pathgen_world_height_set(world, image);
 }
 
 static void
@@ -73,7 +73,7 @@ _btn_generate(void *data, Evas_Object *o, void *event_info)
 
    image = image_generate_random(evas, 100, 100);
 
-   pathgen_world_set_height(world, image);
+   pathgen_world_height_set(world, image);
 }
 
 static void
