@@ -15,15 +15,6 @@
 #define EVT_SIM_RESET "sim,reset"
 #define EVT_WORLD_GENERATE "world,generate"
 
-#define PG_BASE 0
-#define PG_HEIGHT 1
-#define PG_INTEREST 2
-#define PG_PATH 3
-#define PG_TELEPORT 4
-#define PG_HEAT 5
-#define PG_VISUAL 6
-
-
 typedef struct _Pathgen_World_Data Pathgen_World_Data;
 /*
  * This structure augments clipped smart object's instance data,
@@ -33,7 +24,7 @@ typedef struct _Pathgen_World_Data Pathgen_World_Data;
 struct _Pathgen_World_Data
 {
    Evas_Object_Smart_Clipped_Data base;
-   Evas_Object *children[7], *border;
+   Evas_Object *background, *height, *interest, *path, *teleport, *heat, *visual;
    Pathgen_Map *pathmap;
    int w,h;
    int child_count;
