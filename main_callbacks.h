@@ -71,7 +71,7 @@ _btn_generate(void *data, Evas_Object *o, void *event_info)
    evas = evas_object_evas_get(o);
    world = evas_object_name_find(evas, "world");
 
-   image = generate_random_image(evas, 100, 100);
+   image = image_generate_random(evas, 100, 100);
 
    pathgen_world_set_height(world, image);
 }

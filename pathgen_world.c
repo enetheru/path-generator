@@ -205,7 +205,7 @@ pathgen_world_set_height(Evas_Object *world, Evas_Object *new)
    // Assign new object
    priv->height = new;
    evas_object_image_size_get(new, &(priv->w), &(priv->h));
-   evas_object_size_hint_min_set(world, priv->w, priv->h);
+//   evas_object_size_hint_min_set(world, priv->w, priv->h);
    evas_object_show(new);
    
    
