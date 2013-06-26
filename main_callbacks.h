@@ -79,5 +79,44 @@ _btn_generate(void *data, Evas_Object *o, void *event_info)
 static void
 _spinner_path_speed_change(void *data, Evas_Object *o, void *event_info)
 {
-   fprintf(stderr, "%0.6f", (float)elm_spinner_value_get(o));
+   float value;
+   Evas *evas;
+   Evas_Object *world;
+   
+   evas = evas_object_evas_get(o);
+   world = evas_object_name_find(evas, "world");
+   if(!world)return;
+   
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   priv->i_path_search_iter_speed = (float)elm_spinner_value_get(o);
+}
+
+static void
+_spinner_sim_travelers(void *data, Evas_Object *o, void *event_info)
+{
+   float value;
+   Evas *evas;
+   Evas_Object *world;
+   
+   evas = evas_object_evas_get(o);
+   world = evas_object_name_find(evas, "world");
+   if(!world)return;
+   
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   priv->i_world_travelers = (int)elm_spinner_value_get(o);
+}
+
+static void
+_spinner_path_search_iter_max(void *data, Evas_Object *o, void *event_info)
+{
+   float value;
+   Evas *evas;
+   Evas_Object *world;
+   
+   evas = evas_object_evas_get(o);
+   world = evas_object_name_find(evas, "world");
+   if(!world)return;
+   
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   priv->i_path_search_iter_max = (int)elm_spinner_value_get(o);
 }

@@ -83,6 +83,7 @@ pathgen_world_visual_set(Evas_Object *world, Evas_Object *new);
 
 Evas_Object *
 pathgen_world_visual_get(Evas_Object *world);
+
 /************************
 * World Smart Callbacks *
 ************************/

@@ -175,9 +175,9 @@ pathgen_world_add( Evas *evas)
    evas_object_lower(priv->background);
 
    /* set default variables */
-   priv->i_path_search_iter_max = 10000;
-   priv->i_path_search_iter_speed = 0.001;
-   priv->i_world_travelers = 10;
+   priv->i_path_search_iter_max = 1;
+   priv->i_path_search_iter_speed = 0.00001;
+   priv->i_world_travelers = 1;
 
    return world;
 }
@@ -217,6 +217,7 @@ pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
    {
       fprintf(stderr, "Deleting old heightmap.\n");
       /* delete existing height */
+      evas_object_smart_member_del(old);
       evas_object_del(old);
    }
 
@@ -268,6 +269,7 @@ pathgen_world_prepare(Evas_Object *world)
          image_fill_color(priv->heat, 0x00000000);
       else
       {
+         evas_object_smart_member_del(priv->heat);
          evas_object_del(priv->heat);
          priv->heat == NULL;
       }
@@ -289,6 +291,7 @@ pathgen_world_prepare(Evas_Object *world)
          image_fill_color(priv->visual, 0x00000000);
       else
       {
+         evas_object_smart_member_del(priv->visual);
          evas_object_del(priv->visual);
          priv->visual == NULL;
       }
@@ -422,4 +425,3 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    /* walk the path */
    ecore_timer_add(path->step_speed, pathgen_path_step_next, path);
 }
-

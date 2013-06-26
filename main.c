@@ -87,6 +87,32 @@ elm_main(int argc, char **argv)
 
    evas_object_smart_callback_add(btn, "clicked", _btn_sim_reset, NULL);
 
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* number of paths to cast */
+   label = elm_label_add(win);
+   elm_object_text_set(label, "number of travelers");
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   spinner = elm_spinner_add(win);
+   elm_spinner_label_format_set(spinner, "%.0f travelers");
+   elm_spinner_min_max_set(spinner, 1, INT_MAX);
+   elm_spinner_step_set(spinner, 1);
+   evas_object_size_hint_align_set(spinner, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spinner, 0.5, 0.0);
+   elm_box_pack_end(hbox, spinner);
+   evas_object_show(spinner);
+   
+   evas_object_smart_callback_add(spinner, "delay,changed",
+      _spinner_sim_travelers, NULL);
+
+
    /* == Begin World Options == */
    label = elm_label_add(win);
    elm_object_text_set(label, "World Options");
@@ -152,6 +178,32 @@ elm_main(int argc, char **argv)
    
    evas_object_smart_callback_add(spinner, "delay,changed",
       _spinner_path_speed_change, NULL);
+
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* max iterations before quit */
+   label = elm_label_add(win);
+//   evas_object_size_hint_align_set(label, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_text_set(label, "Max Search Iterations");
+   elm_box_pack_end(hbox, label);
+   evas_object_show(label);
+
+   spinner = elm_spinner_add(win);
+   elm_spinner_label_format_set(spinner, "%.0f iterations");
+   elm_spinner_min_max_set(spinner, 1, INT_MAX);
+   elm_spinner_step_set(spinner, 1);
+   evas_object_size_hint_align_set(spinner, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spinner, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, spinner);
+   evas_object_show(spinner);
+   
+   evas_object_smart_callback_add(spinner, "delay,changed",
+      _spinner_path_search_iter_max, NULL);
 
    // now we are done, show the window
    evas_object_resize(win, 800, 600);
