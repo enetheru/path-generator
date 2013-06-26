@@ -138,3 +138,20 @@ _btn_save_path_heatmap(void *data, Evas_Object *o, void *event_info)
    return;
 }
 
+static void
+_chk_toggle_heatmap(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->heat)return;
+
+   if(elm_check_state_get(o))evas_object_show(priv->heat);
+   else evas_object_hide(priv->heat);
+
+   return;
+
+}
+

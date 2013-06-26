@@ -8,7 +8,7 @@ EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *vbox, *hbox, *fs_entry, *sep, *btn, *scroll,
-      *label, *spinner;
+      *label, *spinner, *chk;
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
    elm_win_title_set(win, "path-generator");
@@ -53,6 +53,20 @@ elm_main(int argc, char **argv)
    elm_box_homogeneous_set(vbox, EINA_TRUE);
    elm_box_pack_end(hbox, vbox);
    evas_object_show(vbox);
+
+   /* == Begin Display Options == */
+   label = elm_label_add(win);
+   elm_object_text_set(label, "Display Options");
+   elm_box_pack_end(vbox, label);
+   evas_object_show(label);
+
+   chk = elm_check_add(win);
+   elm_check_state_set(chk, EINA_TRUE);
+   elm_object_part_text_set(chk, NULL,  "Path Heatmap Display");
+   elm_box_pack_end(vbox, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_toggle_heatmap, world);
 
    /* == Begin SIM Options == */
    label = elm_label_add(win);
