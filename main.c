@@ -205,6 +205,18 @@ elm_main(int argc, char **argv)
    evas_object_smart_callback_add(spinner, "delay,changed",
       _spinner_path_search_iter_max, NULL);
 
+   /* add button to save heatmap */
+   btn = elm_fileselector_button_add(win);
+   elm_fileselector_button_window_title_set(btn, "save Path Heatmap");
+   elm_fileselector_button_is_save_set(btn, EINA_TRUE);
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(btn, "Save Path Heatmap");
+   elm_box_pack_end(vbox, btn);
+   evas_object_show(btn);
+
+   evas_object_smart_callback_add(btn, "file,chosen",
+      _btn_save_path_heatmap, NULL);
+
    // now we are done, show the window
    evas_object_resize(win, 800, 600);
    evas_object_show(win);

@@ -120,3 +120,21 @@ _spinner_path_search_iter_max(void *data, Evas_Object *o, void *event_info)
    PATHGEN_WORLD_DATA_GET(world, priv);
    priv->i_path_search_iter_max = (int)elm_spinner_value_get(o);
 }
+
+static void
+_btn_save_path_heatmap(void *data, Evas_Object *o, void *event_info)
+{
+   Evas *evas;
+   Evas_Object *world;
+   if(!event_info)return;
+   
+   evas = evas_object_evas_get(o);
+   world = evas_object_name_find(evas, "world");
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->heat)return;
+
+   evas_object_image_save(priv->heat, (const char *)event_info, NULL, NULL);
+   return;
+}
+
