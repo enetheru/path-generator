@@ -36,14 +36,24 @@ _spin_sim_travelers(void *data, Evas_Object *o, void *event_info)
 static void
 i_sim_setup(Evas_Object *win, Evas_Object *vbox)
 {
-   Evas_Object *world, *lab, *btn, *hbox, *spin;
+   Evas_Object *world, *lab, *btn, *hbox, *spin, *frm;
 
    world = evas_object_name_find(evas_object_evas_get(win),"world");
 
-   lab = elm_label_add(win);
-   elm_object_text_set(lab, "Sim Options");
-   elm_box_pack_end(vbox, lab);
-   evas_object_show(lab);
+   frm = elm_frame_add(win);
+   evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(frm, "Simulation Options");
+   elm_frame_autocollapse_set(frm, EINA_TRUE);
+   elm_box_pack_end(vbox, frm);
+   evas_object_show(frm);
+
+   /* button divider */
+   vbox = elm_box_add(win);
+   evas_object_size_hint_weight_set(vbox, 0.2, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, 0.0);
+   elm_box_homogeneous_set(vbox, EINA_TRUE);
+   elm_object_content_set(frm, vbox);
+   evas_object_show(vbox);
 
    /* add button to start sim */
    btn = elm_button_add(win);
