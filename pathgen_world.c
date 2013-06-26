@@ -347,6 +347,11 @@ _pathgen_world_zoom(
    Evas_Event_Mouse_Wheel *info = event_info;
 
    evas_object_geometry_get(o, NULL, NULL, &w, &h);
+   if(w+h < 128)
+   {
+      evas_object_size_hint_min_set(o, w+1, h+1);
+      return;
+   }
 
    if(evas_key_modifier_is_set(info->modifiers, "Alt"))mult=100;
    if(evas_key_modifier_is_set(info->modifiers, "Control"))
