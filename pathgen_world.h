@@ -30,6 +30,11 @@ struct _Pathgen_World_Data
    Pathgen_Map *pathmap;
    int w,h;
    int travelers;
+
+   /* interface variables */
+   int i_path_search_iter_max,
+       i_world_travelers;
+   float i_path_search_iter_speed;
 };
 
 #define PATHGEN_WORLD_DATA_GET(o, ptr) \

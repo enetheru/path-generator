@@ -2,6 +2,7 @@
 #define PATHGEN_MISC_H
 #include "pathgen_path.h"
 #include "pathgen_node.h"
+#include "math.h"
 
 #include <Evas.h>
 
@@ -102,5 +103,11 @@ image_paint_node(Evas_Object *image, Pathgen_Node *node, int color)
 {
    if(!image || !node)return;
    image_paint_pixel(image, node->x, node->y, color);
+}
+
+static float
+pythag_node(Pathgen_Node *a, Pathgen_Node *b)
+{
+   return sqrt(pow(b->x - a->x,2) + pow(b->y - a->y, 2));
 }
 #endif /*PATHGEN_MISC_H*/

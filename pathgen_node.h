@@ -13,6 +13,10 @@ struct pathgen_node {
 Pathgen_Node *
 pathgen_node_create(Evas_Object *world, int x, int y);
 
+/* delete node, returning its parent or NULL */
+void
+pathgen_node_del(Pathgen_Node *node);
+
 void
 pathgen_node_info(Pathgen_Node *node);
 

@@ -24,6 +24,54 @@ pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end)
    return path;
 }
 
+void
+pathgen_path_del(Pathgen_Path *path)
+{
+   void *data;
+   if(!path)return;
+   /* delete lists of nodes */
+   EINA_LIST_FREE(path->open, data)
+      pathgen_node_del((Pathgen_Node *)data);
+
+   EINA_LIST_FREE(path->closed, data)
+      pathgen_node_del((Pathgen_Node *)data);
+
+   /* delete start, end, current nodes */
+   pathgen_node_del(path->start);
+   pathgen_node_del(path->end);
+   pathgen_node_del(path->current);
+
+   free(path);
+   path = NULL;
+}
+
+void
+pathgen_path_search(Pathgen_Path *path)
+{
+   int iter = 0;
+   while(iter)
+   {
+      pathgen_path_search_iter(path);
+   }
+   if(iter = -1)
+      fprintf(stderr,
+         "ERR: failed to find solution in time \n");
+   if(iter = 1)
+      fprintf(stderr, "solution found \n");
+}
+
+int
+pathgen_path_search_iter(Pathgen_Path *path)
+{
+   return 1;
+}
+
+Eina_Bool
+pathgen_path_search_slow(void *data)
+{
+   return EINA_FALSE;
+}
+
 Eina_Bool
 pathgen_path_step_next(void *data)
 {
@@ -32,7 +80,7 @@ pathgen_path_step_next(void *data)
 
    Eina_List *l;
    void *list_data;
-   Pathgen_Node *nesw[4], *next, *current, worst;
+   Pathgen_Node *nesw[4], *next, *current;
    int i, j, k, x, y, w, h;
 
    pathgen_world_size_get(path->world, &w, &h);
@@ -47,16 +95,13 @@ pathgen_path_step_next(void *data)
    }
    path->step_counter++;
 
-   if(eina_list_count(path->open) == 0)return EINA_FALSE;
-
-   /* get next best node */
-   next = eina_list_data_get(path->open);
-   EINA_LIST_FOREACH(path->open, l, list_data)
+   next = pathgen_path_best(path);
+   if(!next)
    {
-      current = (Pathgen_Node *)list_data;
-      if(current->f < next->f)next = current;
+      fprintf(stderr,
+         "ERR: no next node\n");
+      return EINA_FALSE;
    }
-   pathgen_node_info(next);
    
    /* if the next node is at the finish line, exit */
    if(next->x == path->end->x && next->y == path->end->y)
@@ -104,7 +149,6 @@ pathgen_path_step_next(void *data)
       {
          continue;
       }
-      /* if it is out of bounds, skip */
            if(next->x+1 > w-1) continue;
       else if(next->x-1 < 0) continue;
       else if(next->y+1 > h-1) continue;
@@ -116,11 +160,20 @@ pathgen_path_step_next(void *data)
          else if(i==3){ x = next->x-1; y = next->y  ;}//west
       /* create the new node*/
       nesw[i] = pathgen_node_create(path->world, x, y);
+      if(!nesw[i])
+      {
+         fprintf(stderr,
+            "ERR: node not created as expected\n");
+         continue;
+      }
       nesw[i]->parent = next;
 
-      /* change the F value based on the height map */
+      /* change the F value based on influences */
       k = pathgen_world_height_get_xy(path->world, x, y);
-      nesw[i]->f = next->f + k*k;
+      k = pow(k, 2) / pow(255.0, 2) * 100;
+      float mag = pythag_node(nesw[i], path->end);
+      mag = mag / sqrt(pow(w, 2)+pow(h, 2)) * 100;
+      nesw[i]->f = (mag*1 + k*99 / 100);
 
       /* add the node to the open list */
       path->open = eina_list_append(path->open, nesw[i]);
@@ -159,7 +212,8 @@ pathgen_path_step_trace(void *data)
 void
 pathgen_path_info(Pathgen_Path *path)
 {
-   fprintf(stderr,"p: w=%p, s=%p, e=%p, c=%p, o=%i, c=%i, s=%i, s=%f\n", 
+   fprintf(stderr,
+      "p: w=%p, s=%p, e=%p, c=%p, o=%i, c=%i, s=%i, s=%f\n", 
       path->world, path->start, path->end, path->current, 
       eina_list_count(path->open),
       eina_list_count(path->closed),
@@ -167,4 +221,107 @@ pathgen_path_info(Pathgen_Path *path)
    return;
 }
 
+Pathgen_Node *
+pathgen_path_best(Pathgen_Path *path)
+{
+   //fprintf(stderr, "Searching for the best node.\n");
+   Eina_List *l;
+   void *list_data;
+   Pathgen_Node *best, *current;
+   float maga, magb;
 
+   if(!path)
+   {
+      fprintf(stderr,
+         "ERR: no path given\n");  
+      return NULL;
+   }
+   if(eina_list_count(path->open) == 0)
+   {
+      fprintf(stderr,
+         "ERR: no nodes in open list\n");  
+      return NULL;
+   }
+
+   /* get next best node */
+   best = eina_list_data_get(path->open);
+   EINA_LIST_FOREACH(path->open, l, list_data)
+   {
+      current = (Pathgen_Node *)list_data;
+      if(current->f < best->f)best = current;
+   }
+//   pathgen_node_info(best);
+
+   return best;
+}
+
+void
+pathgen_path_neighbours(Pathgen_Path *path)
+{
+   Eina_List *l;
+   void *list_data;
+   Pathgen_Node *node;
+   Eina_Bool nesw[4];
+   int i,x,y,k;
+   /* examine the neighbours */
+   /* clear any data */
+   for(i=0; i<4; i++) nesw[i] = EINA_FALSE;
+
+   /* search open list for neighbour */
+   EINA_LIST_FOREACH(path->open, l, list_data)
+   {
+      node = (Pathgen_Node *)list_data;
+           if( node->x == path->current->x    &&
+               node->y == path->current->y -1 )  nesw[0]=EINA_TRUE;//north
+      else if( node->x == path->current->x +1 &&
+               node->y == path->current->y    )  nesw[1]=EINA_TRUE;//east
+      else if( node->x == path->current->x    &&
+               node->y == path->current->y +1 )  nesw[2]=EINA_TRUE;//south
+      else if( node->x == path->current->x -1 && 
+               node->y == path->current->y    )  nesw[3]=EINA_TRUE;//west
+   }
+
+   /* search closed list for neighbour */
+   EINA_LIST_FOREACH(path->closed, l, list_data)
+   {
+      node = (Pathgen_Node *)list_data;
+           if( node->x == path->current->x    &&
+               node->y == path->current->y -1 )  nesw[0]=EINA_TRUE;//north
+      else if( node->x == path->current->x +1 &&
+               node->y == path->current->y    )  nesw[1]=EINA_TRUE;//east
+      else if( node->x == path->current->x    &&
+               node->y == path->current->y +1 )  nesw[2]=EINA_TRUE;//south
+      else if( node->x == path->current->x -1 && 
+               node->y == path->current->y    )  nesw[3]=EINA_TRUE;//west
+   }
+   
+   for(i=0; i<4; i++)
+   {
+      /* if the node already exists, skip */
+      if(nesw[i])
+      {
+         continue;
+      }
+      /* setup new coordinates changes */
+              if(i==0){ x = path->current->x  ; y = path->current->y-1;}//north
+         else if(i==1){ x = path->current->x+1; y = path->current->y  ;}//east
+         else if(i==2){ x = path->current->x  ; y = path->current->y+1;}//south
+         else if(i==3){ x = path->current->x-1; y = path->current->y  ;}//west
+      /* create the new node*/
+      node = pathgen_node_create(path->world, x, y);
+      if(!node)continue;
+      node->parent = path->current;
+
+      /* change the F value based on the height map */
+      k = pathgen_world_height_get_xy(path->world, x, y);
+      node->f = path->current->f + k*k;
+
+      /* add the node to the open list */
+      path->open = eina_list_append(path->open, node);
+
+      /* paint the node */
+//      image_paint_node(image, nesw[i], 0x88008888);
+   }
+
+   return;
+}

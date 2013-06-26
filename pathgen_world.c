@@ -174,6 +174,11 @@ pathgen_world_add( Evas *evas)
    evas_object_smart_member_add(priv->background, world);
    evas_object_lower(priv->background);
 
+   /* set default variables */
+   priv->i_path_search_iter_max = 10000;
+   priv->i_path_search_iter_speed = 0.001;
+   priv->i_world_travelers = 10;
+
    return world;
 }
 
@@ -313,7 +318,7 @@ pathgen_world_size_get(Evas_Object *world, int *w, int *h)
 int
 pathgen_world_height_get_xy(Evas_Object *world, int x, int y)
 {
-   int w, h,, k, *pixels;
+   int w, h, k, *pixels;
    if(!world)return 0;
    PATHGEN_WORLD_DATA_GET(world, priv);
    if(!priv->height)return 0;
@@ -321,7 +326,7 @@ pathgen_world_height_get_xy(Evas_Object *world, int x, int y)
    if(!(0 < x < w && 0 < y < h))return 0; 
    pixels = evas_object_image_data_get(priv->height, EINA_FALSE);
    k =  pixels[x+w*y] & 0x000000FF;
-   fprintf(stderr, "height at (%i, %i) is %li\n", x,y,k);
+//   fprintf(stderr, "height at (%i, %i) is %i\n", x,y,k);
    return k;
 }
 
@@ -396,7 +401,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    fprintf(stderr, "want new traveler\n");
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(priv->travelers >= 10)
+   if(priv->travelers >= priv->i_world_travelers)
    {
       fprintf(stderr, "max travelers reached\n");
       return;
@@ -406,11 +411,13 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    /* create start and end points */
    start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
    end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
+   image_paint_node(priv->visual, start, 0xFFFF0000);
+   image_paint_node(priv->visual, end, 0xFF00FF00);
 
    /* new path */
    path = pathgen_path_create(world, start, end);
-   path->step_count = 100; //FIXME
-   path->step_speed = 0.001;//FIXME
+   path->step_count = priv->i_path_search_iter_max;
+   path->step_speed = priv->i_path_search_iter_speed;
 
    /* walk the path */
    ecore_timer_add(path->step_speed, pathgen_path_step_next, path);
