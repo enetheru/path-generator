@@ -40,15 +40,24 @@ _btn_generate(void *data, Evas_Object *o, void *event_info)
 static void
 i_world_setup(Evas_Object *win, Evas_Object *vbox)
 {
-   Evas_Object *world, *lab, *btn, *fs_entry, *hbox;
+   Evas_Object *world, *frm, *lab, *btn, *fs_entry, *hbox;
 
    world = evas_object_name_find(evas_object_evas_get(win),"world");
 
-   /* == Begin World Options == */
-   lab = elm_label_add(win);
-   elm_object_text_set(lab, "World Options");
-   elm_box_pack_end(vbox, lab);
-   evas_object_show(lab);
+   frm = elm_frame_add(win);
+   evas_object_size_hint_weight_set(frm, 0.0, 0.0);
+   evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(frm, "World Options");
+   elm_frame_autocollapse_set(frm, EINA_TRUE);
+   elm_box_pack_end(vbox, frm);
+   evas_object_show(frm);
+
+   /* button divider */
+   vbox = elm_box_add(win);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_homogeneous_set(vbox, EINA_TRUE);
+   elm_object_content_set(frm, vbox);
+   evas_object_show(vbox);
 
    /* file selector entry */
    fs_entry = elm_fileselector_entry_add(win);

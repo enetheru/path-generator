@@ -54,7 +54,7 @@ elm_main(int argc, char **argv)
    /* scroll frame for map view */
    scroll = elm_scroller_add(win);
    evas_object_name_set(scroll, "scroller");
-   evas_object_size_hint_weight_set(scroll, 0.8, EVAS_HINT_EXPAND);
+   evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_box_pack_start(hbox, scroll);
    evas_object_show(scroll);
@@ -71,9 +71,8 @@ elm_main(int argc, char **argv)
 
    /* button divider */
    vbox = elm_box_add(win);
-   evas_object_size_hint_weight_set(vbox, 0.2, EVAS_HINT_EXPAND);
+   evas_object_size_hint_weight_set(vbox, 0.0, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, 0.0);
-   elm_box_homogeneous_set(vbox, EINA_TRUE);
    elm_box_pack_end(hbox, vbox);
    evas_object_show(vbox);
 
