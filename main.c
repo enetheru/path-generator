@@ -3,21 +3,50 @@
 #include "misc.h"
 #include "main_callbacks.h"
 
+#define HELP_TEXT "Path-Generator by Samuel Nicholas<br><br>" \
+   "ESC  -  Toggle this window<br>" \
+   "CTRL+Mouse Wheel  -  Zoom<br>" \
+   "CTRL+ALT+Mouse Wheel  -  Fine Zoom"
+
 EAPI_MAIN int
 
 elm_main(int argc, char **argv)
 {
    Evas_Object *win, *bg, *vbox, *hbox, *fs_entry, *sep, *btn, *scroll,
-      *label, *spinner, *chk;
+      *label, *spinner, *chk, *inwin;
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
    elm_win_title_set(win, "path-generator");
 
    evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
 
+   /***************
+    * HELP WINDOW *
+    **************/
+   inwin = elm_win_inwin_add(win);
+   evas_object_show(inwin);
+   evas_object_event_callback_add(win, EVAS_CALLBACK_KEY_DOWN, _key_press, inwin); 
+
+   vbox = elm_box_add(win);
+   evas_object_size_hint_weight_set(vbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_win_inwin_content_set(inwin, vbox);
+   evas_object_show(vbox);
+
+   label = elm_label_add(win);
+   elm_object_text_set(label, HELP_TEXT);
+   evas_object_show(label);
+
+   elm_box_pack_end(vbox, label);
+
+   /******************
+    * MAIN INTERFACE *
+    *****************/
+
    /* set background */
    bg = elm_bg_add(win);
    elm_win_resize_object_add(win, bg);
+   evas_object_color_set(bg, 250, 250, 249, 255);
    evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_show(bg);
 
@@ -234,6 +263,8 @@ elm_main(int argc, char **argv)
    // now we are done, show the window
    evas_object_resize(win, 800, 600);
    evas_object_show(win);
+
+   elm_win_inwin_activate(inwin);
 
    elm_run(); // run main loop
 

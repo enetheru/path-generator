@@ -6,6 +6,17 @@ _on_done(void *data, Evas_Object *obj, void *event_info)
 }
 
 /* hook on the file,chosen smart callback */
+static void
+_key_press( void *data, Evas *evas, Evas_Object *o, void *event_info)
+{
+   Evas_Event_Key_Down * key = event_info;
+   
+   if(!strcmp(key->keyname, "Escape"))
+   {
+      if(evas_object_visible_get(data))evas_object_hide(data);
+      else evas_object_show(data);
+   }
+}
 
 static void
 _wheel( void *data, Evas *evas, Evas_Object *o, void *event_info)
