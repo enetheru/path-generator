@@ -1,3 +1,4 @@
+#include "pathgen_world.h"
 #include "pathgen_path.h"
 #include "misc.h"
 
@@ -24,15 +25,6 @@ pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end)
 }
 
 Eina_Bool
-pathgen_path_walk(void *data)
-{
-   Pathgen_Path *path = (Pathgen_Path *)data;
-
-   ecore_timer_add(path->step_speed, pathgen_path_step_next, path);
-   return EINA_FALSE;
-}
-
-Eina_Bool
 pathgen_path_step_next(void *data)
 {
    Pathgen_Path *path = (Pathgen_Path *)data;
@@ -49,6 +41,8 @@ pathgen_path_step_next(void *data)
    if(path->step_counter > path->step_count)
    {
       fprintf(stderr, "maximum steps reached stopping\n");
+      evas_object_smart_callback_call(path->world,
+         EVT_SIM_TRAVELER_NEW, NULL);
       return EINA_FALSE;
    }
    path->step_counter++;
@@ -108,7 +102,6 @@ pathgen_path_step_next(void *data)
       /* if the node already exists, skip */
       if(nesw[i])
       {
-         pathgen_node_info(nesw[i]);
          continue;
       }
       /* if it is out of bounds, skip */
@@ -127,7 +120,7 @@ pathgen_path_step_next(void *data)
 
       /* change the F value based on the height map */
       k = pathgen_world_height_get_xy(path->world, x, y);
-      nesw[i]->f = next->f + (k * k * k)/100;
+      nesw[i]->f = next->f + k*k;
 
       /* add the node to the open list */
       path->open = eina_list_append(path->open, nesw[i]);
@@ -143,15 +136,19 @@ Eina_Bool
 pathgen_path_step_trace(void *data)
 {
    Pathgen_Path *path = (Pathgen_Path *)data;
-   Evas_Object *image = (Evas_Object *)pathgen_world_visual_get(path->world);
+   Evas_Object *visual = (Evas_Object *)pathgen_world_visual_get(path->world);
+   Evas_Object *heat = (Evas_Object *)pathgen_world_heat_get(path->world);
    if(path->current != path->start)
    {
-      image_paint_node(image, path->current, 0xFFFF00FF);
+      image_paint_node(visual, path->current, 0xFFFF00FF);
       path->current = path->current->parent;
    }
    else
    {
-      image_paint_path(image, path, 0xFFFF0000);
+      image_paint_path(heat, path, 0xFF000001);
+      image_fill_color(visual, 0x00000000);
+      evas_object_smart_callback_call(path->world,
+         EVT_SIM_TRAVELER_NEW, NULL);
       return EINA_FALSE;
    }
 

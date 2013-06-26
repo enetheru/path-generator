@@ -20,7 +20,7 @@ pathgen_node_create(Evas_Object *world, int x, int y)
 void
 pathgen_node_info(Pathgen_Node *node)
 {
-   fprintf(stderr, "n: w=%p, p=%p, (%3i,%3i), f:%lo\n",
+   fprintf(stderr, "n: w=%p, p=%p, (%3i,%3i), f:%li\n",
       node->world, node->parent,
       node->x, node->y, node->f);      
    return;

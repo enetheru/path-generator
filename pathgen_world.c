@@ -14,6 +14,7 @@ static const Evas_Smart_Cb_Description _smart_callbacks[] =
    {EVT_SIM_STOP, "i"},
    {EVT_SIM_RESET, "i"},
    {EVT_WORLD_GENERATE, "i"},
+   {EVT_SIM_TRAVELER_NEW, "i"},
    {NULL, NULL}
 };
 
@@ -94,31 +95,27 @@ _pathgen_world_smart_calculate(Evas_Object *o)
 
    evas_object_resize(priv->background, w, h);
    evas_object_move(priv->background, x, y);
-   evas_object_lower(priv->background);
 
    evas_object_resize(priv->height, w, h);
    evas_object_move(priv->height, x, y);
-   evas_object_stack_above(priv->height, priv->background);
 
-   evas_object_resize(priv->interest, w, h);
-   evas_object_move(priv->interest, x, y);
-   evas_object_stack_above(priv->interest, priv->height);
+//   evas_object_resize(priv->interest, w, h);
+//   evas_object_move(priv->interest, x, y);
+//   evas_object_stack_above(priv->interest, priv->height);
 
-   evas_object_resize(priv->path, w, h);
-   evas_object_move(priv->path, x, y);
-   evas_object_stack_above(priv->path, priv->interest);
+//   evas_object_resize(priv->path, w, h);
+//   evas_object_move(priv->path, x, y);
+//   evas_object_stack_above(priv->path, priv->interest);
 
-   evas_object_resize(priv->teleport, w, h);
-   evas_object_move(priv->teleport, x, y);
-   evas_object_stack_above(priv->teleport, priv->path);
+//   evas_object_resize(priv->teleport, w, h);
+//   evas_object_move(priv->teleport, x, y);
+//   evas_object_stack_above(priv->teleport, priv->path);
 
    evas_object_resize(priv->heat, w, h);
    evas_object_move(priv->heat, x, y);
-   evas_object_stack_above(priv->heat, priv->teleport);
 
    evas_object_resize(priv->visual, w, h);
    evas_object_move(priv->visual, x, y);
-   evas_object_stack_above(priv->visual, priv->heat);
 }
 
 /* setting our smart interface */
@@ -165,6 +162,9 @@ pathgen_world_add( Evas *evas)
 //   evas_object_smart_callback_add( world, "sim,reset",
 //      (Evas_Smart_Cb) _pathgen_sim_reset, NULL);
 
+   evas_object_smart_callback_add( world, "sim,traveler,new",
+      (Evas_Smart_Cb) _pathgen_sim_traveler_new, NULL);
+
    /* get the private data struct */
    PATHGEN_WORLD_DATA_GET(world, priv);
 
@@ -172,6 +172,7 @@ pathgen_world_add( Evas *evas)
    priv->background = evas_object_rectangle_add(evas);
    evas_object_color_set(priv->background, 200, 200, 200, 255);
    evas_object_smart_member_add(priv->background, world);
+   evas_object_lower(priv->background);
 
    return world;
 }
@@ -215,12 +216,14 @@ pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
    }
 
    // Assign new object
-   priv->height = new;
-   evas_object_image_size_get(new, &(priv->w), &(priv->h));
-   evas_object_show(new);
-   
-   
    evas_object_smart_member_add(new, world);
+   priv->height = new;
+
+   evas_object_stack_above(priv->height, priv->background);
+
+   evas_object_image_size_get(priv->height, &(priv->w), &(priv->h));
+   evas_object_show(priv->height);
+   
    evas_object_smart_changed(world);
 
    evas_object_smart_callback_call(world, EVT_HEAT_RESET, new);   
@@ -232,42 +235,70 @@ pathgen_world_visual_get(Evas_Object *world)
    PATHGEN_WORLD_DATA_GET(world, priv);
    return priv->visual;
 }
-void
-pathgen_world_visual_set(Evas_Object *world, Evas_Object *new)
+
+Evas_Object *
+pathgen_world_heat_get(Evas_Object *world)
 {
-   fprintf(stderr, "setting new visual map.\n");
-   Evas_Object *old;
-
    PATHGEN_WORLD_DATA_GET(world, priv);
-   old = priv->visual;
+   return priv->heat;
+}
 
-   if(!new)
+Eina_Bool
+pathgen_world_prepare(Evas_Object *world)
+{
+   int w, h;
+   Evas *evas;
+   fprintf(stderr, "preparing world for sim.\n");
+   if(!world)return EINA_FALSE;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   evas = evas_object_evas_get(world);
+
+   if(!priv->height)return EINA_FALSE;
+
+   /* preparing heat*/
+   if(priv->heat)
    {
-      fprintf(stderr, "no visual specefied.\n");
-      return;
+      evas_object_image_size_get(priv->heat, &w, &h);
+      if(w == priv->w && h == priv->h)
+         image_fill_color(priv->heat, 0x00000000);
+      else
+      {
+         evas_object_del(priv->heat);
+         priv->heat == NULL;
+      }
+   }
+   if(!priv->heat)
+   {
+      priv->heat = image_generate_color(evas, priv->w, priv->h, 0x00000000);
+
+      evas_object_smart_member_add(priv->heat, world);
+      evas_object_stack_above(priv->heat, priv->height);
+      evas_object_show(priv->heat);
    }
 
-   if(old == new)
+   /* preparing visual */
+   if(priv->visual)
    {
-      fprintf(stderr, "Maps must be unique objects\n");
-      return;
+      evas_object_image_size_get(priv->visual, &w, &h);
+      if(w == priv->w && h == priv->h)
+         image_fill_color(priv->visual, 0x00000000);
+      else
+      {
+         evas_object_del(priv->visual);
+         priv->visual == NULL;
+      }
+   }
+   if(!priv->visual)
+   {
+      priv->visual = image_generate_color(evas, priv->w, priv->h,0x00000000);
+
+      evas_object_smart_member_add(priv->visual, world);
+      evas_object_stack_above(priv->visual, priv->heat);
+      evas_object_show(priv->visual);
    }
 
-   if(old)
-   {
-      fprintf(stderr, "Deleting old visual.\n");
-      /* delete existing height */
-      evas_object_del(old);
-   }
-
-   // Assign new object
-   priv->visual = new;
-   evas_object_show(new);
-   
-   evas_object_smart_member_add(new, world);
    evas_object_smart_changed(world);
-
-   evas_object_smart_callback_call(world, EVT_HEAT_RESET, new);   
+   return EINA_TRUE;
 }
 
 void
@@ -282,14 +313,16 @@ pathgen_world_size_get(Evas_Object *world, int *w, int *h)
 int
 pathgen_world_height_get_xy(Evas_Object *world, int x, int y)
 {
-   int w, h, *pixels;
+   int w, h,, k, *pixels;
    if(!world)return 0;
    PATHGEN_WORLD_DATA_GET(world, priv);
    if(!priv->height)return 0;
    evas_object_image_size_get(priv->height, &w, &h);
-   if(!(0 < x < w && 0 < y < y))return 0; 
+   if(!(0 < x < w && 0 < y < h))return 0; 
    pixels = evas_object_image_data_get(priv->height, EINA_FALSE);
-   return pixels[x+w*y] & 0x000000FF;
+   k =  pixels[x+w*y] & 0x000000FF;
+   fprintf(stderr, "height at (%i, %i) is %li\n", x,y,k);
+   return k;
 }
 
 /************************
@@ -309,62 +342,8 @@ _pathgen_world_zoom(
 
    if(evas_key_modifier_is_set(info->modifiers, "Alt"))mult=100;
    if(evas_key_modifier_is_set(info->modifiers, "Control"))
-      evas_object_size_hint_min_set(o, (w+(w/mult)*info->z), (h+(h/mult)*info->z));
-}
-
-/* create a heat map object */
-static void *
-_pathgen_world_heatmap_reset(
-   void *event_data __UNUSED__,
-   Evas_Object *o,
-   void *event_info __UNUSED__)
-{
-   Evas_Object *heat, *height;
-   int w,h,i,j;
-   void *data;
-   fprintf(stderr, "heat reset callback called\n");
-
-   PATHGEN_WORLD_DATA_GET_OR_RETURN_VAL(o, priv, NULL);
-   heat = priv->heat;
-   height = priv->height;
-
-   if(!height)
-      return NULL;
-
-   if(heat)
-   {
-      fprintf(stderr, "deleting old heatmap\n");
-      evas_object_del(heat);
-   }
-
-   /* calculate data requirements */
-   evas_object_image_size_get(height, &w, &h);
-   int *mem = malloc(w*h*4);
-   // homogenise memory
-   for(i=0; i< w*h; i++) mem[i] = 0x00000000;
-
-   heat = evas_object_image_filled_add(evas_object_evas_get(o));
-   evas_object_image_alpha_set(heat, EINA_TRUE);
-   evas_object_image_size_set(heat, w, h);
-   evas_object_image_data_set(heat, mem);
-   evas_object_image_smooth_scale_set(heat, EINA_FALSE);
-   evas_object_show(heat);
-
-   priv->heat = heat;
-
-   evas_object_smart_member_add(heat, o);
-   evas_object_smart_changed(o);
-
-   return heat;
-}
-
-static void *
-_pathgen_world_heatmap_clear(
-   void *event_data __UNUSED__,
-   Evas_Object *o,
-   void *event_info __UNUSED__)
-{
-   return;
+      evas_object_size_hint_min_set(o,
+         (w+(w/mult)*info->z), (h+(h/mult)*info->z) );
 }
 
 /**********************
@@ -374,11 +353,6 @@ static void
 _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 {
    fprintf(stderr, "want to start sim\n");
-   Evas *evas;
-   Evas_Object *visual;
-   Pathgen_Map *map;
-   Pathgen_Node *start, *end;
-   Pathgen_Path *path;
    PATHGEN_WORLD_DATA_GET(world, priv);
 
    if(!priv->height)
@@ -391,29 +365,10 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
       pathgen_world_info(world);
    }
 
-   if(!priv->visual)
-   {
-      fprintf(stderr, "no vis map, creating.\n");
-      evas = evas_object_evas_get(world);
-      visual = image_generate_color(evas, priv->w, priv->h, 0x00000000);
-      pathgen_world_visual_set(world, visual);
-   }
-   else
-   {
-      visual = priv->visual;
-   }
+   pathgen_world_prepare(world);
 
-   /* create start and end points */
-   start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
-   end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
-
-   /* new path */
-   path = pathgen_path_create(world, start, end);
-   path->step_count = 10000; //FIXME
-   path->step_speed = 0.0001;//FIXME
-
-   /* walk the path */
-   ecore_timer_add(2.0, pathgen_path_walk, path);
+   priv->travelers=0;
+   evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
 
    return;
 }
@@ -430,5 +385,34 @@ _pathgen_sim_reset( void *data, Evas_Object *o, void *event_info )
 {
    fprintf(stderr, "want to reset sim\n");
    return;
+}
+
+static void 
+_pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
+{
+   Pathgen_Node *start, *end;
+   Pathgen_Path *path;
+
+   fprintf(stderr, "want new traveler\n");
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(priv->travelers >= 10)
+   {
+      fprintf(stderr, "max travelers reached\n");
+      return;
+   }
+   priv->travelers++;
+
+   /* create start and end points */
+   start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
+   end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
+
+   /* new path */
+   path = pathgen_path_create(world, start, end);
+   path->step_count = 100; //FIXME
+   path->step_speed = 0.001;//FIXME
+
+   /* walk the path */
+   ecore_timer_add(path->step_speed, pathgen_path_step_next, path);
 }
 
