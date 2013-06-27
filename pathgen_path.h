@@ -32,6 +32,9 @@ pathgen_path_search_slow(void *data);
 Eina_Bool
 pathgen_path_walk(void *data);
 
+Eina_Bool
+pathgen_path_walk_slow(void *data);
+
 Pathgen_Node *
 pathgen_path_best(Pathgen_Path *path);
 

@@ -152,7 +152,7 @@ pathgen_path_search_slow(void *data)
 {
    fprintf(stderr, "slow search\n");
    Pathgen_Path *path = (Pathgen_Path *)data;
-   Evas_Object *image = (Evas_Object *)pathgen_world_visual_get(path->world);
+   Evas_Object *image = (Evas_Object *)pathgen_world_search_get(path->world);
    
    fprintf(stderr, "current_iteration %i of %i\n", path->iter, path->iter_max);
    Eina_List *l;
@@ -332,8 +332,7 @@ pathgen_path_walk_slow(void *data)
    if(!data)ret = EINA_FALSE;
    else
    {
-
-      image_paint_node(priv->visual, path->current, 0xFFFFFF00);
+      image_paint_node(priv->path, path->current, 0xFFFFFF00);
       if(!pathgen_path_walk(path))
       {
          ret = EINA_FALSE;
@@ -341,7 +340,9 @@ pathgen_path_walk_slow(void *data)
    }
    if(!ret)
    {
-      image_fill_color(priv->visual, 0x00000000);
+      image_fill_color(priv->path, 0x00000000);
+      image_paint_path(priv->heatmap, path, 0xFF000000);
+      evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
    }
    return ret;
 }
@@ -357,11 +358,16 @@ pathgen_path_search_complete( void *data, __UNUSED__
    Pathgen_Path *path = event_info;
    PATHGEN_WORLD_DATA_GET(o, priv);
 
-   ecore_timer_add(path->iter_speed*5, pathgen_path_walk_slow, path);
+   image_fill_color(priv->search, 0x00000000);
 
-   image_paint_path(priv->heatmap, path, 0xFF000000);
-//   image_fill_color(priv->visual, 0x00000000);
-
-   evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
-   return;
+   if(priv->i_display_path)
+   {
+      ecore_timer_add(path->iter_speed, pathgen_path_walk_slow, path);
+   }
+   else
+   {
+      image_paint_path(priv->heatmap, path, 0xFF000000);
+      evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
+   }
+   evas_object_smart_changed(o);
 }

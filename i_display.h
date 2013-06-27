@@ -25,38 +25,57 @@ _chk_display_heatmap(void *data, Evas_Object *o, void *event_info)
       priv->i_display_heatmap = EINA_FALSE;
       evas_object_hide(priv->heatmap);
    }
-
-   return;
-
 }
 
 static void
-_chk_display_visual(void *data, Evas_Object *o, void *event_info)
+_chk_display_search(void *data, Evas_Object *o, void *event_info)
 {
    Evas_Object *world;
    
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->heatmap)return;
+   if(!priv->search)return;
 
    if(elm_check_state_get(o))
    {
       fprintf(stderr,
-         "i_display_visual = on\n");
-      priv->i_display_visual = EINA_TRUE;
-      evas_object_show(priv->visual);
+         "i_display_search = on\n");
+      priv->i_display_search = EINA_TRUE;
+      evas_object_show(priv->search);
    }
    else 
    {
       fprintf(stderr,
-         "i_display_visual = off\n");
-      priv->i_display_visual = EINA_FALSE;
-      evas_object_hide(priv->visual);
+         "i_display_search = off\n");
+      priv->i_display_search = EINA_FALSE;
+      evas_object_hide(priv->search);
    }
+}
+static void
+_chk_display_path(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->path)return;
 
-   return;
-
+   if(elm_check_state_get(o))
+   {
+      fprintf(stderr,
+         "i_display_path = on\n");
+      priv->i_display_path = EINA_TRUE;
+      evas_object_show(priv->path);
+   }
+   else 
+   {
+      fprintf(stderr,
+         "i_display_path = off\n");
+      priv->i_display_path = EINA_FALSE;
+      evas_object_hide(priv->path);
+   }
 }
 
 static void
@@ -84,7 +103,7 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
    elm_check_state_set(chk, EINA_TRUE);
-   elm_object_part_text_set(chk, NULL,  "Path Heatmap Display");
+   elm_object_part_text_set(chk, NULL,  "Show Heatmap");
    elm_box_pack_end(vbox, chk);
    evas_object_show(chk);
 
@@ -93,11 +112,21 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
    elm_check_state_set(chk, EINA_TRUE);
-   elm_object_part_text_set(chk, NULL,  "Display Path Search");
+   elm_object_part_text_set(chk, NULL,  "Show Path Search");
    elm_box_pack_end(vbox, chk);
    evas_object_show(chk);
 
-   evas_object_smart_callback_add(chk, "changed", _chk_display_visual, world);
+   evas_object_smart_callback_add(chk, "changed", _chk_display_search, world);
+
+   chk = elm_check_add(win);
+   evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
+   elm_check_state_set(chk, EINA_TRUE);
+   elm_object_part_text_set(chk, NULL,  "Show Path");
+   elm_box_pack_end(vbox, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_display_path, world);
+
 }
 
 #endif /*I_DISPLAY_H*/

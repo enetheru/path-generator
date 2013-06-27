@@ -26,15 +26,15 @@ typedef struct _Pathgen_World_Data Pathgen_World_Data;
 struct _Pathgen_World_Data
 {
    Evas_Object_Smart_Clipped_Data base;
-   Evas_Object *background, *height, *interest, *path,
-      *teleport, *heatmap, *visual;
-   Pathgen_Map *pathmap;
+   Evas_Object *background, *height, *interest, *pathmap,
+      *teleport, *heatmap, *search, *path;
    int w,h;
    int travelers;
 
    /* display settings */
    Eina_Bool i_display_heatmap;
-   Eina_Bool i_display_visual;
+   Eina_Bool i_display_search;
+   Eina_Bool i_display_path;
 
    /* interface variables */
    int i_path_search_iter_max,
@@ -85,7 +85,7 @@ int
 pathgen_world_height_get_xy(Evas_Object *world, int x, int y);
 
 void
-pathgen_world_visual_set(Evas_Object *world, Evas_Object *new);
+pathgen_world_search_set(Evas_Object *world, Evas_Object *new);
 
 Evas_Object *
 pathgen_world_visual_get(Evas_Object *world);
