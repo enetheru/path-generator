@@ -15,6 +15,7 @@
 #define EVT_SIM_RESET "sim,reset"
 #define EVT_WORLD_GENERATE "world,generate"
 #define EVT_SIM_TRAVELER_NEW "sim,traveler,new"
+#define EVT_PATH_SEARCH_COMPLETE "path,search,complete"
 
 typedef struct _Pathgen_World_Data Pathgen_World_Data;
 /*
@@ -31,10 +32,15 @@ struct _Pathgen_World_Data
    int w,h;
    int travelers;
 
+   /* display settings */
+   Eina_Bool i_display_heatmap;
+   Eina_Bool i_display_path_search;
+
    /* interface variables */
    int i_path_search_iter_max,
        i_world_travelers;
    float i_path_search_iter_speed;
+
 };
 
 #define PATHGEN_WORLD_DATA_GET(o, ptr) \
@@ -115,12 +121,19 @@ _pathgen_sim_reset( void *data, Evas_Object *o, void *event_info );
 static void
 _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info );
 
-
 /********
 * Other *
 ********/
 
 Eina_Bool
 pathgen_world_travel(void *data);
+
+/*****************************
+* Interface Variable Getters *
+*****************************/
+
+Eina_Bool
+pathgen_i_display_path_search_get(Evas_Object *world);
+
 
 #endif /*PATHGEN_WORLD*/

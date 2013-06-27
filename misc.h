@@ -89,13 +89,8 @@ image_paint_pixel(Evas_Object *image, int x, int y, int color)
 static void
 image_paint_path(Evas_Object *image, Pathgen_Path *path, int color)
 {
-   Pathgen_Node *current;
-   current = path->end;
-   while(current != path->start)
-   {
-      current = current->parent;
-      image_paint_pixel(image, current->x, current->y, color);
-   }
+   while(pathgen_path_walk(path))
+      image_paint_pixel(image, path->current->x, path->current->y, color);      
 }
 
 static void

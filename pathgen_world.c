@@ -15,6 +15,7 @@ static const Evas_Smart_Cb_Description _smart_callbacks[] =
    {EVT_SIM_RESET, "i"},
    {EVT_WORLD_GENERATE, "i"},
    {EVT_SIM_TRAVELER_NEW, "i"},
+   {EVT_PATH_SEARCH_COMPLETE, "i"},
    {NULL, NULL}
 };
 
@@ -165,6 +166,9 @@ pathgen_world_add( Evas *evas)
    evas_object_smart_callback_add( world, "sim,traveler,new",
       (Evas_Smart_Cb) _pathgen_sim_traveler_new, NULL);
 
+   evas_object_smart_callback_add( world, "path,search,complete",
+      (Evas_Smart_Cb) pathgen_path_search_complete, NULL);
+
    /* get the private data struct */
    PATHGEN_WORLD_DATA_GET(world, priv);
 
@@ -175,9 +179,14 @@ pathgen_world_add( Evas *evas)
    evas_object_lower(priv->background);
 
    /* set default variables */
+   /* display */
+   priv->i_display_path_search = 1;
+   priv->i_display_heatmap = 1;
+   /* world */
+   priv->i_world_travelers = 1;
+   /* path */
    priv->i_path_search_iter_max = 1;
    priv->i_path_search_iter_speed = 0.00001;
-   priv->i_world_travelers = 1;
 
    return world;
 }
@@ -265,9 +274,7 @@ pathgen_world_prepare(Evas_Object *world)
    if(priv->heat)
    {
       evas_object_image_size_get(priv->heat, &w, &h);
-      if(w == priv->w && h == priv->h)
-         image_fill_color(priv->heat, 0x00000000);
-      else
+      if(!(w == priv->w && h == priv->h))
       {
          evas_object_smart_member_del(priv->heat);
          evas_object_del(priv->heat);
@@ -287,9 +294,7 @@ pathgen_world_prepare(Evas_Object *world)
    if(priv->visual)
    {
       evas_object_image_size_get(priv->visual, &w, &h);
-      if(w == priv->w && h == priv->h)
-         image_fill_color(priv->visual, 0x00000000);
-      else
+      if(!(w == priv->w && h == priv->h))
       {
          evas_object_smart_member_del(priv->visual);
          evas_object_del(priv->visual);
@@ -367,6 +372,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 {
    fprintf(stderr, "want to start sim\n");
    PATHGEN_WORLD_DATA_GET(world, priv);
+   Pathgen_Path *path;
 
    if(!priv->height)
    {
@@ -381,7 +387,18 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
    pathgen_world_prepare(world);
 
    priv->travelers=0;
-   evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
+//   if(!priv->i_display_path_search)
+      evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
+//   else
+//   {
+//      fprintf(stderr, "fast path\n");
+//      while(priv->travelers < priv->i_world_travelers)
+//      {
+//         _pathgen_sim_traveler_new(&path, world, NULL);
+//         while(pathgen_path_step_next(path));
+//         priv->travelers++;
+//      }
+//   }
 
    return;
 }
@@ -406,7 +423,6 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    Pathgen_Node *start, *end;
    Pathgen_Path *path;
 
-   fprintf(stderr, "want new traveler\n");
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
    if(priv->travelers >= priv->i_world_travelers)
@@ -419,14 +435,35 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    /* create start and end points */
    start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
    end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
-   image_paint_node(priv->visual, start, 0xFFFF0000);
-   image_paint_node(priv->visual, end, 0xFF00FF00);
+   if(priv->i_display_path_search)
+   {
+      image_paint_node(priv->visual, start, 0xFFFF0000);
+      image_paint_node(priv->visual, end, 0xFF00FF00);
+   }
 
    /* new path */
    path = pathgen_path_create(world, start, end);
-   path->step_count = priv->i_path_search_iter_max;
-   path->step_speed = priv->i_path_search_iter_speed;
+   path->iter_max = priv->i_path_search_iter_max;
+   path->iter_speed = priv->i_path_search_iter_speed;
 
-   /* walk the path */
-   ecore_timer_add(path->step_speed, pathgen_path_step_next, path);
+   if(priv->i_display_path_search)/* walk the path */
+      ecore_timer_add(path->iter_speed, pathgen_path_search_slow, path);
+   else
+   {
+      while(pathgen_path_search_fast(path));
+      image_paint_path(priv->heat, path, 0xFF000000);
+      evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);      
+   }
 }
+
+/*****************************
+* Interface Variable Getters *
+*****************************/
+
+Eina_Bool
+pathgen_i_display_path_search_get(Evas_Object *world)
+{
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   return priv->i_display_path_search;
+}
+
