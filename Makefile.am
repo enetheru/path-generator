@@ -11,7 +11,6 @@ bin_PROGRAMS = pathgen
 
 pathgen_SOURCES = main.c\
    pathgen_world.h pathgen_world.c \
-   pathgen_map.h pathgen_map.c \
    pathgen_node.h pathgen_node.c \
    pathgen_path.h pathgen_path.c \
    i_splash.h i_display.h i_sim.h i_world.h i_path.h

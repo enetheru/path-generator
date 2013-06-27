@@ -1,6 +1,5 @@
 #ifndef PATHGEN_WORLD_H
 #define PATHGEN_WORLD_H
-#include "pathgen_map.h"
 #include <Ecore_Evas.h>
 
 

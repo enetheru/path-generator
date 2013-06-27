@@ -1,6 +1,5 @@
 #ifndef PATHGEN_NODE_H
 #define PATHGEN_NODE_H
-#include "pathgen_map.h"
 
 typedef struct pathgen_node Pathgen_Node;
 struct pathgen_node {

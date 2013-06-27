@@ -1,7 +1,6 @@
 #ifndef PATHGEN_PATH_H
 #define PATHGEN_PATH_H
 #include <Eina.h>
-#include "pathgen_map.h"
 #include "pathgen_node.h"
 
 typedef struct pathgen_path Pathgen_Path;

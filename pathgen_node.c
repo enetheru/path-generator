@@ -1,3 +1,4 @@
+#include <Evas.h>
 #include "pathgen_node.h"
 
 Pathgen_Node *
@@ -34,9 +35,8 @@ pathgen_node_create(Evas_Object *world, int x, int y)
 void
 pathgen_node_del(Pathgen_Node *node)
 {
-   if(!node)return NULL;
+   if(!node)return;
    free(node);
-   node = NULL;
 }
 
 void
