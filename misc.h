@@ -31,6 +31,7 @@ image_generate_random(Evas *evas, int w, int h)
    }
    evas_object_image_data_set(image, pixels);
 
+   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
    return image;
 }
 
@@ -57,6 +58,7 @@ image_generate_color(Evas *evas, int w, int h, int color)
    }
    evas_object_image_data_set(image, pixels);
 
+   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
    return image;
 }
 
@@ -72,6 +74,7 @@ image_fill_color(Evas_Object *image, int color)
    {
       pixels[i] = color;
    }
+   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
 }
 
 static void

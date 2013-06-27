@@ -173,7 +173,7 @@ pathgen_path_search_slow(void *data)
       return EINA_FALSE;
    }
    path->end->parent = next->parent;
-   path->current = path->end;
+   path->current = next;
 
    /* bail if its taking too long */
    if(path->iter >= path->iter_max)
@@ -326,13 +326,24 @@ pathgen_path_walk(void *data)
 Eina_Bool
 pathgen_path_walk_slow(void *data)
 {
-   if(!data)return EINA_FALSE;
+   Eina_Bool ret = EINA_TRUE;
    Pathgen_Path *path = data;
    PATHGEN_WORLD_DATA_GET(path->world, priv);
+   if(!data)ret = EINA_FALSE;
+   else
+   {
 
-   image_paint_node(priv->visual, path->current, 0xFFFFFF00);
-   
-   return pathgen_path_walk(path);
+      image_paint_node(priv->visual, path->current, 0xFFFFFF00);
+      if(!pathgen_path_walk(path))
+      {
+         ret = EINA_FALSE;
+      }
+   }
+   if(!ret)
+   {
+      image_fill_color(priv->visual, 0x00000000);
+   }
+   return ret;
 }
 
 /***********************
@@ -345,8 +356,12 @@ pathgen_path_search_complete( void *data, __UNUSED__
 {
    Pathgen_Path *path = event_info;
    PATHGEN_WORLD_DATA_GET(o, priv);
+
    ecore_timer_add(path->iter_speed*5, pathgen_path_walk_slow, path);
-   image_paint_path(priv->heat, path, 0xFF000000);
+
+   image_paint_path(priv->heatmap, path, 0xFF000000);
+//   image_fill_color(priv->visual, 0x00000000);
+
    evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
    return;
 }

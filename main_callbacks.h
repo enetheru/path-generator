@@ -38,8 +38,8 @@ _btn_save_path_heatmap(void *data, Evas_Object *o, void *event_info)
    world = evas_object_name_find(evas, "world");
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->heat)return;
+   if(!priv->heatmap)return;
 
-   evas_object_image_save(priv->heat, (const char *)event_info, NULL, NULL);
+   evas_object_image_save(priv->heatmap, (const char *)event_info, NULL, NULL);
    return;
 }

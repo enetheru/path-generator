@@ -9,21 +9,21 @@ _chk_display_heatmap(void *data, Evas_Object *o, void *event_info)
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->heat)return;
+   if(!priv->heatmap)return;
 
    if(elm_check_state_get(o))
    {
       fprintf(stderr,
          "i_display_heatmap = on\n");
       priv->i_display_heatmap = EINA_TRUE;
-      evas_object_show(priv->heat);
+      evas_object_show(priv->heatmap);
    }
    else
    {
       fprintf(stderr,
          "i_display_heatmap = off\n");
       priv->i_display_heatmap = EINA_FALSE;
-      evas_object_hide(priv->heat);
+      evas_object_hide(priv->heatmap);
    }
 
    return;
@@ -31,27 +31,27 @@ _chk_display_heatmap(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
-_chk_display_path_search(void *data, Evas_Object *o, void *event_info)
+_chk_display_visual(void *data, Evas_Object *o, void *event_info)
 {
    Evas_Object *world;
    
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->heat)return;
+   if(!priv->heatmap)return;
 
    if(elm_check_state_get(o))
    {
       fprintf(stderr,
-         "i_display_path_search = on\n");
-      priv->i_display_path_search = EINA_TRUE;
+         "i_display_visual = on\n");
+      priv->i_display_visual = EINA_TRUE;
       evas_object_show(priv->visual);
    }
    else 
    {
       fprintf(stderr,
-         "i_display_path_search = off\n");
-      priv->i_display_path_search = EINA_FALSE;
+         "i_display_visual = off\n");
+      priv->i_display_visual = EINA_FALSE;
       evas_object_hide(priv->visual);
    }
 
@@ -97,7 +97,7 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
    elm_box_pack_end(vbox, chk);
    evas_object_show(chk);
 
-   evas_object_smart_callback_add(chk, "changed", _chk_display_path_search, world);
+   evas_object_smart_callback_add(chk, "changed", _chk_display_visual, world);
 }
 
 #endif /*I_DISPLAY_H*/

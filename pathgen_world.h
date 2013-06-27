@@ -8,8 +8,8 @@
 #define _pathgen_world_type "Pathgen_World"
 #define EVT_CHILDREN_NUMBER_CHANGED "children,changed"
 #define EVT_ZOOM "zoom"
-#define EVT_HEAT_RESET "heat,reset"
-#define EVT_HEAT_CLEAR "heat,clear"
+#define EVT_HEAT_RESET "heatmap,reset"
+#define EVT_HEAT_CLEAR "heatmap,clear"
 #define EVT_SIM_START "sim,start"
 #define EVT_SIM_STOP "sim,stop"
 #define EVT_SIM_RESET "sim,reset"
@@ -27,14 +27,14 @@ struct _Pathgen_World_Data
 {
    Evas_Object_Smart_Clipped_Data base;
    Evas_Object *background, *height, *interest, *path,
-      *teleport, *heat, *visual;
+      *teleport, *heatmap, *visual;
    Pathgen_Map *pathmap;
    int w,h;
    int travelers;
 
    /* display settings */
    Eina_Bool i_display_heatmap;
-   Eina_Bool i_display_path_search;
+   Eina_Bool i_display_visual;
 
    /* interface variables */
    int i_path_search_iter_max,

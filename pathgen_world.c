@@ -51,7 +51,9 @@ _pathgen_world_smart_show(Evas_Object *o)
    evas_object_show(priv->interest);
    evas_object_show(priv->path);
    evas_object_show(priv->teleport);
-   evas_object_show(priv->heat);
+   if(priv->i_display_heatmap)
+      evas_object_show(priv->heatmap);
+   if(priv->i_display_visual)
    evas_object_show(priv->visual);
 
    _pathgen_world_parent_sc->show(o);
@@ -66,7 +68,9 @@ _pathgen_world_smart_hide(Evas_Object *o)
    evas_object_hide(priv->interest);
    evas_object_hide(priv->path);
    evas_object_hide(priv->teleport);
-   evas_object_hide(priv->heat);
+   if(!priv->i_display_heatmap)
+   evas_object_hide(priv->heatmap);
+   if(!priv->i_display_visual)
    evas_object_hide(priv->visual);
 
    _pathgen_world_parent_sc->hide(o);
@@ -112,8 +116,8 @@ _pathgen_world_smart_calculate(Evas_Object *o)
 //   evas_object_move(priv->teleport, x, y);
 //   evas_object_stack_above(priv->teleport, priv->path);
 
-   evas_object_resize(priv->heat, w, h);
-   evas_object_move(priv->heat, x, y);
+   evas_object_resize(priv->heatmap, w, h);
+   evas_object_move(priv->heatmap, x, y);
 
    evas_object_resize(priv->visual, w, h);
    evas_object_move(priv->visual, x, y);
@@ -180,7 +184,7 @@ pathgen_world_add( Evas *evas)
 
    /* set default variables */
    /* display */
-   priv->i_display_path_search = 1;
+   priv->i_display_visual = 1;
    priv->i_display_heatmap = 1;
    /* world */
    priv->i_world_travelers = 1;
@@ -197,7 +201,7 @@ pathgen_world_info(Evas_Object *world)
    PATHGEN_WORLD_DATA_GET(world, priv);
    fprintf(stderr, "w: b=%p, h=%p, i=%p, p=%p, t=%p ,h=%p, v=%p, w=%i, h=%i\n",
       priv->background, priv->height, priv->interest, priv->path,
-      priv->teleport, priv->heat, priv->visual, priv->w, priv->h);
+      priv->teleport, priv->heatmap, priv->visual, priv->w, priv->h);
 }
 /* set to return any previous object set to the height of the
  * world or NULL, if any (or on errors) */
@@ -252,10 +256,10 @@ pathgen_world_visual_get(Evas_Object *world)
 }
 
 Evas_Object *
-pathgen_world_heat_get(Evas_Object *world)
+pathgen_world_heatmap_get(Evas_Object *world)
 {
    PATHGEN_WORLD_DATA_GET(world, priv);
-   return priv->heat;
+   return priv->heatmap;
 }
 
 Eina_Bool
@@ -270,24 +274,24 @@ pathgen_world_prepare(Evas_Object *world)
 
    if(!priv->height)return EINA_FALSE;
 
-   /* preparing heat*/
-   if(priv->heat)
+   /* preparing heatmap*/
+   if(priv->heatmap)
    {
-      evas_object_image_size_get(priv->heat, &w, &h);
+      evas_object_image_size_get(priv->heatmap, &w, &h);
       if(!(w == priv->w && h == priv->h))
       {
-         evas_object_smart_member_del(priv->heat);
-         evas_object_del(priv->heat);
-         priv->heat == NULL;
+         evas_object_smart_member_del(priv->heatmap);
+         evas_object_del(priv->heatmap);
+         priv->heatmap == NULL;
       }
    }
-   if(!priv->heat)
+   if(!priv->heatmap)
    {
-      priv->heat = image_generate_color(evas, priv->w, priv->h, 0x00000000);
+      priv->heatmap = image_generate_color(evas, priv->w, priv->h, 0x00000000);
 
-      evas_object_smart_member_add(priv->heat, world);
-      evas_object_stack_above(priv->heat, priv->height);
-      evas_object_show(priv->heat);
+      evas_object_smart_member_add(priv->heatmap, world);
+      evas_object_stack_above(priv->heatmap, priv->height);
+      evas_object_show(priv->heatmap);
    }
 
    /* preparing visual */
@@ -306,7 +310,7 @@ pathgen_world_prepare(Evas_Object *world)
       priv->visual = image_generate_color(evas, priv->w, priv->h,0x00000000);
 
       evas_object_smart_member_add(priv->visual, world);
-      evas_object_stack_above(priv->visual, priv->heat);
+      evas_object_stack_above(priv->visual, priv->heatmap);
       evas_object_show(priv->visual);
    }
 
@@ -387,18 +391,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
    pathgen_world_prepare(world);
 
    priv->travelers=0;
-//   if(!priv->i_display_path_search)
       evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
-//   else
-//   {
-//      fprintf(stderr, "fast path\n");
-//      while(priv->travelers < priv->i_world_travelers)
-//      {
-//         _pathgen_sim_traveler_new(&path, world, NULL);
-//         while(pathgen_path_step_next(path));
-//         priv->travelers++;
-//      }
-//   }
 
    return;
 }
@@ -435,7 +428,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    /* create start and end points */
    start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
    end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
-   if(priv->i_display_path_search)
+   if(priv->i_display_visual)
    {
       image_paint_node(priv->visual, start, 0xFFFF0000);
       image_paint_node(priv->visual, end, 0xFF00FF00);
@@ -446,12 +439,12 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    path->iter_max = priv->i_path_search_iter_max;
    path->iter_speed = priv->i_path_search_iter_speed;
 
-   if(priv->i_display_path_search)/* walk the path */
+   if(priv->i_display_visual)/* walk the path */
       ecore_timer_add(path->iter_speed, pathgen_path_search_slow, path);
    else
    {
       while(pathgen_path_search_fast(path));
-      image_paint_path(priv->heat, path, 0xFF000000);
+      image_paint_path(priv->heatmap, path, 0xFF000000);
       evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);      
    }
 }
@@ -461,9 +454,9 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 *****************************/
 
 Eina_Bool
-pathgen_i_display_path_search_get(Evas_Object *world)
+pathgen_i_display_visual_get(Evas_Object *world)
 {
    PATHGEN_WORLD_DATA_GET(world, priv);
-   return priv->i_display_path_search;
+   return priv->i_display_visual;
 }
 
