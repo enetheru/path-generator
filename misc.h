@@ -13,14 +13,12 @@ image_generate_random(Evas *evas, int w, int h)
    int *pixels, i, value;
    int mask = 0x000000FF;
 
-   pixels = malloc(w*h*4);
-   if(!pixels)return NULL;
-
-   /* create default 100x100 randomly generated maze */
+   /* create default randomly generated image */
    image = evas_object_image_filled_add(evas);
    evas_object_image_size_set(image, w, h);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
 
+   pixels = evas_object_image_data_get(image, EINA_TRUE);
    /* generating the contents of the image */   
    for(i = 0; i < w * h; i++)
    {
@@ -30,8 +28,8 @@ image_generate_random(Evas *evas, int w, int h)
       pixels[i] = value;
    }
    evas_object_image_data_set(image, pixels);
+   evas_object_image_data_update_add(image, 0, 0, w, h);
 
-   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
    return image;
 }
 
@@ -41,15 +39,13 @@ image_generate_color(Evas *evas, int w, int h, int color)
    Evas_Object *image;
    int *pixels, i, value;
 
-   pixels = malloc(w*h*4);
-   if(!pixels)return NULL;
-
    /* create default 100x100 randomly generated maze */
    image = evas_object_image_filled_add(evas);
    evas_object_image_size_set(image, w, h);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
    evas_object_image_alpha_set(image, EINA_TRUE);
 
+   pixels = evas_object_image_data_get(image, EINA_TRUE);
    /* generating the contents of the image */   
    for(i = 0; i < w * h; i++)
    {
@@ -57,8 +53,7 @@ image_generate_color(Evas *evas, int w, int h, int color)
       pixels[i] = color;
    }
    evas_object_image_data_set(image, pixels);
-
-   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
+   evas_object_image_data_update_add(image, 0, 0, w, h);
    return image;
 }
 
@@ -74,7 +69,8 @@ image_fill_color(Evas_Object *image, int color)
    {
       pixels[i] = color;
    }
-   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
+   evas_object_image_data_set(image, pixels);
+   evas_object_image_data_update_add(image, 0, 0, w, h);
 }
 
 static void
@@ -86,7 +82,8 @@ image_paint_pixel(Evas_Object *image, int x, int y, int color)
    if(!(0 < x < w && 0 < y < h))return;
    pixels = evas_object_image_data_get(image, EINA_TRUE);
    pixels[x+w*y] = color;
-   evas_object_image_pixels_dirty_set(image, EINA_TRUE);
+   evas_object_image_data_set(image, pixels);
+   evas_object_image_data_update_add(image, 0,0,w,h);
 }
 
 static void
