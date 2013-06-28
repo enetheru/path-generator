@@ -26,7 +26,8 @@ pathgen_node_create(Evas_Object *world, int x, int y)
    node->parent = NULL;
    node->x = x;
    node->y = y;
-   node->f = 0;
+   node->z = pathgen_world_height_get_xy(world, x, y);
+   node->g = 0;
 //   pathgen_node_info(node);
    return node;
 }
@@ -45,6 +46,24 @@ pathgen_node_info(Pathgen_Node *node)
    fprintf(stderr,
       "n: w=%p, p=%p, (%3i,%3i), f:%li\n",
       node->world, node->parent,
-      node->x, node->y, node->f);      
+      node->x, node->y, node->g);      
    return;
+}
+
+float
+pathgen_node_dist_euclid(Pathgen_Node *a, Pathgen_Node *b)
+{
+   int dx, dy;
+   dx = abs(a->x - b->x);
+   dy = abs(a->y - b->y);
+   return sqrt(dx * dx + dy * dy);
+}
+
+int
+pathgen_node_dist_manhat(Pathgen_Node *a, Pathgen_Node *b)
+{
+   int dx, dy;
+   dx = abs(a->x - b->x);
+   dy = abs(a->y - b->y);
+   return dx + dy;
 }

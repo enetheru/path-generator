@@ -103,9 +103,4 @@ image_paint_node(Evas_Object *image, Pathgen_Node *node, int color)
    image_paint_pixel(image, node->x, node->y, color);
 }
 
-static float
-pythag_node(Pathgen_Node *a, Pathgen_Node *b)
-{
-   return sqrt(pow(b->x - a->x,2) + pow(b->y - a->y, 2));
-}
 #endif /*PATHGEN_MISC_H*/

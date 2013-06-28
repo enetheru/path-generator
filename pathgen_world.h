@@ -40,8 +40,13 @@ struct _Pathgen_World_Data
        i_world_travelers;
    float i_path_search_iter_speed;
    /* path influence variables */
-   int i_path_inf_height;
-   int i_path_inf_distance;
+   float i_path_inf_dist_manhat,
+      i_path_inf_dist_euclid,
+      i_path_inf_desasc;
+
+   /* world constants that are used in calculations */
+   float c_euclid_max;
+   int c_manhat_max;
 
 };
 

@@ -24,28 +24,37 @@ _spin_path_search_iter_max(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
-_slid_path_inf_height(void *data, Evas_Object *o, void *event_info)
+_slid_path_inf_dist_manhat(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_path_inf_height = (int)elm_slider_value_get(o);
+   priv->i_path_inf_dist_manhat = (float)elm_slider_value_get(o);
    fprintf(stderr,
-      "height influence = %i\n",
-      (int)elm_slider_value_get(o));
+      "i_path_inf_dist_manhat = %f\n",
+      (float)elm_slider_value_get(o));
 }
 
 static void
-_slid_path_inf_distance(void *data, Evas_Object *o, void *event_info)
+_slid_path_inf_dist_euclid(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_path_inf_distance = (int)elm_slider_value_get(o);
+   priv->i_path_inf_dist_euclid = (float)elm_slider_value_get(o);
    fprintf(stderr,
-      "distance influence = %i\n",
-      (int)elm_slider_value_get(o));
+      "i_path_inf_dist_euclid = %f\n",
+      (float)elm_slider_value_get(o));
 }
 
-
+static void
+_slid_path_inf_desasc(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_inf_desasc = (float)elm_slider_value_get(o);
+   fprintf(stderr,
+      "i_path_inf_descasc = %i\n",
+      (float)elm_slider_value_get(o));
+}
 
 static void
 i_path_setup(Evas_Object *win, Evas_Object *vbox)
@@ -139,25 +148,37 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    slid = elm_slider_add(win);
    evas_object_size_hint_align_set(slid, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(slid, "Height Influence");
-   elm_slider_indicator_format_set(slid, "%.0f");
-   elm_slider_min_max_set(slid, 0.0, 100.0);
+   elm_object_text_set(slid, "Manhattan Distance");
+   elm_slider_indicator_format_set(slid, "%1.3f");
+   elm_slider_min_max_set(slid, 0.0, 1.0);
    elm_box_pack_end(vbox, slid);
    evas_object_show(slid);
 
    evas_object_smart_callback_add(slid, "delay,changed",
-      _slid_path_inf_height, world);
+      _slid_path_inf_dist_manhat, world);
 
    slid = elm_slider_add(win);
    evas_object_size_hint_align_set(slid, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(slid, "Distance Influence");
-   elm_slider_indicator_format_set(slid, "%.0f");
-   elm_slider_min_max_set(slid, 0.0, 100.0);
+   elm_object_text_set(slid, "Euclidean Distance");
+   elm_slider_indicator_format_set(slid, "%1.3f");
+   elm_slider_min_max_set(slid, 0.0, 1.0);
    elm_box_pack_end(vbox, slid);
    evas_object_show(slid);
 
    evas_object_smart_callback_add(slid, "delay,changed",
-      _slid_path_inf_distance, world);
+      _slid_path_inf_dist_euclid, world);
+
+   slid = elm_slider_add(win);
+   evas_object_size_hint_align_set(slid, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(slid, "Descent/Ascent");
+   elm_slider_indicator_format_set(slid, "%1.3f");
+   elm_slider_min_max_set(slid, 0.0, 1.0);
+   elm_box_pack_end(vbox, slid);
+   evas_object_show(slid);
+
+   evas_object_smart_callback_add(slid, "delay,changed",
+      _slid_path_inf_desasc, world);
+
 
 }
 

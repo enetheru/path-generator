@@ -132,12 +132,22 @@ pathgen_path_search_fast(void *data)
       peers[i] = pathgen_node_create(path->world, x, y);
       peers[i]->parent = best;
 
-      /* change the F value based on influences */
-      k = pathgen_world_height_get_xy(path->world, x, y);
-      k = pow(k, 2) / pow(255.0, 2) * 100;
-      float mag = pythag_node(peers[i], path->end);
-      mag = mag / sqrt(pow(priv->w, 2)+pow(priv->h, 2)) * 100;
-      peers[i]->f = (mag*3 + k*97 / 100);
+      /* == build hueristic data == */
+      /* manhattan distance from origin */
+      float dist_m = (float)pathgen_node_dist_manhat(peers[i], path->end);
+      
+      /* euclidean distance to target */
+      float dist_e = pathgen_node_dist_euclid(peers[i], path->end);
+
+      /* change of height */
+      float desasc = abs(peers[i]->z - best->z);
+
+      float f = dist_m * priv->i_path_inf_dist_manhat
+        + dist_e * priv->i_path_inf_dist_euclid
+        + desasc * priv->i_path_inf_desasc;
+            
+      peers[i]->g = f;
+
 
       /* add the node to the open list */
       path->open = eina_list_append(path->open, peers[i]);
@@ -159,9 +169,10 @@ pathgen_path_search_slow(void *data)
    Eina_List *l;
    void *list_data;
    int i, j, x, y;
+   double f;
 
    path = data;
-   image = pathgen_world_search_get(path->world);
+   image = (Evas_Object *)pathgen_world_search_get(path->world);
    PATHGEN_WORLD_DATA_GET(path->world, priv);
 
    fprintf(stderr, "current_iteration %i of %i\n", path->iter, path->iter_max);
@@ -255,31 +266,25 @@ pathgen_path_search_slow(void *data)
       }
       nesw[i]->parent = next;
 
-      fprintf(stderr, "working out f value\n");
-      /* change the F value based on influences */
-      /* height hueristic */
+      /* == build hueristic data == */
+      /* manhattan distance from origin */
+      float dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->end);
+      fprintf(stderr, "manhattan distance to end = %f\n", dist_m);
+      
+      /* euclidean distance to target */
+      float dist_e = pathgen_node_dist_euclid(nesw[i], path->end);
+      fprintf(stderr, "euclidean distance to end = %f\n", dist_e);
 
-      /* euclidean distance from node to end*/
-      int dx, dy;
-      float d;
-      float k, f;
-      dx = abs(nesw[i]->x - path->end->x);
-      dy = abs(nesw[i]->y - path->end->y);
-      d =  sqrt(dx * dx + dy * dy)
-         / sqrt(priv->w * priv->w + priv->h + priv->h)
-         * priv->i_path_inf_distance;
+      /* change of height */
+      float desasc = abs(nesw[i]->z - next->z);
+      fprintf(stderr, "ascent/descent difficulty = %f\n", desasc);
 
-      /* height */
-      k = pathgen_world_height_get_xy(path->world, x, y);
-      k = k / 255.0 * priv->i_path_inf_height;
-
-      f = (d + k)/2;
-      nesw[i]->f = f;
+      f = dist_m * priv->i_path_inf_dist_manhat
+        + dist_e * priv->i_path_inf_dist_euclid
+        + desasc * priv->i_path_inf_desasc;
+            
       fprintf(stderr, "f value = %f\n", f);
-
-//      float mag = pythag_node(nesw[i], path->end);
-//      mag = mag / sqrt(pow(w, 2)+pow(h, 2)) * 100;
-//      nesw[i]->f = (mag*3 + k*97 / 100);
+      nesw[i]->g = f;
 
       /* add the node to the open list */
       path->open = eina_list_append(path->open, nesw[i]);
@@ -320,7 +325,9 @@ pathgen_path_best(Pathgen_Path *path)
    EINA_LIST_FOREACH(path->open, l, list_data)
    {
       current = (Pathgen_Node *)list_data;
-      if(current->f < best->f && current)best = current;
+      if(current)
+         if(current->g < best->g)best = current;
+         else if(current->g == best->g && rand() % 10 < 5)best = current;
    }
 //   pathgen_node_info(best);
 

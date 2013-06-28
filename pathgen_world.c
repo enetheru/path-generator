@@ -199,8 +199,9 @@ pathgen_world_add( Evas *evas)
    priv->i_path_search_iter_max = 1;
    priv->i_path_search_iter_speed = 0.00001;
 
-   priv->i_path_inf_height = 0;
-   priv->i_path_inf_distance = 0;
+   priv->i_path_inf_dist_manhat = 0;
+   priv->i_path_inf_dist_euclid = 0;
+   priv->i_path_inf_desasc = 0;
 
    return world;
 }
