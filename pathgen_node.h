@@ -6,7 +6,7 @@ struct pathgen_node {
    Evas_Object *world;
    Pathgen_Node *parent;
    int x, y;
-   long int f;
+   double f;
 };
 
 Pathgen_Node *
