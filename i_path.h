@@ -52,7 +52,7 @@ _slid_path_inf_desasc(void *data, Evas_Object *o, void *event_info)
    PATHGEN_WORLD_DATA_GET(data, priv);
    priv->i_path_inf_desasc = (float)elm_slider_value_get(o);
    fprintf(stderr,
-      "i_path_inf_descasc = %i\n",
+      "i_path_inf_descasc = %f\n",
       (float)elm_slider_value_get(o));
 }
 
@@ -94,9 +94,10 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(lab);
 
    spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "%1.6f Seconds");
-   elm_spinner_min_max_set(spin, 0.000001, 5.0);
-   elm_spinner_step_set(spin, 0.000001);
+   elm_spinner_label_format_set(spin, "%0.3f");
+   elm_spinner_min_max_set(spin, 0.001, 5.0);
+   elm_spinner_step_set(spin, 0.001);
+   elm_spinner_value_set(spin, I_PATH_SEARCH_ITER_SPEED_DEFAULT);
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
    elm_box_pack_end(hbox, spin);
@@ -124,6 +125,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_spinner_label_format_set(spin, "%.0f iterations");
    elm_spinner_min_max_set(spin, 1, INT_MAX);
    elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_SEARCH_ITER_MAX_DEFAULT);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(spin, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(hbox, spin);
@@ -151,6 +153,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_object_text_set(slid, "Manhattan Distance");
    elm_slider_indicator_format_set(slid, "%1.3f");
    elm_slider_min_max_set(slid, 0.0, 1.0);
+   elm_slider_value_set(slid, I_PATH_INF_DIST_MANHAT_DEFAULT);
    elm_box_pack_end(vbox, slid);
    evas_object_show(slid);
 
@@ -162,6 +165,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_object_text_set(slid, "Euclidean Distance");
    elm_slider_indicator_format_set(slid, "%1.3f");
    elm_slider_min_max_set(slid, 0.0, 1.0);
+   elm_slider_value_set(slid, I_PATH_INF_DIST_EUCLID_DEFAULT);
    elm_box_pack_end(vbox, slid);
    evas_object_show(slid);
 
@@ -173,13 +177,12 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_object_text_set(slid, "Descent/Ascent");
    elm_slider_indicator_format_set(slid, "%1.3f");
    elm_slider_min_max_set(slid, 0.0, 1.0);
+   elm_slider_value_set(slid, I_PATH_INF_DESASC_DEFAULT);
    elm_box_pack_end(vbox, slid);
    evas_object_show(slid);
 
    evas_object_smart_callback_add(slid, "delay,changed",
       _slid_path_inf_desasc, world);
-
-
 }
 
 #endif /*I_PATH_H*/

@@ -30,23 +30,27 @@ struct _Pathgen_World_Data
    int w,h;
    int travelers;
 
+   /* == interface variables == */
    /* display settings */
    Eina_Bool i_display_heatmap;
    Eina_Bool i_display_search;
    Eina_Bool i_display_path;
-
-   /* interface variables */
-   int i_path_search_iter_max,
-       i_world_travelers;
-   float i_path_search_iter_speed;
+   /* sim */
+   int       i_sim_travelers;
+   /* world */
+   int       i_world_gen_x,
+             i_world_gen_y;
+   /* pathing */
+   int       i_path_search_iter_max;
+   float     i_path_search_iter_speed;
    /* path influence variables */
-   float i_path_inf_dist_manhat,
-      i_path_inf_dist_euclid,
-      i_path_inf_desasc;
+   float     i_path_inf_dist_manhat,
+             i_path_inf_dist_euclid,
+             i_path_inf_desasc;
 
-   /* world constants that are used in calculations */
-   float c_euclid_max;
-   int c_manhat_max;
+   /* == world constants that are used in calculations == */
+   float     c_euclid_max;
+   int       c_manhat_max;
 
 };
 

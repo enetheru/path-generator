@@ -1,3 +1,4 @@
+#include "i_defaults.h"
 #include "pathgen_world.h"
 #include "pathgen_path.h"
 #include "pathgen_node.h"
@@ -190,18 +191,21 @@ pathgen_world_add( Evas *evas)
 
    /* set default variables */
    /* display */
-   priv->i_display_search = 1;
-   priv->i_display_path = 1;
-   priv->i_display_heatmap = 1;
+   priv->i_display_search = I_DISPLAY_SEARCH_DEFAULT;
+   priv->i_display_path = I_DISPLAY_PATH_DEFAULT;
+   priv->i_display_heatmap = I_DISPLAY_HEATMAP_DEFAULT;
+   /* sim */
+   priv->i_sim_travelers = I_SIM_TRAVELERS_DEFAULT;
    /* world */
-   priv->i_world_travelers = 1;
+   priv->i_world_gen_x = I_WORLD_GEN_X_DEFAULT;
+   priv->i_world_gen_y = I_WORLD_GEN_Y_DEFAULT;
    /* path */
-   priv->i_path_search_iter_max = 1;
-   priv->i_path_search_iter_speed = 0.00001;
+   priv->i_path_search_iter_max = I_PATH_SEARCH_ITER_MAX_DEFAULT;
+   priv->i_path_search_iter_speed = I_PATH_SEARCH_ITER_SPEED_DEFAULT;
 
-   priv->i_path_inf_dist_manhat = 0;
-   priv->i_path_inf_dist_euclid = 0;
-   priv->i_path_inf_desasc = 0;
+   priv->i_path_inf_dist_manhat = I_PATH_INF_DIST_MANHAT_DEFAULT;
+   priv->i_path_inf_dist_euclid = I_PATH_INF_DIST_EUCLID_DEFAULT;
+   priv->i_path_inf_desasc = I_PATH_INF_DESASC_DEFAULT;
 
    return world;
 }
@@ -459,7 +463,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(priv->travelers >= priv->i_world_travelers)
+   if(priv->travelers >= priv->i_sim_travelers)
    {
       fprintf(stderr, "max travelers reached\n");
       return;

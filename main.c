@@ -2,6 +2,7 @@
 #include "pathgen_world.h"
 #include "misc.h"
 #include "main_callbacks.h"
+#include "i_defaults.h"
 #include "i_splash.h"
 #include "i_display.h"
 #include "i_sim.h"

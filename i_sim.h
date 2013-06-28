@@ -29,7 +29,7 @@ _spin_sim_travelers(void *data, Evas_Object *o, void *event_info)
    if(!data)return;
    
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_world_travelers = (int)elm_spinner_value_get(o);
+   priv->i_sim_travelers = (int)elm_spinner_value_get(o);
 }
 
 
@@ -102,6 +102,7 @@ i_sim_setup(Evas_Object *win, Evas_Object *vbox)
    elm_spinner_step_set(spin, 1);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   elm_spinner_value_set(spin, I_SIM_TRAVELERS_DEFAULT);
    elm_box_pack_end(hbox, spin);
    evas_object_show(spin);
    
