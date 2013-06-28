@@ -1,3 +1,4 @@
+#include <math.h>
 #include <Evas.h>
 #include "pathgen_node.h"
 
@@ -44,7 +45,7 @@ void
 pathgen_node_info(Pathgen_Node *node)
 {
    fprintf(stderr,
-      "n: w=%p, p=%p, (%3i,%3i), f:%li\n",
+      "n: w=%p, p=%p, (%3i,%3i), f:%f\n",
       node->world, node->parent,
       node->x, node->y, node->g);      
    return;

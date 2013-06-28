@@ -70,16 +70,24 @@ elm_main(int argc, char **argv)
    evas_object_size_hint_min_set(world, 500, 500);
    elm_object_content_set(scroll, world);
 
+/***************
+* side buttons *
+****************/
+
+   /* scroll frame for buttons view */
+   scroll = elm_scroller_add(win);
+   elm_scroller_content_min_limit(scroll, EINA_TRUE, EINA_FALSE);
+   evas_object_size_hint_weight_set(scroll, 0.0, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, scroll);
+   evas_object_show(scroll);
+
    /* button divider */
    vbox = elm_box_add(win);
    evas_object_size_hint_weight_set(vbox, 0.0, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, 0.0);
-   elm_box_pack_end(hbox, vbox);
+   elm_object_content_set(scroll, vbox);
    evas_object_show(vbox);
-
-/***************
-* side buttons *
-****************/
 
    i_display_setup(win, vbox);
    i_sim_setup(win, vbox);
