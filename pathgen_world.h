@@ -39,6 +39,9 @@ struct _Pathgen_World_Data
    int i_path_search_iter_max,
        i_world_travelers;
    float i_path_search_iter_speed;
+   /* path influence variables */
+   int i_path_inf_height;
+   int i_path_inf_distance;
 
 };
 

@@ -62,9 +62,9 @@ pathgen_path_search_fast(void *data)
    Eina_List *l;
    void *list_data;
    Pathgen_Node *peers[4], *best, *node;
-   int i,j,k,x,y,w,h;
+   int i,j,k,x,y;
 
-   pathgen_world_size_get(path->world, &w, &h);
+   PATHGEN_WORLD_DATA_GET(path->world, priv);
 
    /* get next best node */
    best = pathgen_path_best(path);
@@ -119,9 +119,9 @@ pathgen_path_search_fast(void *data)
       {
          continue;
       }
-           if(best->x+1 > w-1) continue;
+           if(best->x+1 > priv->w-1) continue;
       else if(best->x-1 < 0) continue;
-      else if(best->y+1 > h-1) continue;
+      else if(best->y+1 > priv->h-1) continue;
       else if(best->y-1 < 0) continue;
       /* setup new coordinates changes */
               if(i==0){ x = best->x  ; y = best->y-1;}//north
@@ -136,7 +136,7 @@ pathgen_path_search_fast(void *data)
       k = pathgen_world_height_get_xy(path->world, x, y);
       k = pow(k, 2) / pow(255.0, 2) * 100;
       float mag = pythag_node(peers[i], path->end);
-      mag = mag / sqrt(pow(w, 2)+pow(h, 2)) * 100;
+      mag = mag / sqrt(pow(priv->w, 2)+pow(priv->h, 2)) * 100;
       peers[i]->f = (mag*3 + k*97 / 100);
 
       /* add the node to the open list */
@@ -151,16 +151,20 @@ Eina_Bool
 pathgen_path_search_slow(void *data)
 {
    fprintf(stderr, "slow search\n");
-   Pathgen_Path *path = (Pathgen_Path *)data;
-   Evas_Object *image = (Evas_Object *)pathgen_world_search_get(path->world);
-   
-   fprintf(stderr, "current_iteration %i of %i\n", path->iter, path->iter_max);
+
+   Pathgen_Path *path;
+   Pathgen_Node *nesw[4], *next, *node;
+
+   Evas_Object *image;   
    Eina_List *l;
    void *list_data;
-   Pathgen_Node *nesw[4], *next, *node;
-   int i, j, k, x, y, w, h;
+   int i, j, x, y;
 
-   pathgen_world_size_get(path->world, &w, &h);
+   path = data;
+   image = pathgen_world_search_get(path->world);
+   PATHGEN_WORLD_DATA_GET(path->world, priv);
+
+   fprintf(stderr, "current_iteration %i of %i\n", path->iter, path->iter_max);
 
    fprintf(stderr, "searching for best node\n");
    next = pathgen_path_best(path);
@@ -232,9 +236,9 @@ pathgen_path_search_slow(void *data)
       {
          continue;
       }
-           if(next->x+1 > w-1) continue;
+           if(next->x+1 > priv->w-1) continue;
       else if(next->x-1 < 0) continue;
-      else if(next->y+1 > h-1) continue;
+      else if(next->y+1 > priv->h-1) continue;
       else if(next->y-1 < 0) continue;
       /* setup new coordinates changes */
               if(i==0){ x = next->x  ; y = next->y-1;}//north
@@ -253,11 +257,29 @@ pathgen_path_search_slow(void *data)
 
       fprintf(stderr, "working out f value\n");
       /* change the F value based on influences */
+      /* height hueristic */
+
+      /* euclidean distance from node to end*/
+      int dx, dy;
+      float d;
+      float k, f;
+      dx = abs(nesw[i]->x - path->end->x);
+      dy = abs(nesw[i]->y - path->end->y);
+      d =  sqrt(dx * dx + dy * dy)
+         / sqrt(priv->w * priv->w + priv->h + priv->h)
+         * priv->i_path_inf_distance;
+
+      /* height */
       k = pathgen_world_height_get_xy(path->world, x, y);
-      k = pow(k, 2) / pow(255.0, 2) * 100;
-      float mag = pythag_node(nesw[i], path->end);
-      mag = mag / sqrt(pow(w, 2)+pow(h, 2)) * 100;
-      nesw[i]->f = (mag*3 + k*97 / 100);
+      k = k / 255.0 * priv->i_path_inf_height;
+
+      f = (d + k)/2;
+      nesw[i]->f = f;
+      fprintf(stderr, "f value = %f\n", f);
+
+//      float mag = pythag_node(nesw[i], path->end);
+//      mag = mag / sqrt(pow(w, 2)+pow(h, 2)) * 100;
+//      nesw[i]->f = (mag*3 + k*97 / 100);
 
       /* add the node to the open list */
       path->open = eina_list_append(path->open, nesw[i]);
@@ -298,7 +320,7 @@ pathgen_path_best(Pathgen_Path *path)
    EINA_LIST_FOREACH(path->open, l, list_data)
    {
       current = (Pathgen_Node *)list_data;
-      if(current->f < best->f)best = current;
+      if(current->f < best->f && current)best = current;
    }
 //   pathgen_node_info(best);
 
