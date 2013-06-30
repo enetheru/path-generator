@@ -21,7 +21,7 @@ pathgen_node_del(Pathgen_Node *node);
 void
 pathgen_node_info(Pathgen_Node *node);
 
-float
+double
 pathgen_node_dist_euclid(Pathgen_Node *a, Pathgen_Node *b);
 
 int

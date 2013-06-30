@@ -134,18 +134,18 @@ pathgen_path_search_fast(void *data)
 
       /* == build hueristic data == */
       /* manhattan distance from origin */
-      float inf_dist_m = (float)pathgen_node_dist_manhat(peers[i], path->end);
+      int inf_dist_m = (float)pathgen_node_dist_manhat(peers[i], path->end);
       
       /* euclidean distance to target */
-      float inf_dist_e = pathgen_node_dist_euclid(peers[i], path->end);
+      double inf_dist_e = pathgen_node_dist_euclid(peers[i], path->end);
 
       /* change of height */
-      float inf_desasc = abs(peers[i]->z - best->z);
+      int inf_desasc = abs(peers[i]->z - best->z);
 
       /* adherance to roads */
-      float inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
+      int inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
 
-      float f =
+      double f =
           inf_dist_m * priv->i_path_inf_dist_manhat
         + inf_dist_e * priv->i_path_inf_dist_euclid
         + inf_desasc * priv->i_path_inf_desasc
@@ -271,19 +271,19 @@ pathgen_path_search_slow(void *data)
 
       /* == build hueristic data == */
       /* manhattan distance from origin */
-      float inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->end);
+      int inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->start);
       fprintf(stderr, "manhattan distance to end = %f\n", inf_dist_m);
       
       /* euclidean distance to target */
-      float inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->end);
+      double inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->start);
       fprintf(stderr, "euclidean distance to end = %f\n", inf_dist_e);
 
       /* change of height */
-      float inf_desasc = abs(nesw[i]->z - next->z);
+      int inf_desasc = abs(nesw[i]->z - next->z);
       fprintf(stderr, "ascent/descent difficulty = %f\n", inf_desasc);
 
       /* adherance to roads */
-      float inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
+      int inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
       fprintf(stderr, "path difficulty           = %f\n", inf_path);
 
       f = inf_dist_m * priv->i_path_inf_dist_manhat

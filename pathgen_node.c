@@ -51,7 +51,7 @@ pathgen_node_info(Pathgen_Node *node)
    return;
 }
 
-float
+double
 pathgen_node_dist_euclid(Pathgen_Node *a, Pathgen_Node *b)
 {
    int dx, dy;
