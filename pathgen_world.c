@@ -11,6 +11,7 @@ static const Evas_Smart_Cb_Description _smart_callbacks[] =
    {EVT_HEAT_CLEAR, "i"}, //zeroes data
    {EVT_ZOOM, "i"},
    {EVT_SIM_START, "i"},
+   {EVT_SIM_FINISHED, "i"},
    {EVT_SIM_STOP, "i"},
    {EVT_SIM_RESET, "i"},
    {EVT_WORLD_GENERATE, "i"},
@@ -160,6 +161,9 @@ pathgen_world_add( Evas *evas)
 
    evas_object_smart_callback_add( world, "sim,start",
       (Evas_Smart_Cb) _pathgen_sim_start, NULL);
+
+   evas_object_smart_callback_add( world, "sim,finished",
+      (Evas_Smart_Cb) _pathgen_sim_finished, NULL);
 
    evas_object_smart_callback_add( world, "sim,traveler,new",
       (Evas_Smart_Cb) _pathgen_sim_traveler_new, NULL);
@@ -407,8 +411,12 @@ static void
 _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 {
    fprintf(stderr, "want to start sim\n");
-   PATHGEN_WORLD_DATA_GET(world, priv);
+   Evas_Object *ui;
+   Evas *evas;
    Pathgen_Path *path;
+
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   evas = evas_object_evas_get(world);
 
    if(!priv->height)
    {
@@ -423,9 +431,35 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
    pathgen_world_prepare(world);
 
    priv->travelers=0;
-      evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
+   evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
 
-   return;
+   ui = evas_object_name_find(evas, "sim,start");
+   elm_object_disabled_set(ui, EINA_TRUE);
+
+   ui = evas_object_name_find(evas, "world,generate");
+   elm_object_disabled_set(ui, EINA_TRUE);
+
+   ui = evas_object_name_find(evas, "world,height,load");
+   elm_object_disabled_set(ui, EINA_TRUE);
+}
+
+static void
+_pathgen_sim_finished(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "Finished Sim\n");
+   Evas *evas;
+   Evas_Object *ui;
+
+   evas = evas_object_evas_get(o);
+
+   ui = evas_object_name_find(evas, "sim,start");
+   elm_object_disabled_set(ui, EINA_FALSE);
+
+   ui = evas_object_name_find(evas, "world,generate");
+   elm_object_disabled_set(ui, EINA_FALSE);
+
+   ui = evas_object_name_find(evas, "world,height,load");
+   elm_object_disabled_set(ui, EINA_FALSE);
 }
 
 static void
@@ -453,6 +487,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    if(priv->travelers >= priv->i_sim_travelers)
    {
       fprintf(stderr, "max travelers reached\n");
+      evas_object_smart_callback_call(world, EVT_SIM_FINISHED, NULL);
       return;
    }
    priv->travelers++;

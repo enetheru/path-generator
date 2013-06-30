@@ -62,6 +62,7 @@ i_sim_setup(Evas_Object *win, Evas_Object *vbox)
 
    /* add button to start sim */
    btn = elm_button_add(win);
+   evas_object_name_set(btn, "sim,start");
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(btn, "Start Sim");
    elm_box_pack_end(vbox, btn);
@@ -81,7 +82,7 @@ i_sim_setup(Evas_Object *win, Evas_Object *vbox)
    /* add button to reset sim */
    btn = elm_button_add(win);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(btn, "Reset Sim");
+   elm_object_text_set(btn, "Reset Heatmap");
    elm_box_pack_end(vbox, btn);
    evas_object_show(btn);
 

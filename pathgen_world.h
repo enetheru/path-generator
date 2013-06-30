@@ -10,6 +10,7 @@
 #define EVT_HEAT_RESET "heatmap,reset"
 #define EVT_HEAT_CLEAR "heatmap,clear"
 #define EVT_SIM_START "sim,start"
+#define EVT_SIM_FINISHED "sim,finished"
 #define EVT_SIM_STOP "sim,stop"
 #define EVT_SIM_RESET "sim,reset"
 #define EVT_WORLD_GENERATE "world,generate"
@@ -127,6 +128,9 @@ _pathgen_world_heatmap_clear(
 
 static void
 _pathgen_sim_start( void *data, Evas_Object *o, void *event_info );
+
+static void
+_pathgen_sim_finished( void *data, Evas_Object *o, void *event_info );
 
 static void
 _pathgen_sim_stop( void *data, Evas_Object *o, void *event_info );
