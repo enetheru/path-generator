@@ -271,11 +271,11 @@ pathgen_path_search_slow(void *data)
 
       /* == build hueristic data == */
       /* manhattan distance from origin */
-      int inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->start);
+      int inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->end);
       fprintf(stderr, "manhattan distance to end = %i\n", inf_dist_m);
       
       /* euclidean distance to target */
-      double inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->start);
+      double inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->end);
       fprintf(stderr, "euclidean distance to end = %f\n", inf_dist_e);
 
       /* change of height */

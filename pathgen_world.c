@@ -48,6 +48,7 @@ _pathgen_world_smart_show(Evas_Object *o)
 {
    PATHGEN_WORLD_DATA_GET(o, priv);
    evas_object_show(priv->background);
+   if(priv->i_display_height)
    evas_object_show(priv->height);
    evas_object_show(priv->interest);
    evas_object_show(priv->path);
@@ -67,16 +68,17 @@ _pathgen_world_smart_hide(Evas_Object *o)
 {
    PATHGEN_WORLD_DATA_GET(o, priv);
    evas_object_hide(priv->background);
-   evas_object_hide(priv->height);
+   if(priv->i_display_height)
+      evas_object_hide(priv->height);
    evas_object_hide(priv->interest);
    evas_object_hide(priv->path);
    evas_object_hide(priv->teleport);
    if(!priv->i_display_heatmap)
-   evas_object_hide(priv->heatmap);
+      evas_object_hide(priv->heatmap);
    if(!priv->i_display_search)
-   evas_object_hide(priv->search);
+      evas_object_hide(priv->search);
    if(!priv->i_display_path)
-   evas_object_hide(priv->path);
+      evas_object_hide(priv->path);
 
    _pathgen_world_parent_sc->hide(o);
 }
@@ -428,10 +430,6 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
       pathgen_world_info(world);
    }
 
-   pathgen_world_prepare(world);
-
-   priv->travelers=0;
-   evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
 
    ui = evas_object_name_find(evas, "sim,start");
    elm_object_disabled_set(ui, EINA_TRUE);
@@ -441,6 +439,11 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 
    ui = evas_object_name_find(evas, "world,height,load");
    elm_object_disabled_set(ui, EINA_TRUE);
+
+   pathgen_world_prepare(world);
+
+   priv->travelers=0;
+   evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
 }
 
 static void
