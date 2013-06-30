@@ -32,9 +32,10 @@ struct _Pathgen_World_Data
 
    /* == interface variables == */
    /* display settings */
-   Eina_Bool i_display_heatmap;
-   Eina_Bool i_display_search;
-   Eina_Bool i_display_path;
+   Eina_Bool i_display_height,
+             i_display_heatmap,
+             i_display_search,
+             i_display_path;
    /* sim */
    int       i_sim_travelers;
    /* world */

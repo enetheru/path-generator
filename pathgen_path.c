@@ -369,7 +369,6 @@ pathgen_path_walk_slow(void *data)
    }
    if(!ret)
    {
-      image_fill_color(priv->path, 0x00000000);
       image_paint_path(priv->heatmap, path, 0xFF000000);
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
    }
@@ -387,10 +386,10 @@ pathgen_path_search_complete( void *data, __UNUSED__
    Pathgen_Path *path = event_info;
    PATHGEN_WORLD_DATA_GET(o, priv);
 
-   image_fill_color(priv->search, 0x00000000);
 
    if(priv->i_display_path)
    {
+      image_fill_color(priv->path, 0x00000000);
       ecore_timer_add(path->iter_speed, pathgen_path_walk_slow, path);
    }
    else

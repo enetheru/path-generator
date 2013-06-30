@@ -2,6 +2,31 @@
 #define I_DISPLAY_H
 
 static void
+_chk_display_height(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->height)return;
+
+   if(elm_check_state_get(o))
+   {
+      fprintf(stderr,
+         "i_display_height = on\n");
+      priv->i_display_height = EINA_TRUE;
+      evas_object_show(priv->height);
+   }
+   else
+   {
+      fprintf(stderr,
+         "i_display_height = off\n");
+      priv->i_display_height = EINA_FALSE;
+      evas_object_hide(priv->height);
+   }
+}
+static void
 _chk_display_heatmap(void *data, Evas_Object *o, void *event_info)
 {
    Evas_Object *world;
@@ -99,6 +124,15 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_content_set(frm, vbox);
    evas_object_show(vbox);
+
+   chk = elm_check_add(win);
+   evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
+   elm_check_state_set(chk, EINA_TRUE);
+   elm_object_part_text_set(chk, NULL,  "Show Height");
+   elm_box_pack_end(vbox, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_display_height, world);
 
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
