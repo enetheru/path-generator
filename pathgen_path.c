@@ -377,7 +377,7 @@ pathgen_path_walk_slow(void *data)
    }
    if(!ret)
    {
-      image_paint_path(priv->heatmap, path, 0xFF000000);
+      image_paint_path(priv->heatmap, path, 0x01000000);
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
    }
    return ret;
@@ -402,7 +402,7 @@ pathgen_path_search_complete( void *data, __UNUSED__
    }
    else
    {
-      image_paint_path(priv->heatmap, path, 0xFF000000);
+      image_paint_path(priv->heatmap, path, 0x01000000);
       evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
    }
    evas_object_smart_changed(o);
