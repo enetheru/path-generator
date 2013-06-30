@@ -2,7 +2,7 @@
 #include "pathgen_world.h"
 #include "pathgen_path.h"
 #include "pathgen_node.h"
-#include "misc.h"
+#include "image.h"
 
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {
@@ -206,6 +206,7 @@ pathgen_world_add( Evas *evas)
    priv->i_path_inf_dist_manhat = I_PATH_INF_DIST_MANHAT_DEFAULT;
    priv->i_path_inf_dist_euclid = I_PATH_INF_DIST_EUCLID_DEFAULT;
    priv->i_path_inf_desasc = I_PATH_INF_DESASC_DEFAULT;
+   priv->i_path_inf_path = I_PATH_INF_PATH_DEFAULT;
 
    return world;
 }

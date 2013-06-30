@@ -1,6 +1,8 @@
 #ifndef I_SIM_H
 #define I_SIM_H
 
+#include "image.h"
+
 static void
 _btn_sim_start(void *data, Evas_Object *o, void *event_info)
 {
@@ -20,6 +22,9 @@ static void
 _btn_sim_reset(void *data, Evas_Object *o, void *event_info)
 {
    fprintf(stderr, "want to reset sim\n");
+   PATHGEN_WORLD_DATA_GET(data, priv);
+
+   image_fill_color(priv->heatmap, 0x00000000);
    return;
 }
 
@@ -77,8 +82,8 @@ i_sim_setup(Evas_Object *win, Evas_Object *vbox)
    btn = elm_button_add(win);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(btn, "Reset Sim");
-//   elm_box_pack_end(vbox, btn);
-//   evas_object_show(btn);
+   elm_box_pack_end(vbox, btn);
+   evas_object_show(btn);
 
    evas_object_smart_callback_add(btn, "clicked", _btn_sim_reset, world);
 

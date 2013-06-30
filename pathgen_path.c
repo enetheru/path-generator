@@ -1,6 +1,6 @@
 #include "pathgen_world.h"
 #include "pathgen_path.h"
-#include "misc.h"
+#include "image.h"
 
 Pathgen_Path *
 pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end)
@@ -134,17 +134,22 @@ pathgen_path_search_fast(void *data)
 
       /* == build hueristic data == */
       /* manhattan distance from origin */
-      float dist_m = (float)pathgen_node_dist_manhat(peers[i], path->end);
+      float inf_dist_m = (float)pathgen_node_dist_manhat(peers[i], path->end);
       
       /* euclidean distance to target */
-      float dist_e = pathgen_node_dist_euclid(peers[i], path->end);
+      float inf_dist_e = pathgen_node_dist_euclid(peers[i], path->end);
 
       /* change of height */
-      float desasc = abs(peers[i]->z - best->z);
+      float inf_desasc = abs(peers[i]->z - best->z);
 
-      float f = dist_m * priv->i_path_inf_dist_manhat
-        + dist_e * priv->i_path_inf_dist_euclid
-        + desasc * priv->i_path_inf_desasc;
+      /* adherance to roads */
+      float inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
+
+      float f =
+          inf_dist_m * priv->i_path_inf_dist_manhat
+        + inf_dist_e * priv->i_path_inf_dist_euclid
+        + inf_desasc * priv->i_path_inf_desasc
+        + inf_path   * priv->i_path_inf_path;
             
       peers[i]->g = f;
 
@@ -165,14 +170,12 @@ pathgen_path_search_slow(void *data)
    Pathgen_Path *path;
    Pathgen_Node *nesw[4], *next, *node;
 
-   Evas_Object *image;   
    Eina_List *l;
    void *list_data;
    int i, j, x, y;
    double f;
 
    path = data;
-   image = (Evas_Object *)pathgen_world_search_get(path->world);
    PATHGEN_WORLD_DATA_GET(path->world, priv);
 
    fprintf(stderr, "current_iteration %i of %i\n", path->iter, path->iter_max);
@@ -212,7 +215,7 @@ pathgen_path_search_slow(void *data)
    path->open = eina_list_remove(path->open, next);
    path->closed = eina_list_append(path->closed, next);
 
-   image_paint_node(image, next, 0x88000000);
+   image_paint_node(priv->search, next, 0x88000000);
 
    /* examine the neighbours */
    /* clear any data */
@@ -268,20 +271,25 @@ pathgen_path_search_slow(void *data)
 
       /* == build hueristic data == */
       /* manhattan distance from origin */
-      float dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->end);
-      fprintf(stderr, "manhattan distance to end = %f\n", dist_m);
+      float inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->end);
+      fprintf(stderr, "manhattan distance to end = %f\n", inf_dist_m);
       
       /* euclidean distance to target */
-      float dist_e = pathgen_node_dist_euclid(nesw[i], path->end);
-      fprintf(stderr, "euclidean distance to end = %f\n", dist_e);
+      float inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->end);
+      fprintf(stderr, "euclidean distance to end = %f\n", inf_dist_e);
 
       /* change of height */
-      float desasc = abs(nesw[i]->z - next->z);
-      fprintf(stderr, "ascent/descent difficulty = %f\n", desasc);
+      float inf_desasc = abs(nesw[i]->z - next->z);
+      fprintf(stderr, "ascent/descent difficulty = %f\n", inf_desasc);
 
-      f = dist_m * priv->i_path_inf_dist_manhat
-        + dist_e * priv->i_path_inf_dist_euclid
-        + desasc * priv->i_path_inf_desasc;
+      /* adherance to roads */
+      float inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
+      fprintf(stderr, "path difficulty           = %f\n", inf_path);
+
+      f = inf_dist_m * priv->i_path_inf_dist_manhat
+        + inf_dist_e * priv->i_path_inf_dist_euclid
+        + inf_desasc * priv->i_path_inf_desasc
+        + inf_path   * priv->i_path_inf_path;
             
       fprintf(stderr, "f value = %f\n", f);
       nesw[i]->g = f;
@@ -290,7 +298,7 @@ pathgen_path_search_slow(void *data)
       path->open = eina_list_append(path->open, nesw[i]);
 
       /* paint the node */
-      image_paint_node(image, nesw[i], 0x88008888);
+      image_paint_node(priv->search, nesw[i], 0x88008888);
    }
    fprintf(stderr, "incrementing iterater\n");
    evas_object_smart_changed(path->world);

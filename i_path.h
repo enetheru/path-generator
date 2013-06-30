@@ -57,6 +57,17 @@ _slid_path_inf_desasc(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
+_slid_path_inf_path(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_inf_path = (float)elm_slider_value_get(o);
+   fprintf(stderr,
+      "i_path_inf_path = %f\n",
+      (float)elm_slider_value_get(o));
+}
+
+static void
 i_path_setup(Evas_Object *win, Evas_Object *vbox)
 {
    Evas_Object *world, *frm, *lab, *spin, *hbox, *slid;
@@ -183,6 +194,19 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    evas_object_smart_callback_add(slid, "delay,changed",
       _slid_path_inf_desasc, world);
+
+   slid = elm_slider_add(win);
+   evas_object_size_hint_align_set(slid, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(slid, "Path");
+   elm_slider_indicator_format_set(slid, "%1.3f");
+   elm_slider_min_max_set(slid, 0.0, 1.0);
+   elm_slider_value_set(slid, I_PATH_INF_PATH_DEFAULT);
+   elm_box_pack_end(vbox, slid);
+   evas_object_show(slid);
+
+   evas_object_smart_callback_add(slid, "delay,changed",
+      _slid_path_inf_path, world);
+
 }
 
 #endif /*I_PATH_H*/

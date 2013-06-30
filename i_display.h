@@ -127,7 +127,7 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
 
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
-   elm_check_state_set(chk, EINA_TRUE);
+   elm_check_state_set(chk, I_DISPLAY_HEIGHT_DEFAULT);
    elm_object_part_text_set(chk, NULL,  "Show Height");
    elm_box_pack_end(vbox, chk);
    evas_object_show(chk);
@@ -136,7 +136,7 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
 
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
-   elm_check_state_set(chk, EINA_TRUE);
+   elm_check_state_set(chk, I_DISPLAY_HEATMAP_DEFAULT);
    elm_object_part_text_set(chk, NULL,  "Show Heatmap");
    elm_box_pack_end(vbox, chk);
    evas_object_show(chk);
@@ -145,7 +145,7 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
 
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
-   elm_check_state_set(chk, EINA_TRUE);
+   elm_check_state_set(chk, I_DISPLAY_SEARCH_DEFAULT);
    elm_object_part_text_set(chk, NULL,  "Show Path Search");
    elm_box_pack_end(vbox, chk);
    evas_object_show(chk);
@@ -154,13 +154,12 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
 
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
-   elm_check_state_set(chk, EINA_TRUE);
+   elm_check_state_set(chk, I_DISPLAY_PATH_DEFAULT);
    elm_object_part_text_set(chk, NULL,  "Show Path");
    elm_box_pack_end(vbox, chk);
    evas_object_show(chk);
 
    evas_object_smart_callback_add(chk, "changed", _chk_display_path, world);
-
 }
 
 #endif /*I_DISPLAY_H*/

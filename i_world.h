@@ -1,6 +1,8 @@
 #ifndef I_WORLD_H
 #define I_WORLD_H
 
+#include "image.h"
+
 static void 
 _fs_load_height(void *data, Evas_Object *obj, void *event_info)
 {
