@@ -9,12 +9,6 @@
 #include "i_world.h"
 #include "i_path.h"
 
-
-#define HELP_TEXT "Path-Generator by Samuel Nicholas<br><br>" \
-   "ESC  -  Toggle this window<br>" \
-   "CTRL+Mouse Wheel  -  Zoom<br>" \
-   "CTRL+ALT+Mouse Wheel  -  Fine Zoom"
-
 EAPI_MAIN int
 
 elm_main(int argc, char **argv)
