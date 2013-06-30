@@ -158,21 +158,8 @@ pathgen_world_add( Evas *evas)
    evas_object_smart_callback_add( world, "zoom",
       _pathgen_world_zoom, NULL);
 
-//   evas_object_smart_callback_add( world, "heat,reset",
-//      (Evas_Smart_Cb) _pathgen_world_heatmap_reset, NULL);
-
-//   evas_object_smart_callback_add( world, "heat,clear",
-//      (Evas_Smart_Cb) _pathgen_world_heatmap_clear, NULL);
-
-   /* add callbacks to sim start/stop/reset functions */
    evas_object_smart_callback_add( world, "sim,start",
       (Evas_Smart_Cb) _pathgen_sim_start, NULL);
-
-//   evas_object_smart_callback_add( world, "sim,stop",
-//      (Evas_Smart_Cb) _pathgen_sim_stop, NULL);
-
-//   evas_object_smart_callback_add( world, "sim,reset",
-//      (Evas_Smart_Cb) _pathgen_sim_reset, NULL);
 
    evas_object_smart_callback_add( world, "sim,traveler,new",
       (Evas_Smart_Cb) _pathgen_sim_traveler_new, NULL);
@@ -261,10 +248,9 @@ pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
 
    evas_object_image_size_get(priv->height, &(priv->w), &(priv->h));
    evas_object_show(priv->height);
-   
+
    evas_object_smart_changed(world);
 
-   evas_object_smart_callback_call(world, EVT_HEAT_RESET, new);   
 }
 
 Evas_Object *

@@ -1,6 +1,6 @@
 #ifndef PATHGEN_IMAGE_H
 #define PATHGEN_IMAGE_H
-
+#include <math.h>
 #include <Evas.h>
 #include "image.h"
 #include "pathgen_path.h"

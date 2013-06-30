@@ -272,7 +272,7 @@ pathgen_path_search_slow(void *data)
       /* == build hueristic data == */
       /* manhattan distance from origin */
       int inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->start);
-      fprintf(stderr, "manhattan distance to end = %f\n", inf_dist_m);
+      fprintf(stderr, "manhattan distance to end = %i\n", inf_dist_m);
       
       /* euclidean distance to target */
       double inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->start);
@@ -280,11 +280,11 @@ pathgen_path_search_slow(void *data)
 
       /* change of height */
       int inf_desasc = abs(nesw[i]->z - next->z);
-      fprintf(stderr, "ascent/descent difficulty = %f\n", inf_desasc);
+      fprintf(stderr, "ascent/descent difficulty = %i\n", inf_desasc);
 
       /* adherance to roads */
       int inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
-      fprintf(stderr, "path difficulty           = %f\n", inf_path);
+      fprintf(stderr, "path difficulty           = %i\n", inf_path);
 
       f = inf_dist_m * priv->i_path_inf_dist_manhat
         + inf_dist_e * priv->i_path_inf_dist_euclid
