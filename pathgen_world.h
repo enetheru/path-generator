@@ -40,8 +40,8 @@ struct _Pathgen_World_Data
    /* sim */
    int       i_sim_travelers;
    /* world */
-   int       i_world_gen_x,
-             i_world_gen_y;
+   int       i_world_gen_w,
+             i_world_gen_h;
    /* pathing */
    int       i_path_search_iter_max;
    float     i_path_search_iter_speed;

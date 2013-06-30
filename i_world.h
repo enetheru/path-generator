@@ -37,26 +37,26 @@ _btn_generate(void *data, Evas_Object *o, void *event_info)
    evas = evas_object_evas_get(o);
 
    image = image_generate_random(evas,
-      priv->i_world_gen_x, priv->i_world_gen_y);
+      priv->i_world_gen_w, priv->i_world_gen_h);
    pathgen_world_height_set(data, image);
 }
 
 static void
-_spin_world_gen_size_x(void *data, Evas_Object *o, void *event_info)
+_spin_world_gen_size_w(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
 
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_world_gen_x = (int)elm_spinner_value_get(o);
+   priv->i_world_gen_w = (int)elm_spinner_value_get(o);
 }
 
 static void
-_spin_world_gen_size_y(void *data, Evas_Object *o, void *event_info)
+_spin_world_gen_size_h(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
 
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_world_gen_y = (int)elm_spinner_value_get(o);
+   priv->i_world_gen_h = (int)elm_spinner_value_get(o);
 }
 
 static void
@@ -140,7 +140,7 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(hbox);
 
    spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "x=%.0f");
+   elm_spinner_label_format_set(spin, "w=%.0f");
    elm_spinner_min_max_set(spin, 128, 2048);
    elm_spinner_step_set(spin, 64);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
@@ -149,10 +149,10 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(spin);
    
    evas_object_smart_callback_add(spin, "delay,changed",
-      _spin_world_gen_size_x, world);
+      _spin_world_gen_size_w, world);
 
    spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "y=%.0f");
+   elm_spinner_label_format_set(spin, "h=%.0f");
    elm_spinner_min_max_set(spin, 128, 2048);
    elm_spinner_step_set(spin, 64);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
@@ -161,7 +161,7 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(spin);
    
    evas_object_smart_callback_add(spin, "delay,changed",
-      _spin_world_gen_size_y, world);
+      _spin_world_gen_size_h, world);
 
 
 }

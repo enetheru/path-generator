@@ -190,8 +190,8 @@ pathgen_world_add( Evas *evas)
    /* sim */
    priv->i_sim_travelers = I_SIM_TRAVELERS_DEFAULT;
    /* world */
-   priv->i_world_gen_x = I_WORLD_GEN_X_DEFAULT;
-   priv->i_world_gen_y = I_WORLD_GEN_Y_DEFAULT;
+   priv->i_world_gen_w = I_WORLD_GEN_W_DEFAULT;
+   priv->i_world_gen_h = I_WORLD_GEN_H_DEFAULT;
    /* path */
    priv->i_path_search_iter_max = I_PATH_SEARCH_ITER_MAX_DEFAULT;
    priv->i_path_search_iter_speed = I_PATH_SEARCH_ITER_SPEED_DEFAULT;
