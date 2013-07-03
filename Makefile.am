@@ -13,7 +13,8 @@ pathgen_SOURCES = main.c i_defaults.h image.h\
    pathgen_world.h pathgen_world.c \
    pathgen_node.h pathgen_node.c \
    pathgen_path.h pathgen_path.c \
-   i_splash.h i_display.h i_sim.h i_world.h i_path.h
+   i_splash.h i_display.h i_sim.h i_world.h i_path.h \
+   noise.h pixel.h
 
 pathgen_LDADD = @ELEMENTARY_LIBS@
 

@@ -1,37 +1,12 @@
-#ifndef PATHGEN_IMAGE_H
-#define PATHGEN_IMAGE_H
+#ifndef IMAGE_H
+#define IMAGE_H
 #include <math.h>
 #include <Evas.h>
-#include "image.h"
+#include "pixel.h"
 #include "pathgen_path.h"
 #include "pathgen_node.h"
 
-static uint32_t
-pixel_add(uint32_t a, uint32_t b)
-{
-   uint16_t ar,ag,ab,aa,br,bg,bb,ba,cr,cg,cb,ca;
-   uint32_t c;
 
-   
-   aa = (a & 0xFF000000) >> 24;
-   ar = (a & 0x00FF0000) >> 16;
-   ag = (a & 0x0000FF00) >> 8;
-   ab = (a & 0x000000FF);
-
-   ba = (b & 0xFF000000) >> 24;
-   br = (b & 0x00FF0000) >> 16;
-   bg = (b & 0x0000FF00) >> 8;
-   bb = (b & 0x000000FF);
-
-   ca = fmin(aa+ba, 255);
-   cr = fmin(ar+br, 255);
-   cg = fmin(ag+bg, 255);
-   cb = fmin(ab+bb, 255);
-
-   c = ca <<24 | cr << 16 | cg << 8 | cb;
-//   fprintf(stderr, "adding %X to %X to produce %X\n", b, a, c);
-   return c;
-}
 
 
 static Evas_Object *
@@ -161,4 +136,4 @@ image_pixel_value_get(Evas_Object *image, Evas_Coord x, Evas_Coord y, uint32_t m
 
 
 
-#endif /* PATHGEN_IMAGE_H */
+#endif /* IMAGE_H */

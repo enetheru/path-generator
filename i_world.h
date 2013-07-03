@@ -2,6 +2,7 @@
 #define I_WORLD_H
 
 #include "image.h"
+#include "noise.h"
 
 static void 
 _fs_load_height(void *data, Evas_Object *obj, void *event_info)
@@ -38,6 +39,7 @@ _btn_generate(void *data, Evas_Object *o, void *event_info)
 
    image = image_generate_random(evas,
       priv->i_world_gen_w, priv->i_world_gen_h);
+   image_paint_noise(image, priv->i_world_gen_density);
    pathgen_world_height_set(data, image);
 }
 
@@ -58,6 +60,16 @@ _spin_world_gen_size_h(void *data, Evas_Object *o, void *event_info)
    PATHGEN_WORLD_DATA_GET(data, priv);
    priv->i_world_gen_h = (int)elm_spinner_value_get(o);
 }
+
+static void
+_spin_world_gen_density(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_world_gen_density = (int)elm_spinner_value_get(o);
+}
+
 
 static void
 i_world_setup(Evas_Object *win, Evas_Object *vbox)
@@ -162,6 +174,18 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_world_gen_size_h, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "density=%.0f");
+   elm_spinner_min_max_set(spin, 1, 2048);
+   elm_spinner_step_set(spin, 1);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_world_gen_density, world);
 
 
 }
