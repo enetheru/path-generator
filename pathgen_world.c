@@ -192,6 +192,7 @@ pathgen_world_add( Evas *evas)
    /* world */
    priv->i_world_gen_w = I_WORLD_GEN_W_DEFAULT;
    priv->i_world_gen_h = I_WORLD_GEN_H_DEFAULT;
+   priv->i_world_gen_density = I_WORLD_GEN_DENSITY_DEFAULT;
    /* path */
    priv->i_path_search_iter_max = I_PATH_SEARCH_ITER_MAX_DEFAULT;
    priv->i_path_search_iter_speed = I_PATH_SEARCH_ITER_SPEED_DEFAULT;

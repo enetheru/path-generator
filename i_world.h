@@ -74,7 +74,8 @@ _spin_world_gen_density(void *data, Evas_Object *o, void *event_info)
 static void
 i_world_setup(Evas_Object *win, Evas_Object *vbox)
 {
-   Evas_Object *world, *frm, *lab, *spin, *btn, *fs_entry, *hbox;
+   Evas_Object *world, *frm, *lab, *spin, *btn, *fs_entry, *hbox,
+      *vbox1, *vbox2;
 
    world = evas_object_name_find(evas_object_evas_get(win),"world");
 
@@ -114,17 +115,17 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(frm);
 
    /* button divider */
-   vbox = elm_box_add(win);
-   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_content_set(frm, vbox);
-   evas_object_show(vbox);
+   vbox1 = elm_box_add(win);
+   evas_object_size_hint_align_set(vbox1, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(frm, vbox1);
+   evas_object_show(vbox1);
 
    /* add button to reset sim */
    btn = elm_button_add(win);
    evas_object_name_set(btn, "world,generate");
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(btn, "Generate Random World");
-   elm_box_pack_end(vbox, btn);
+   elm_box_pack_end(vbox1, btn);
    evas_object_show(btn);
 
    evas_object_smart_callback_add(btn, "clicked", _btn_generate, world);
@@ -132,29 +133,30 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    frm = elm_frame_add(win);
    evas_object_size_hint_weight_set(frm, 0.0, 0.0);
    evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(frm, "World Dimensions");
+   elm_object_text_set(frm, "Width and Height");
    elm_frame_autocollapse_set(frm, EINA_TRUE);
-   elm_box_pack_end(vbox, frm);
+   elm_box_pack_end(vbox1, frm);
    evas_object_show(frm);
 
    /* button divider */
-   vbox = elm_box_add(win);
-   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_object_content_set(frm, vbox);
-   evas_object_show(vbox);
+   vbox2 = elm_box_add(win);
+   evas_object_size_hint_align_set(vbox2, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(frm, vbox2);
+   evas_object_show(vbox2);
 
    /* sub divider */
    hbox = elm_box_add(win);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    elm_box_homogeneous_set(hbox, EINA_TRUE);
    evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
-   elm_box_pack_end(vbox, hbox);
+   elm_box_pack_end(vbox2, hbox);
    evas_object_show(hbox);
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "w=%.0f");
-   elm_spinner_min_max_set(spin, 128, 2048);
-   elm_spinner_step_set(spin, 64);
+   elm_spinner_min_max_set(spin, I_WORLD_GEN_W_MIN, I_WORLD_GEN_W_MAX);
+   elm_spinner_value_set(spin, I_WORLD_GEN_W_DEFAULT);
+   elm_spinner_step_set(spin, I_WORLD_GEN_W_STEP);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
    elm_box_pack_end(hbox, spin);
@@ -165,8 +167,9 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "h=%.0f");
-   elm_spinner_min_max_set(spin, 128, 2048);
-   elm_spinner_step_set(spin, 64);
+   elm_spinner_min_max_set(spin, I_WORLD_GEN_H_MIN, I_WORLD_GEN_H_MAX);
+   elm_spinner_value_set(spin, I_WORLD_GEN_H_DEFAULT);
+   elm_spinner_step_set(spin, I_WORLD_GEN_H_STEP);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
    elm_box_pack_end(hbox, spin);
@@ -176,12 +179,14 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
       _spin_world_gen_size_h, world);
 
    spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "density=%.0f");
-   elm_spinner_min_max_set(spin, 1, 2048);
-   elm_spinner_step_set(spin, 1);
+   elm_spinner_label_format_set(spin, "Density=%.0f");
+   elm_spinner_min_max_set(spin, I_WORLD_GEN_DENSITY_MIN,
+      I_WORLD_GEN_DENSITY_MAX);
+   elm_spinner_value_set(spin, I_WORLD_GEN_DENSITY_DEFAULT);
+   elm_spinner_step_set(spin, I_WORLD_GEN_DENSITY_STEP);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
-   elm_box_pack_end(hbox, spin);
+   elm_box_pack_end(vbox1, spin);
    evas_object_show(spin);
    
    evas_object_smart_callback_add(spin, "delay,changed",
