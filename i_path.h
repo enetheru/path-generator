@@ -103,12 +103,29 @@ _slid_path_walk_strength(void *data, Evas_Object *o, void *event_info)
       (int)elm_slider_value_get(o));
 }
 
+static void 
+_hoversel_path_algorithm_dijkstra(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "dijkstra Selected\n");
+}
+
 static void
 i_path_setup(Evas_Object *win, Evas_Object *vbox)
 {
-   Evas_Object *world, *frm, *lab, *spin, *hbox, *slid, *chk;
+   Evas_Object *world, *frm, *lab, *spin, *hbox, *slid, *chk, *hov;
 
    world = evas_object_name_find(evas_object_evas_get(win),"world");
+
+   hov = elm_hoversel_add(win);
+   elm_hoversel_hover_parent_set(hov, win);
+   evas_object_size_hint_align_set(hov, EVAS_HINT_FILL, 0);
+   evas_object_size_hint_weight_set(hov, EVAS_HINT_EXPAND, 0);
+   elm_object_text_set(hov, "Choose Path Finding Algorithm");
+   elm_hoversel_item_add(hov, "Dijkstra", NULL, ELM_ICON_NONE, _hoversel_path_algorithm_dijkstra, NULL);
+   elm_hoversel_item_add(hov, "A*", NULL, ELM_ICON_NONE, NULL, NULL);
+   elm_hoversel_item_add(hov, "Jump Point", NULL, ELM_ICON_NONE, NULL, NULL);
+   elm_box_pack_end(vbox, hov);
+   evas_object_show(hov);
 
    frm = elm_frame_add(win);
    evas_object_size_hint_weight_set(frm, 0.0, 0.0);
