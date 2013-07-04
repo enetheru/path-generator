@@ -58,7 +58,7 @@ image_paint_noise(Evas_Object *image, int density)
 //      pixels[i + w * j] = grid[nx][ny];
 //   }
 
-   /* linear interpalation */
+   /* linear interpolation */
   for(i = 0; i < w; i++) for(j = 0; j < h; j++)
    {
       px = (float)i / (float)w;
@@ -92,6 +92,60 @@ image_paint_noise(Evas_Object *image, int density)
       /* set color of pixel to data at grid location */
       pixels[i + w * j] = pixel_desaturate(pix3) | 0xFF000000;
    }
+
+   /* pixel coordinates expressed from 0-1 */
+   float u, v;
+   /* vector from the top left bounding grid location to our pixel */
+   float vx, vy;
+   /* bounding walls of our location, top bottom left right */
+   int l, r, t, b;
+   /* quadratic interpolation */
+   for(i = 0; i < w; i++) for(j = 0; j < h; j++)
+   {
+      /* get the x and y position of the pixel in UV coords */
+      u = (float)i / (float)w;
+      v = (float)j / (float)h;
+
+      /* grid locations that bound the pixel */
+      l = floor(u / interval);
+      t = floor(v / interval);
+      r = l+1;
+      b = t+1;
+
+      /* vector to the pixel from the top left bounding grid location */
+      vx = (u * density) - l;
+      vy = (v * density) - t;
+      if(vx < 0.5)
+         vx = 2 * vx * vx;
+      else
+         vx = (-2 * vx * vx) + (4 * vx)-1;
+
+      if(vy < 0.5)
+         vy = 2 * vy * vy;
+      else
+         vy = (-2 * vy * vy) + (4 * vy)-1;
+
+      /* interpolate x positions */
+      tl = pixel_multiply_float(grid[t][l], fabs(vx-1));
+      tr = pixel_multiply_float(grid[t][r], vx);
+      bl = pixel_multiply_float(grid[b][l], fabs(vx-1));
+      br = pixel_multiply_float(grid[b][r], vx);
+
+      /* join values together */
+      pix1 = pixel_add(tl,tr);
+      pix2 = pixel_add(bl,br);
+
+      /* interpalate y positions */
+      pix1 = pixel_multiply_float(pix1, fabs(vy-1));
+      pix2 = pixel_multiply_float(pix2, vy);
+
+      /* join values together */
+      pix3 = pixel_add(pix1,pix2);
+
+      /* set color of pixel to data at grid location */
+      pixels[i + w * j] = pixel_desaturate(pix3) | 0xFF000000;
+   }
+
 
    evas_object_image_data_set(image, pixels);
    evas_object_image_data_update_add(image, 0, 0, w, h);
