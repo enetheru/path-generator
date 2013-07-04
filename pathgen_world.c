@@ -512,13 +512,9 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    if(priv->i_display_search) /* walk the path slowly */
    {
       image_fill_color(priv->search, 0x00000000);
-      ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_search_slow, path);
+      ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_search, path);
    }
-   else
-   {
-      while(pathgen_path_search_fast(path));
-      evas_object_smart_callback_call(world, EVT_PATH_SEARCH_COMPLETE, path);
-   }
+   else while(pathgen_path_search(path));
 }
 
 /*****************************

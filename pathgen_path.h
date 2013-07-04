@@ -36,10 +36,7 @@ pathgen_path_search_complete( void *data, Evas_Object *world, void *event_info )
 ***************/
 
 Eina_Bool
-pathgen_path_search_fast(void *data);
-
-Eina_Bool
-pathgen_path_search_slow(void *data);
+pathgen_path_search(void *data);
 
 Eina_Bool
 pathgen_path_walk(void *data);

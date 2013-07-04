@@ -23,7 +23,7 @@ elm_main(int argc, char **argv)
 
    evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
    evas_object_event_callback_add(win, EVAS_CALLBACK_KEY_DOWN, _key_down, NULL);
-   evas_object_key_grab(win, "Escape", 0, 0, EINA_TRUE);
+   if(!evas_object_key_grab(win, "Escape", 0, 0, EINA_TRUE))fprintf(stderr, "could not grab");;
 
    evas = evas_object_evas_get(win);
 
