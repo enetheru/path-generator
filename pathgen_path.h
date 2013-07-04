@@ -8,9 +8,7 @@ struct pathgen_path {
    Evas_Object *world;
    Pathgen_Node *start, *end, *current;
    Eina_List *open, *closed;
-   int iter, iter_max;
-   float iter_speed;
-   int tie;
+   int iter;
 };
 
 /*******

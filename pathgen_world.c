@@ -508,13 +508,11 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 
    /* new path */
    path = pathgen_path_create(world, start, end);
-   path->iter_max = priv->i_path_search_iter_max;
-   path->iter_speed = priv->i_path_search_iter_speed;
 
    if(priv->i_display_search) /* walk the path slowly */
    {
       image_fill_color(priv->search, 0x00000000);
-      ecore_timer_add(path->iter_speed, pathgen_path_search_slow, path);
+      ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_search_slow, path);
    }
    else
    {

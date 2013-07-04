@@ -46,11 +46,10 @@ void
 pathgen_path_info(Pathgen_Path *path)
 {
    fprintf(stderr,
-      "p: w=%p, s=%p, e=%p, c=%p, o=%i, c=%i, s=%i, s=%f\n", 
+      "p: w=%p, s=%p, e=%p, c=%p, o=%i, c=%i\n", 
       path->world, path->start, path->end, path->current, 
       eina_list_count(path->open),
-      eina_list_count(path->closed),
-      path->iter_max, path->iter_speed);
+      eina_list_count(path->closed));
    return;
 }
 
@@ -78,7 +77,7 @@ pathgen_path_search_fast(void *data)
    path->current = path->end;
 
    /* bail if its taking too long */
-   if(path->iter >= path->iter_max)
+   if(path->iter >= priv->i_path_search_iter_max)
       return EINA_FALSE;
 
    /* if the next node is at the finish line, exit */
@@ -178,7 +177,7 @@ pathgen_path_search_slow(void *data)
    path = data;
    PATHGEN_WORLD_DATA_GET(path->world, priv);
 
-   fprintf(stderr, "current_iteration %i of %i\n", path->iter, path->iter_max);
+   fprintf(stderr, "current_iteration %i of %i\n", path->iter, priv->i_path_search_iter_max);
 
    fprintf(stderr, "searching for best node\n");
    next = pathgen_path_best(path);
@@ -194,7 +193,7 @@ pathgen_path_search_slow(void *data)
    path->current = next;
 
    /* bail if its taking too long */
-   if(path->iter >= path->iter_max)
+   if(path->iter >= priv->i_path_search_iter_max)
    {
       fprintf(stderr, "maximum steps reached stopping\n");
       evas_object_smart_callback_call(path->world,
@@ -398,7 +397,7 @@ pathgen_path_search_complete( void *data, __UNUSED__
    if(priv->i_display_path)
    {
       image_fill_color(priv->path, 0x00000000);
-      ecore_timer_add(path->iter_speed, pathgen_path_walk_slow, path);
+      ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_walk_slow, path);
    }
    else
    {
