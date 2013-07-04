@@ -76,6 +76,7 @@ pathgen_path_search(void *data)
       return EINA_FALSE;
    }
    path->goal->parent = next->parent;
+   path->end = next;
    path->current = next;
 
    /* bail if its taking too long */
@@ -231,7 +232,7 @@ pathgen_path_walk(void *data)
 
    if(!path->current->parent)
    {
-      path->current = path->goal;
+      path->current = path->end;
       return EINA_FALSE;
    }
    path->current = path->current->parent;
