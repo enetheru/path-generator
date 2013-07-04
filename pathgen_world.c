@@ -197,6 +197,7 @@ pathgen_world_add( Evas *evas)
    priv->i_path_search_iter_max = I_PATH_SEARCH_ITER_MAX_DEFAULT;
    priv->i_path_search_iter_speed = I_PATH_SEARCH_ITER_SPEED_DEFAULT;
    priv->i_path_search_diagonal = I_PATH_SEARCH_DIAGONAL_DEFAULT;
+   priv->i_path_walk_strength = I_PATH_WALK_STRENGTH_DEFAULT;
 
    priv->i_path_inf_dist_manhat = I_PATH_INF_DIST_MANHAT_DEFAULT;
    priv->i_path_inf_dist_euclid = I_PATH_INF_DIST_EUCLID_DEFAULT;

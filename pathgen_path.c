@@ -285,7 +285,7 @@ pathgen_path_walk_slow(void *data)
    }
    if(!ret)
    {
-      image_paint_path(priv->heatmap, path, 0x01000000);
+      image_paint_path(priv->heatmap, path, (uint32_t)(priv->i_path_walk_strength)<<24);
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
    }
    return ret;

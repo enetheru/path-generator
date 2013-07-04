@@ -37,16 +37,21 @@ struct _Pathgen_World_Data
              i_display_heatmap,
              i_display_search,
              i_display_path;
+
    /* sim */
    int       i_sim_travelers;
+
    /* world */
    int       i_world_gen_w,
              i_world_gen_h,
              i_world_gen_density;
+
    /* pathing */
-   int       i_path_search_iter_max;
+   int       i_path_search_iter_max,
+             i_path_walk_strength;
    float     i_path_search_iter_speed;
    Eina_Bool i_path_search_diagonal;
+
    /* path influence variables */
    float     i_path_inf_dist_manhat,
              i_path_inf_dist_euclid,
