@@ -27,4 +27,7 @@ pathgen_node_dist_euclid(Pathgen_Node *a, Pathgen_Node *b);
 int
 pathgen_node_dist_manhat(Pathgen_Node *a, Pathgen_Node *b);
 
+int
+pathgen_node_dist_diagon(Pathgen_Node *a, Pathgen_Node *b);
+
 #endif /*PATHGEN_NODE_H*/

@@ -106,6 +106,16 @@ _slid_path_walk_strength(void *data, Evas_Object *o, void *event_info)
 static void 
 _hoversel_path_algorithm_dijkstra(void *data, Evas_Object *o, void *event_info)
 {
+   PATHGEN_WORLD_DATA_GET(data, priv);
+  priv->hueristic = hueristic_dijkstra;
+   fprintf(stderr, "dijkstra Selected\n");
+}
+
+static void 
+_hoversel_path_algorithm_custom(void *data, Evas_Object *o, void *event_info)
+{
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->hueristic = hueristic_custom;
    fprintf(stderr, "dijkstra Selected\n");
 }
 
@@ -121,7 +131,8 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_size_hint_align_set(hov, EVAS_HINT_FILL, 0);
    evas_object_size_hint_weight_set(hov, EVAS_HINT_EXPAND, 0);
    elm_object_text_set(hov, "Choose Path Finding Algorithm");
-   elm_hoversel_item_add(hov, "Dijkstra", NULL, ELM_ICON_NONE, _hoversel_path_algorithm_dijkstra, NULL);
+   elm_hoversel_item_add(hov, "Dijkstra", NULL, ELM_ICON_NONE, _hoversel_path_algorithm_dijkstra, world);
+   elm_hoversel_item_add(hov, "Custom", NULL, ELM_ICON_NONE, _hoversel_path_algorithm_custom, world);
    elm_hoversel_item_add(hov, "A*", NULL, ELM_ICON_NONE, NULL, NULL);
    elm_hoversel_item_add(hov, "Jump Point", NULL, ELM_ICON_NONE, NULL, NULL);
    elm_box_pack_end(vbox, hov);

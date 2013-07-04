@@ -182,6 +182,8 @@ pathgen_world_add( Evas *evas)
    evas_object_smart_member_add(priv->background, world);
    evas_object_lower(priv->background);
 
+   priv->hueristic = &hueristic_dijkstra;
+
    /* set default variables */
    /* display */
    priv->i_display_search = I_DISPLAY_SEARCH_DEFAULT;

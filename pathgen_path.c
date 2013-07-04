@@ -181,27 +181,9 @@ pathgen_path_search(void *data)
          continue;
       }
       peers[i]->parent = best;
-
-      /* == build hueristic data == */
-      /* manhattan distance from origin */
-      int inf_dist_m = (float)pathgen_node_dist_manhat(peers[i], path->goal);
       
-      /* euclidean distance to target */
-      double inf_dist_e = pathgen_node_dist_euclid(peers[i], path->goal);
-
-      /* change of height */
-      int inf_desasc = abs(peers[i]->z - best->z);
-
-      /* adherance to roads */
-      int inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
-
-      f = inf_dist_m * priv->i_path_inf_dist_manhat
-        + inf_dist_e * priv->i_path_inf_dist_euclid
-        + inf_desasc * priv->i_path_inf_desasc
-        + inf_path   * priv->i_path_inf_path;
-            
-      peers[i]->g = f;
-
+      peers[i]->g = priv->hueristic(path, peers[i]);
+     
       /* add the node to the open list */
       path->open = eina_list_append(path->open, peers[i]);
 
@@ -314,4 +296,34 @@ pathgen_path_search_complete( void *data, __UNUSED__
       evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
    }
    evas_object_smart_changed(o);
+}
+
+
+double
+hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node)
+{
+   return pathgen_node_dist_diagon(node, path->start);
+}
+
+double
+hueristic_custom(Pathgen_Path *path, Pathgen_Node *node)
+{
+   PATHGEN_WORLD_DATA_GET(path->world, priv);
+   /* == build hueristic data == */
+   /* manhattan distance from origin */
+   int inf_dist_m = (float)pathgen_node_dist_manhat(node, path->goal);
+      
+   /* euclidean distance to target */
+   double inf_dist_e = pathgen_node_dist_euclid(node, path->goal);
+
+   /* change of height */
+   int inf_desasc = abs(node->z - path->end->z);
+
+   /* adherance to roads */
+   int inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, node->x, node->y, 0xFF000000, 24);
+
+   return inf_dist_m * priv->i_path_inf_dist_manhat
+     + inf_dist_e * priv->i_path_inf_dist_euclid
+     + inf_desasc * priv->i_path_inf_desasc
+     + inf_path   * priv->i_path_inf_path;
 }

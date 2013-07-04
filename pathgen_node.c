@@ -68,3 +68,12 @@ pathgen_node_dist_manhat(Pathgen_Node *a, Pathgen_Node *b)
    dy = abs(a->y - b->y);
    return dx + dy;
 }
+
+int
+pathgen_node_dist_diagon(Pathgen_Node *a, Pathgen_Node *b)
+{
+   int dx, dy;
+   dx = abs(a->x - b->x);
+   dy = abs(a->y - b->y);
+   return fmax(dx, dy);
+}

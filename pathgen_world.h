@@ -1,6 +1,8 @@
 #ifndef PATHGEN_WORLD_H
 #define PATHGEN_WORLD_H
 #include <Ecore_Evas.h>
+#include "pathgen_path.h"
+#include "pathgen_node.h"
 
 
 #define __UNUSED__
@@ -30,6 +32,9 @@ struct _Pathgen_World_Data
       *teleport, *heatmap, *search, *path;
    int w,h;
    int travelers;
+
+   /* solver hueristic */
+   double (*hueristic)(Pathgen_Path *, Pathgen_Node *);
 
    /* == interface variables == */
    /* display settings */

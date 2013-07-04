@@ -51,5 +51,10 @@ pathgen_path_walk_slow(void *data);
 Pathgen_Node *
 pathgen_path_best(Pathgen_Path *path);
 
+double
+hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node);
+
+double
+hueristic_custom(Pathgen_Path *path, Pathgen_Node *node);
 
 #endif /*PATHGEN_PATH_H*/
