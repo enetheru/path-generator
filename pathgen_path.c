@@ -57,7 +57,7 @@ Eina_Bool
 pathgen_path_search(void *data)
 {
    Pathgen_Path *path;
-   Pathgen_Node *nesw[4], *next, *node;
+   Pathgen_Node *peers[8], *best, *node;
 
    Eina_List *l;
    void *list_data;
@@ -67,17 +67,17 @@ pathgen_path_search(void *data)
    path = data;
    PATHGEN_WORLD_DATA_GET(path->world, priv);
 
-   next = pathgen_path_best(path);
-   if(!next)
+   best = pathgen_path_best(path);
+   if(!best)
    {
-      fprintf(stderr, "ERR:path_search, no next node\n");
+      fprintf(stderr, "ERR:path_search, no best node\n");
       evas_object_smart_callback_call(path->world,
          EVT_PATH_SEARCH_COMPLETE, path);
       return EINA_FALSE;
    }
-   path->goal->parent = next->parent;
-   path->end = next;
-   path->current = next;
+   path->goal->parent = best->parent;
+   path->end = best;
+   path->current = best;
 
    /* bail if its taking too long */
    if(path->iter >= priv->i_path_search_iter_max)
@@ -88,8 +88,8 @@ pathgen_path_search(void *data)
       return EINA_FALSE;
    }
 
-   /* if the next node is at the finish line, exit */
-   if(next->x == path->goal->x && next->y == path->goal->y)
+   /* if the best node is at the finish line, exit */
+   if(best->x == path->goal->x && best->y == path->goal->y)
    {
 //      fprintf(stderr, "INF:path_search, Goal reached.\n");
       evas_object_smart_callback_call(path->world,
@@ -98,71 +98,99 @@ pathgen_path_search(void *data)
    }
 
    /* move the node to the closed list */
-   path->open = eina_list_remove(path->open, next);
-   path->closed = eina_list_append(path->closed, next);
+   path->open = eina_list_remove(path->open, best);
+   path->closed = eina_list_append(path->closed, best);
 
    if(priv->i_display_search)
-      image_paint_node(priv->search, next, 0x88000000);
+      image_paint_node(priv->search, best, 0x88000000);
 
    /* examine the neighbours */
    /* clear any data */
-   for(i=0; i<4; i++) nesw[i] = NULL;
+   if(priv->i_path_search_diagonal)j = 8;
+   else j = 4;
+   for(i=0; i<j; i++) peers[i] = NULL;
 
    /* search open list for neighbour */
    EINA_LIST_FOREACH(path->open, l, list_data)
    {
       node = (Pathgen_Node *)list_data;
-           if(node->x==next->x    && node->y==next->y -1)nesw[0]=node;//north
-      else if(node->x==next->x +1 && node->y==next->y   )nesw[1]=node;//east
-      else if(node->x==next->x    && node->y==next->y +1)nesw[2]=node;//south
-      else if(node->x==next->x -1 && node->y==next->y   )nesw[3]=node;//west
+         // North, east, south, west
+           if(node->x==best->x    && node->y==best->y -1)peers[0]=node;
+      else if(node->x==best->x +1 && node->y==best->y   )peers[1]=node;
+      else if(node->x==best->x    && node->y==best->y +1)peers[2]=node;
+      else if(node->x==best->x -1 && node->y==best->y   )peers[3]=node;
+      else if(priv->i_path_search_diagonal)
+      {  // north east, north west, south east, south west
+           if(node->x==best->x +1 && node->y==best->y -1)peers[4]=node;
+      else if(node->x==best->x -1 && node->y==best->y -1)peers[5]=node;
+      else if(node->x==best->x +1 && node->y==best->y +1)peers[6]=node;
+      else if(node->x==best->x -1 && node->y==best->y +1)peers[7]=node;
+         
+      }
    }
 
    /* search closed list for neighbour */
    EINA_LIST_FOREACH(path->closed, l, list_data)
    {
       node = (Pathgen_Node *)list_data;
-           if(node->x==next->x    && node->y==next->y -1)nesw[0]=node;//north
-      else if(node->x==next->x +1 && node->y==next->y   )nesw[1]=node;//east
-      else if(node->x==next->x    && node->y==next->y +1)nesw[2]=node;//south
-      else if(node->x==next->x -1 && node->y==next->y   )nesw[3]=node;//west
+         // North, east, south, west
+           if(node->x==best->x    && node->y==best->y -1)peers[0]=node;
+      else if(node->x==best->x +1 && node->y==best->y   )peers[1]=node;
+      else if(node->x==best->x    && node->y==best->y +1)peers[2]=node;
+      else if(node->x==best->x -1 && node->y==best->y   )peers[3]=node;
+      {  // north east, north west, south east, south west
+           if(node->x==best->x +1 && node->y==best->y -1)peers[4]=node;
+      else if(node->x==best->x -1 && node->y==best->y -1)peers[5]=node;
+      else if(node->x==best->x +1 && node->y==best->y +1)peers[6]=node;
+      else if(node->x==best->x -1 && node->y==best->y +1)peers[7]=node;
+         
+      }
+
    }
    
-   for(i=0; i<4; i++)
+   for(i=0; i<j; i++)
    {
       /* if the node already exists, skip */
-      if(nesw[i])
+      if(peers[i])
       {
          continue;
       }
-           if(next->x+1 > priv->w-1) continue;
-      else if(next->x-1 < 0) continue;
-      else if(next->y+1 > priv->h-1) continue;
-      else if(next->y-1 < 0) continue;
+
+      /* if the node is out of bounds skip */
+           if(best->x+1 > priv->w-1) continue;
+      else if(best->x-1 < 0) continue;
+      else if(best->y+1 > priv->h-1) continue;
+      else if(best->y-1 < 0) continue;
+
       /* setup new coordinates changes */
-              if(i==0){ x = next->x  ; y = next->y-1;}//north
-         else if(i==1){ x = next->x+1; y = next->y  ;}//east
-         else if(i==2){ x = next->x  ; y = next->y+1;}//south
-         else if(i==3){ x = next->x-1; y = next->y  ;}//west
+           if(i==0){ x = best->x  ; y = best->y-1;}//north
+      else if(i==1){ x = best->x+1; y = best->y  ;}//east
+      else if(i==2){ x = best->x  ; y = best->y+1;}//south
+      else if(i==3){ x = best->x-1; y = best->y  ;}//west
+      else if(i==4){ x = best->x+1; y = best->y-1;}//north east
+      else if(i==5){ x = best->x-1; y = best->y-1;}//north west
+      else if(i==6){ x = best->x+1; y = best->y+1;}//south east
+      else if(i==7){ x = best->x-1; y = best->y+1;}//south west
+
       /* create the new node*/
-      nesw[i] = pathgen_node_create(path->world, x, y);
-      if(!nesw[i])
+      peers[i] = pathgen_node_create(path->world, x, y);
+      if(!peers[i])
       {
          fprintf(stderr,
             "ERR:path_search, node not created as expected\n");
          continue;
       }
-      nesw[i]->parent = next;
+      peers[i]->parent = best;
 
       /* == build hueristic data == */
       /* manhattan distance from origin */
-      int inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->goal);
+      int inf_dist_m = (float)pathgen_node_dist_manhat(peers[i], path->goal);
       
       /* euclidean distance to target */
-      double inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->goal);
+      double inf_dist_e = pathgen_node_dist_euclid(peers[i], path->goal);
 
       /* change of height */
-      int inf_desasc = abs(nesw[i]->z - next->z);
+      int inf_desasc = abs(peers[i]->z - best->z);
 
       /* adherance to roads */
       int inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, x, y, 0xFF000000, 24);
@@ -172,14 +200,14 @@ pathgen_path_search(void *data)
         + inf_desasc * priv->i_path_inf_desasc
         + inf_path   * priv->i_path_inf_path;
             
-      nesw[i]->g = f;
+      peers[i]->g = f;
 
       /* add the node to the open list */
-      path->open = eina_list_append(path->open, nesw[i]);
+      path->open = eina_list_append(path->open, peers[i]);
 
       /* paint the node */
       if(priv->i_display_search)
-         image_paint_node(priv->search, nesw[i], 0x88008888);
+         image_paint_node(priv->search, peers[i], 0x88008888);
    }
    evas_object_smart_changed(path->world);
    path->iter++;

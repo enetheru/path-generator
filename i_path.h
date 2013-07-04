@@ -2,6 +2,31 @@
 #define I_PATH_H
 
 static void
+_chk_path_search_diagonal(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->height)return;
+
+   if(elm_check_state_get(o))
+   {
+      fprintf(stderr,
+         "i_path_search_diagonal = on\n");
+      priv->i_path_search_diagonal = EINA_TRUE;
+   }
+   else
+   {
+      fprintf(stderr,
+         "i_path_search_diagonal = off\n");
+      priv->i_path_search_diagonal = EINA_FALSE;
+   }
+}
+
+
+static void
 _spin_path_speed_change(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
@@ -70,7 +95,7 @@ _slid_path_inf_path(void *data, Evas_Object *o, void *event_info)
 static void
 i_path_setup(Evas_Object *win, Evas_Object *vbox)
 {
-   Evas_Object *world, *frm, *lab, *spin, *hbox, *slid;
+   Evas_Object *world, *frm, *lab, *spin, *hbox, *slid, *chk;
 
    world = evas_object_name_find(evas_object_evas_get(win),"world");
 
@@ -87,6 +112,15 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
    elm_object_content_set(frm, vbox);
    evas_object_show(vbox);
+
+   chk = elm_check_add(win);
+   evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
+   elm_check_state_set(chk, I_PATH_SEARCH_DIAGONAL_DEFAULT);
+   elm_object_part_text_set(chk, NULL,  "Allow Diagonal Movement");
+   elm_box_pack_end(vbox, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_path_search_diagonal, world);
 
    /* sub divider */
    hbox = elm_box_add(win);

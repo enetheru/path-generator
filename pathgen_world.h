@@ -46,6 +46,7 @@ struct _Pathgen_World_Data
    /* pathing */
    int       i_path_search_iter_max;
    float     i_path_search_iter_speed;
+   Eina_Bool i_path_search_diagonal;
    /* path influence variables */
    float     i_path_inf_dist_manhat,
              i_path_inf_dist_euclid,
