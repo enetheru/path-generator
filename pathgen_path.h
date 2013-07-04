@@ -6,7 +6,7 @@
 typedef struct pathgen_path Pathgen_Path;
 struct pathgen_path {
    Evas_Object *world;
-   Pathgen_Node *start, *end, *current;
+   Pathgen_Node *start, *end, *goal, *current;
    Eina_List *open, *closed;
    int iter;
 };

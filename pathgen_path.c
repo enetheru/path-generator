@@ -10,7 +10,7 @@ pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end)
    Pathgen_Path *path = malloc(sizeof(Pathgen_Path));
    path->world = world;
    path->start = start;
-   path->end = end;
+   path->goal = end;
 
    path->open = NULL;
    path->open = eina_list_append(path->open, path->start);
@@ -34,7 +34,7 @@ pathgen_path_del(Pathgen_Path *path)
 
    /* delete start, end, current nodes */
    pathgen_node_del(path->start);
-   pathgen_node_del(path->end);
+   pathgen_node_del(path->goal);
    pathgen_node_del(path->current);
 
    free(path);
@@ -47,7 +47,7 @@ pathgen_path_info(Pathgen_Path *path)
 {
    fprintf(stderr,
       "p: w=%p, s=%p, e=%p, c=%p, o=%i, c=%i\n", 
-      path->world, path->start, path->end, path->current, 
+      path->world, path->start, path->goal, path->current, 
       eina_list_count(path->open),
       eina_list_count(path->closed));
    return;
@@ -75,7 +75,7 @@ pathgen_path_search(void *data)
          EVT_PATH_SEARCH_COMPLETE, path);
       return EINA_FALSE;
    }
-   path->end->parent = next->parent;
+   path->goal->parent = next->parent;
    path->current = next;
 
    /* bail if its taking too long */
@@ -88,7 +88,7 @@ pathgen_path_search(void *data)
    }
 
    /* if the next node is at the finish line, exit */
-   if(next->x == path->end->x && next->y == path->end->y)
+   if(next->x == path->goal->x && next->y == path->goal->y)
    {
 //      fprintf(stderr, "INF:path_search, Goal reached.\n");
       evas_object_smart_callback_call(path->world,
@@ -155,10 +155,10 @@ pathgen_path_search(void *data)
 
       /* == build hueristic data == */
       /* manhattan distance from origin */
-      int inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->end);
+      int inf_dist_m = (float)pathgen_node_dist_manhat(nesw[i], path->goal);
       
       /* euclidean distance to target */
-      double inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->end);
+      double inf_dist_e = pathgen_node_dist_euclid(nesw[i], path->goal);
 
       /* change of height */
       int inf_desasc = abs(nesw[i]->z - next->z);
@@ -231,7 +231,7 @@ pathgen_path_walk(void *data)
 
    if(!path->current->parent)
    {
-      path->current = path->end;
+      path->current = path->goal;
       return EINA_FALSE;
    }
    path->current = path->current->parent;
