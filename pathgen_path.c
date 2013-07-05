@@ -292,7 +292,7 @@ pathgen_path_search_complete( void *data, __UNUSED__
    }
    else
    {
-      image_paint_path(priv->heatmap, path, 0x01000000);
+      image_paint_path(priv->heatmap, path, (uint32_t)(priv->i_path_walk_strength)<<24);
       evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
    }
    evas_object_smart_changed(o);
