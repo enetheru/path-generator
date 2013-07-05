@@ -74,7 +74,9 @@ image_fill_color(Evas_Object *image, uint32_t color)
 }
 
 static void
-image_fill_function(Evas_Object *image, uint32_t (*process)(uint32_t, uint32_t), uint32_t color)
+image_fill_function(Evas_Object *image,
+   uint32_t (*process)(uint32_t, uint32_t),
+   uint32_t color)
 {
    int i, w, h;
    uint32_t *pixels;
@@ -152,6 +154,32 @@ image_pixel_value_get(Evas_Object *image, int x, int y, uint32_t mask, int shift
    return (pixels[x+w*y] & mask)>>shift;
 }
 
+static void
+image_comp_func(Evas_Object *image_o,
+   int x, int y,
+   uint32_t (*process)(uint32_t, uint32_t),
+   Evas_Object *image_b)
+{
+   int i, wo, ho, wb, hb;
+   uint32_t *pixels_o, *pixels_b;
 
+   if(!image_o || !image_b)return;
+
+   evas_object_image_size_get(image_o, &wo, &ho);
+   evas_object_image_size_get(image_b, &wb, &hb);
+
+   if(x+wb > wo || y+hb > ho)return;
+
+   pixels_o = evas_object_image_data_get(image, EINA_TRUE);
+   pixels_b = evas_object_image_data_get(image, EINA_FALSE);
+   for(i=0; i < w*h; i++)
+   {
+//      pixels_o[i+x] = process(pixels_o[i+x],pixels_b[i]); //FIXME
+   }
+   evas_object_image_data_set(image, pixels);
+   evas_object_image_data_update_add(image, 0, 0, w, h);
+
+
+}
 
 #endif /* IMAGE_H */
