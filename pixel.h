@@ -26,6 +26,31 @@ pixel_add(uint32_t a, uint32_t b)
    c = ca <<24 | cr << 16 | cg << 8 | cb;
    return c;
 }
+static uint32_t
+pixel_subtract(uint32_t a, uint32_t b)
+{
+   uint16_t ar,ag,ab,aa,br,bg,bb,ba,cr,cg,cb,ca;
+   uint32_t c;
+
+   
+   aa = (a & 0xFF000000) >> 24;
+   ar = (a & 0x00FF0000) >> 16;
+   ag = (a & 0x0000FF00) >> 8;
+   ab = (a & 0x000000FF);
+
+   ba = (b & 0xFF000000) >> 24;
+   br = (b & 0x00FF0000) >> 16;
+   bg = (b & 0x0000FF00) >> 8;
+   bb = (b & 0x000000FF);
+
+   ca = fmax(aa-ba, 0);
+   cr = fmax(ar-br, 0);
+   cg = fmax(ag-bg, 0);
+   cb = fmax(ab-bb, 0);
+
+   c = ca <<24 | cr << 16 | cg << 8 | cb;
+   return c;
+}
 
 static uint32_t
 pixel_average(uint32_t a, uint32_t b)

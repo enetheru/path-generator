@@ -7,7 +7,8 @@
 #include "pathgen_node.h"
 
 
-
+static void
+image_fill_color(Evas_Object *image, uint32_t color);
 
 static Evas_Object *
 image_generate_random(Evas *evas, int w, int h)
@@ -51,15 +52,7 @@ image_generate_color(Evas *evas, int w, int h, uint32_t color)
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
    evas_object_image_alpha_set(image, EINA_TRUE);
 
-   pixels = evas_object_image_data_get(image, EINA_TRUE);
-   /* generating the contents of the image */   
-   for(i = 0; i < w * h; i++)
-   {
-      /* build random grey image */
-      pixels[i] = color;
-   }
-   evas_object_image_data_set(image, pixels);
-   evas_object_image_data_update_add(image, 0, 0, w, h);
+   image_fill_color(image, color);
    return image;
 }
 
@@ -75,6 +68,23 @@ image_fill_color(Evas_Object *image, uint32_t color)
    for(i=0; i < w*h; i++)
    {
       pixels[i] = color;
+   }
+   evas_object_image_data_set(image, pixels);
+   evas_object_image_data_update_add(image, 0, 0, w, h);
+}
+
+static void
+image_fill_function(Evas_Object *image, uint32_t (*process)(uint32_t, uint32_t), uint32_t color)
+{
+   int i, w, h;
+   uint32_t *pixels;
+
+   if(!image)return;
+   evas_object_image_size_get(image, &w, &h);
+   pixels = evas_object_image_data_get(image, EINA_TRUE);
+   for(i=0; i < w*h; i++)
+   {
+      pixels[i] = process(pixels[i], color);
    }
    evas_object_image_data_set(image, pixels);
    evas_object_image_data_update_add(image, 0, 0, w, h);
