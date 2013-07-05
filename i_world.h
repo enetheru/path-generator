@@ -44,6 +44,15 @@ _btn_generate(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
+_spin_world_height_mult(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_world_height_mult = (int)elm_spinner_value_get(o);
+}
+
+static void
 _spin_world_gen_size_w(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
@@ -94,18 +103,46 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(vbox);
 
    /* file selector entry */
-   fs_entry = elm_fileselector_entry_add(win);
+   fs_entry = elm_fileselector_button_add(win);
    evas_object_name_set(fs_entry, "world,height,load");
    evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
-   elm_fileselector_entry_path_set(fs_entry, "select height map");
-   elm_fileselector_entry_expandable_set(fs_entry, EINA_FALSE);
-   elm_object_text_set(fs_entry, "Select height map");
+   elm_fileselector_button_expandable_set(fs_entry, EINA_FALSE);
+   elm_object_text_set(fs_entry, "Load a Heightmap File");
    elm_box_pack_end(vbox, fs_entry);
    evas_object_show(fs_entry);
 
    evas_object_smart_callback_add(
       fs_entry, "file,chosen", _fs_load_height, world);
 
+   /* height multiplier spinner */
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   lab = elm_label_add(win);
+   elm_object_text_set(lab, "Height Multiplier");
+   elm_box_pack_end(hbox, lab);
+   evas_object_show(lab);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "%.0f");
+   elm_spinner_min_max_set(spin, I_WORLD_HEIGHT_MULT_MIN,
+      I_WORLD_HEIGHT_MULT_MAX);
+   elm_spinner_value_set(spin, I_WORLD_HEIGHT_MULT_DEFAULT);
+   elm_spinner_step_set(spin, I_WORLD_HEIGHT_MULT_STEP);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_world_height_mult, world);
+
+   /* world generation options */
   frm = elm_frame_add(win);
    evas_object_size_hint_weight_set(frm, 0.0, 0.0);
    evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);

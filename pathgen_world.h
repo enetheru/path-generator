@@ -49,7 +49,8 @@ struct _Pathgen_World_Data
    /* world */
    int       i_world_gen_w,
              i_world_gen_h,
-             i_world_gen_density;
+             i_world_gen_density,
+             i_world_height_mult;
 
    /* pathing */
    int       i_path_search_iter_max,

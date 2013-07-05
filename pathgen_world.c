@@ -195,6 +195,7 @@ pathgen_world_add( Evas *evas)
    priv->i_world_gen_w = I_WORLD_GEN_W_DEFAULT;
    priv->i_world_gen_h = I_WORLD_GEN_H_DEFAULT;
    priv->i_world_gen_density = I_WORLD_GEN_DENSITY_DEFAULT;
+   priv->i_world_height_mult = I_WORLD_HEIGHT_MULT_DEFAULT;
    /* path */
    priv->i_path_search_iter_max = I_PATH_SEARCH_ITER_MAX_DEFAULT;
    priv->i_path_search_iter_speed = I_PATH_SEARCH_ITER_SPEED_DEFAULT;
@@ -380,7 +381,7 @@ pathgen_world_height_get_xy(Evas_Object *world, int x, int y)
    evas_object_image_size_get(priv->height, &w, &h);
    if(!(0 < x < w && 0 < y < h))return 0; 
    pixels = evas_object_image_data_get(priv->height, EINA_FALSE);
-   k =  pixels[x+w*y] & 0x000000FF;
+   k =  (pixels[x+w*y] & 0x000000FF) * priv->i_world_height_mult;
 //   fprintf(stderr, "height at (%i, %i) is %i\n", x,y,k);
    return k;
 }
