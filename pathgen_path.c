@@ -302,7 +302,10 @@ pathgen_path_search_complete( void *data, __UNUSED__
 double
 hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node)
 {
-   return pathgen_node_dist_diagon(node, path->start);
+   PATHGEN_WORLD_DATA_GET(path->world, priv);
+   if(priv->i_path_search_diagonal)
+      return pathgen_node_dist_diagon(node, path->start);
+   return pathgen_node_dist_manhat(node, path->start);
 }
 
 double

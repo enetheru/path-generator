@@ -56,6 +56,7 @@ struct _Pathgen_World_Data
              i_path_walk_strength;
    float     i_path_search_iter_speed;
    Eina_Bool i_path_search_diagonal;
+   int       i_path_search_algorithm;
 
    /* path influence variables */
    float     i_path_inf_dist_manhat,
