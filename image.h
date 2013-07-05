@@ -160,7 +160,7 @@ image_comp_func(Evas_Object *image_o,
    uint32_t (*process)(uint32_t, uint32_t),
    Evas_Object *image_b)
 {
-   int i, wo, ho, wb, hb;
+   int i, j, wo, ho, wb, hb;
    uint32_t *pixels_o, *pixels_b;
 
    if(!image_o || !image_b)return;
@@ -170,14 +170,15 @@ image_comp_func(Evas_Object *image_o,
 
    if(x+wb > wo || y+hb > ho)return;
 
-   pixels_o = evas_object_image_data_get(image, EINA_TRUE);
-   pixels_b = evas_object_image_data_get(image, EINA_FALSE);
-   for(i=0; i < w*h; i++)
+   pixels_o = evas_object_image_data_get(image_o, EINA_TRUE);
+   pixels_b = evas_object_image_data_get(image_o, EINA_FALSE);
+   for(i=0; i < wb*hb; i++)
    {
-//      pixels_o[i+x] = process(pixels_o[i+x],pixels_b[i]); //FIXME
+      j = x + wo * ( i / hb + y) + (i % wb);
+      pixels_o[j] = process(pixels_o[j],pixels_b[i]);
    }
-   evas_object_image_data_set(image, pixels);
-   evas_object_image_data_update_add(image, 0, 0, w, h);
+   evas_object_image_data_set(image_o, pixels_o);
+   evas_object_image_data_update_add(image_o, 0, 0, wo, ho);
 
 
 }
