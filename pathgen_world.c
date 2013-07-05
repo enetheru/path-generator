@@ -3,6 +3,7 @@
 #include "pathgen_path.h"
 #include "pathgen_node.h"
 #include "image.h"
+#include "pixel.h"
 
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {
@@ -201,6 +202,8 @@ pathgen_world_add( Evas *evas)
    priv->i_path_search_iter_speed = I_PATH_SEARCH_ITER_SPEED_DEFAULT;
    priv->i_path_search_diagonal = I_PATH_SEARCH_DIAGONAL_DEFAULT;
    priv->i_path_walk_strength = I_PATH_WALK_STRENGTH_DEFAULT;
+   priv->i_path_walk_degrade = I_PATH_WALK_DEGRADE_DEFAULT;
+   priv->i_path_walk_degrade_int = I_PATH_WALK_DEGRADE_INT_DEFAULT;
 
    priv->i_path_inf_dist_manhat = I_PATH_INF_DIST_MANHAT_DEFAULT;
    priv->i_path_inf_dist_euclid = I_PATH_INF_DIST_EUCLID_DEFAULT;
@@ -436,6 +439,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
       pathgen_world_info(world);
    }
 
+   
 
    ui = evas_object_name_find(evas, "sim,start");
    elm_object_disabled_set(ui, EINA_TRUE);
@@ -449,6 +453,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
    pathgen_world_prepare(world);
 
    priv->travelers=0;
+   priv->i_path_walk_degrade_count = 0;
    evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
 }
 
@@ -500,6 +505,17 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
       return;
    }
    priv->travelers++;
+
+   if(priv->i_path_walk_degrade_count < priv->i_path_walk_degrade_int)
+   {
+      priv->i_path_walk_degrade_count++;
+   }
+   else
+   {
+      image_fill_function(priv->heatmap, pixel_subtract,
+         (uint32_t)priv->i_path_walk_degrade<<24);
+      priv->i_path_walk_degrade_count = 0;
+   }
 
 
    /* create start and end points */

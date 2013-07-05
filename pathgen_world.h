@@ -54,7 +54,10 @@ struct _Pathgen_World_Data
 
    /* pathing */
    int       i_path_search_iter_max,
-             i_path_walk_strength;
+             i_path_walk_strength,
+             i_path_walk_degrade,
+             i_path_walk_degrade_int,
+             i_path_walk_degrade_count;
    float     i_path_search_iter_speed;
    Eina_Bool i_path_search_diagonal;
    int       i_path_search_algorithm;
