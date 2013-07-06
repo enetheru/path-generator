@@ -10,6 +10,12 @@
 static void
 image_fill_color(Evas_Object *image, uint32_t color);
 
+static void
+image_func_image(Evas_Object *image_o,
+   int x, int y,
+   uint32_t (*process)(uint32_t, uint32_t),
+   Evas_Object *image_b);
+
 static Evas_Object *
 image_generate_random(Evas *evas, int w, int h)
 {
@@ -128,8 +134,12 @@ image_add_pixel(Evas_Object *image, int x, int y, uint32_t color)
 static void
 image_paint_path(Evas_Object *image, Pathgen_Path *path, uint32_t color)
 {
+   Evas_Object *brush;
+   brush = evas_object_image_filled_add(evas_object_evas_get(image));
+   evas_object_image_file_set(brush, "5x5.png", NULL);
    while(pathgen_path_walk(path))
-      image_add_pixel(image, path->current->x, path->current->y, color);      
+      image_func_image(image, path->current->x, path->current->y,
+         pixel_add, brush);      
 }
 
 static void
@@ -155,7 +165,7 @@ image_pixel_value_get(Evas_Object *image, int x, int y, uint32_t mask, int shift
 }
 
 static void
-image_comp_func(Evas_Object *image_o,
+image_func_image(Evas_Object *image_o,
    int x, int y,
    uint32_t (*process)(uint32_t, uint32_t),
    Evas_Object *image_b)
@@ -168,10 +178,13 @@ image_comp_func(Evas_Object *image_o,
    evas_object_image_size_get(image_o, &wo, &ho);
    evas_object_image_size_get(image_b, &wb, &hb);
 
+   x = x - wb/2;
+   y = y - hb/2;
+
    if(x+wb > wo || y+hb > ho)return;
 
    pixels_o = evas_object_image_data_get(image_o, EINA_TRUE);
-   pixels_b = evas_object_image_data_get(image_o, EINA_FALSE);
+   pixels_b = evas_object_image_data_get(image_b, EINA_FALSE);
    for(i=0; i < wb*hb; i++)
    {
       j = x + wo * ( i / hb + y) + (i % wb);
@@ -179,8 +192,6 @@ image_comp_func(Evas_Object *image_o,
    }
    evas_object_image_data_set(image_o, pixels_o);
    evas_object_image_data_update_add(image_o, 0, 0, wo, ho);
-
-
 }
 
 #endif /* IMAGE_H */
