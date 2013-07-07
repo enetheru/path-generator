@@ -213,6 +213,7 @@ pathgen_world_add( Evas *evas)
    priv->i_path_walk_degrade_int = I_PATH_WALK_DEGRADE_INT_DEFAULT;
 
    priv->i_path_inf_dist_manhat = I_PATH_INF_DIST_MANHAT_DEFAULT;
+   priv->i_path_inf_dist_diagon = I_PATH_INF_DIST_DIAGON_DEFAULT;
    priv->i_path_inf_dist_euclid = I_PATH_INF_DIST_EUCLID_DEFAULT;
    priv->i_path_inf_desasc = I_PATH_INF_DESASC_DEFAULT;
    priv->i_path_inf_path = I_PATH_INF_PATH_DEFAULT;
@@ -450,7 +451,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 static void 
 _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 {
-   Pathgen_Node *start, *end;
+   Pathgen_Node *start, *goal;
    Pathgen_Path *path;
 
    if(!world)return;
@@ -477,15 +478,15 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 
    /* create start and end points */
    start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
-   end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
+   goal = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
 
    /* new path */
-   path = pathgen_path_create(world, start, end);
+   path = pathgen_path_create(world, start, goal);
 
    if(priv->i_display_search) /* walk the path slowly */
    {
       image_func_fill(priv->search, NULL, 0x00000000);
-      image_func_pixel(priv->search, end->x, end->y, NULL, 0xFF00FF00);
+      image_func_pixel(priv->search, goal->x, goal->y, NULL, 0xFF00FF00);
       ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_search, path);
    }
    else while(pathgen_path_search(path));

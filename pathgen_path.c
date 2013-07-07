@@ -4,14 +4,14 @@
 #include "r_pixel.h"
 
 Pathgen_Path *
-pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end)
+pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *goal)
 {
    if(!world)return NULL;
 
    Pathgen_Path *path = malloc(sizeof(Pathgen_Path));
    path->world = world;
    path->start = start;
-   path->goal = end;
+   path->goal = goal;
 
    path->open = NULL;
    path->open = eina_list_append(path->open, path->start);
@@ -284,31 +284,45 @@ pathgen_path_walk_slow(void *data)
 double
 hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node)
 {
+   int dist_m, dist_d, pathmap;
+   float desasc, dist_e;
    PATHGEN_WORLD_DATA_GET(path->world, priv);
-   if(priv->i_path_search_diagonal)
-      return pathgen_node_dist_diagon(node, path->start);
-   return pathgen_node_dist_manhat(node, path->start);
+
+   dist_m = pathgen_node_dist_manhat(node, path->start);
+   dist_d = pathgen_node_dist_diagon(node, path->start);
+   dist_e = pathgen_node_dist_euclid(node, path->start);
+   desasc = abs(node->z - path->current->z);
+   pathmap = 255 - image_pixel_value_get(priv->heatmap,
+      node->x, node->y, 0xFF000000, 24);
+
+   return
+       dist_m * priv->i_path_inf_dist_manhat
+     + dist_d * priv->i_path_inf_dist_diagon
+     + dist_e * priv->i_path_inf_dist_euclid
+     + desasc * priv->i_path_inf_desasc
+     + pathmap* priv->i_path_inf_path;
 }
 
 double
-hueristic_custom(Pathgen_Path *path, Pathgen_Node *node)
+hueristic_best_first(Pathgen_Path *path, Pathgen_Node *node)
 {
+   int dist_m, dist_d, pathmap;
+   float desasc, dist_e;
    PATHGEN_WORLD_DATA_GET(path->world, priv);
-   /* == build hueristic data == */
-   /* manhattan distance from origin */
-   int inf_dist_m = (float)pathgen_node_dist_manhat(node, path->goal);
-      
-   /* euclidean distance to target */
-   double inf_dist_e = pathgen_node_dist_euclid(node, path->goal);
 
-   /* change of height */
-   int inf_desasc = abs(node->z - path->end->z);
+   dist_m = pathgen_node_dist_manhat(node, path->goal);
+   dist_d = pathgen_node_dist_diagon(node, path->goal);
+   dist_e = pathgen_node_dist_euclid(node, path->goal);
 
-   /* adherance to roads */
-   int inf_path = 255 - (float)image_pixel_value_get(priv->heatmap, node->x, node->y, 0xFF000000, 24);
+   desasc = abs(node->z - path->current->z);
 
-   return inf_dist_m * priv->i_path_inf_dist_manhat
-     + inf_dist_e * priv->i_path_inf_dist_euclid
-     + inf_desasc * priv->i_path_inf_desasc
-     + inf_path   * priv->i_path_inf_path;
+   pathmap = 255 - image_pixel_value_get(priv->heatmap,
+      node->x, node->y, 0xFF000000, 24);
+
+   return
+       dist_m * priv->i_path_inf_dist_manhat
+     + dist_d * priv->i_path_inf_dist_diagon
+     + dist_e * priv->i_path_inf_dist_euclid
+     + desasc * priv->i_path_inf_desasc
+     + pathmap* priv->i_path_inf_path;
 }

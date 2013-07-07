@@ -16,7 +16,7 @@ struct pathgen_path {
 ********/
 
 Pathgen_Path *
-pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end);
+pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *goal);
 
 void
 pathgen_path_del(Pathgen_Path *path);
@@ -48,6 +48,6 @@ double
 hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node);
 
 double
-hueristic_custom(Pathgen_Path *path, Pathgen_Node *node);
+hueristic_best_first(Pathgen_Path *path, Pathgen_Node *node);
 
 #endif /*PATHGEN_PATH_H*/

@@ -67,6 +67,7 @@ struct _Pathgen_World_Data
 
    /* path influence variables */
    float i_path_inf_dist_manhat,
+         i_path_inf_dist_diagon,
          i_path_inf_dist_euclid,
          i_path_inf_desasc,
          i_path_inf_path;
