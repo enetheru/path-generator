@@ -30,20 +30,7 @@ _fs_load_height(void *data, Evas_Object *obj, void *event_info)
 static void
 _btn_generate(void *data, Evas_Object *o, void *event_info)
 {
-   Evas_Object *image;
-   Evas *evas;
-
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-   evas = evas_object_evas_get(o);
-
-   image = evas_object_image_filled_add(evas);
-   evas_object_image_size_set(image,
-      priv->i_world_gen_w, priv->i_world_gen_h);
-   evas_object_image_smooth_scale_set(image, EINA_FALSE);
-   image_paint_noise(image, priv->i_world_gen_density);
-   image_fill_function(image, pixel_desaturate, 0);
-   pathgen_world_height_set(data, image);
+   evas_object_smart_callback_call(data, "world,generate", event_info);
 }
 
 static void

@@ -3,21 +3,21 @@
 #include "pathgen_path.h"
 #include "pathgen_node.h"
 #include "r_image.h"
+#include "r_noise.h"
 #include "r_pixel.h"
 
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {
-   {EVT_CHILDREN_NUMBER_CHANGED, "i"},
-   {EVT_HEAT_RESET, "i"}, //deletes object and creates a now one
-   {EVT_HEAT_CLEAR, "i"}, //zeroes data
    {EVT_ZOOM, "i"},
+
    {EVT_SIM_START, "i"},
    {EVT_SIM_FINISHED, "i"},
-   {EVT_SIM_STOP, "i"},
-   {EVT_SIM_RESET, "i"},
-   {EVT_WORLD_GENERATE, "i"},
    {EVT_SIM_TRAVELER_NEW, "i"},
+
    {EVT_PATH_SEARCH_COMPLETE, "i"},
+
+   {EVT_WORLD_GENERATE, "i"},
+
    {NULL, NULL}
 };
 
@@ -159,20 +159,23 @@ pathgen_world_add( Evas *evas)
    Evas_Object * world = evas_object_smart_add(evas, _pathgen_world_smart_class_new());
 
    /* add callbacks */
-   evas_object_smart_callback_add( world, "zoom",
-      _pathgen_world_zoom, NULL);
+   evas_object_smart_callback_add( world, EVT_ZOOM,
+      (Evas_Smart_Cb) _pathgen_world_zoom, NULL);
 
-   evas_object_smart_callback_add( world, "sim,start",
+   evas_object_smart_callback_add( world, EVT_SIM_START,
       (Evas_Smart_Cb) _pathgen_sim_start, NULL);
 
-   evas_object_smart_callback_add( world, "sim,finished",
+   evas_object_smart_callback_add( world, EVT_SIM_FINISHED,
       (Evas_Smart_Cb) _pathgen_sim_finished, NULL);
 
-   evas_object_smart_callback_add( world, "sim,traveler,new",
+   evas_object_smart_callback_add( world, EVT_SIM_TRAVELER_NEW,
       (Evas_Smart_Cb) _pathgen_sim_traveler_new, NULL);
 
-   evas_object_smart_callback_add( world, "path,search,complete",
+   evas_object_smart_callback_add( world, EVT_PATH_SEARCH_COMPLETE,
       (Evas_Smart_Cb) pathgen_path_search_complete, NULL);
+
+   evas_object_smart_callback_add( world, EVT_WORLD_GENERATE,
+      (Evas_Smart_Cb) _pathgen_world_generate, NULL);
 
    /* get the private data struct */
    PATHGEN_WORLD_DATA_GET(world, priv);
@@ -211,17 +214,6 @@ pathgen_world_add( Evas *evas)
    priv->i_path_inf_path = I_PATH_INF_PATH_DEFAULT;
 
    return world;
-}
-
-void
-pathgen_world_info(Evas_Object *world)
-{
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   fprintf(stderr,
-      "w: b=%p, h=%p, i=%p, p=%p, t=%p ,h=%p, s=%p, p=%p, w=%i, h=%i\n",
-      priv->background, priv->height, priv->interest, priv->path,
-      priv->teleport, priv->heatmap, priv->search, priv->path,
-      priv->w, priv->h);
 }
 
 /* set to return any previous object set to the height of the
@@ -266,27 +258,6 @@ pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
 
    evas_object_smart_changed(world);
 
-}
-
-Evas_Object *
-pathgen_world_path_get(Evas_Object *world)
-{
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   return priv->path;
-}
-
-Evas_Object *
-pathgen_world_search_get(Evas_Object *world)
-{
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   return priv->search;
-}
-
-Evas_Object *
-pathgen_world_heatmap_get(Evas_Object *world)
-{
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   return priv->heatmap;
 }
 
 Eina_Bool
@@ -415,6 +386,26 @@ _pathgen_world_zoom(
          (w+(w/mult)*info->z), (h+(h/mult)*info->z) );
 }
 
+static void
+_pathgen_world_generate(
+   void *data,
+   Evas_Object *o,
+   void *event_info)
+{
+   Evas *evas;
+   Evas_Object *image;
+   PATHGEN_WORLD_DATA_GET(o, priv);
+   evas = evas_object_evas_get(o);
+
+   image = evas_object_image_filled_add(evas);
+   evas_object_image_size_set(image,
+      priv->i_world_gen_w, priv->i_world_gen_h);
+   evas_object_image_smooth_scale_set(image, EINA_FALSE);
+   image_paint_noise(image, priv->i_world_gen_density);
+   image_fill_function(image, pixel_desaturate, 0);
+   pathgen_world_height_set(o, image);
+}
+
 /**********************
 * Sim Smart Callbacks *
 ***********************/
@@ -434,12 +425,6 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
       fprintf(stderr, "no height map, cannot run sim.\n");
       return;
    }
-   else
-   {
-      pathgen_world_info(world);
-   }
-
-   
 
    ui = evas_object_name_find(evas, "sim,start");
    elm_object_disabled_set(ui, EINA_TRUE);
@@ -455,39 +440,6 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
    priv->travelers=0;
    priv->i_path_walk_degrade_count = 0;
    evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
-}
-
-static void
-_pathgen_sim_finished(void *data, Evas_Object *o, void *event_info)
-{
-   fprintf(stderr, "Finished Sim\n");
-   Evas *evas;
-   Evas_Object *ui;
-
-   evas = evas_object_evas_get(o);
-
-   ui = evas_object_name_find(evas, "sim,start");
-   elm_object_disabled_set(ui, EINA_FALSE);
-
-   ui = evas_object_name_find(evas, "world,generate");
-   elm_object_disabled_set(ui, EINA_FALSE);
-
-   ui = evas_object_name_find(evas, "world,height,load");
-   elm_object_disabled_set(ui, EINA_FALSE);
-}
-
-static void
-_pathgen_sim_stop( void *data, Evas_Object *o, void *event_info )
-{
-   fprintf(stderr, "want to stop sim\n");
-   return;
-}
-
-static void
-_pathgen_sim_reset( void *data, Evas_Object *o, void *event_info )
-{
-   fprintf(stderr, "want to reset sim\n");
-   return;
 }
 
 static void 
@@ -538,21 +490,22 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    else while(pathgen_path_search(path));
 }
 
-/*****************************
-* Interface Variable Getters *
-*****************************/
-
-Eina_Bool
-pathgen_i_display_search_get(Evas_Object *world)
+static void
+_pathgen_sim_finished(void *data, Evas_Object *o, void *event_info)
 {
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   return priv->i_display_search;
-}
+   fprintf(stderr, "Finished Sim\n");
+   Evas *evas;
+   Evas_Object *ui;
 
-Eina_Bool
-pathgen_i_display_path_get(Evas_Object *world)
-{
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   return priv->i_display_path;
+   evas = evas_object_evas_get(o);
+
+   ui = evas_object_name_find(evas, "sim,start");
+   elm_object_disabled_set(ui, EINA_FALSE);
+
+   ui = evas_object_name_find(evas, "world,generate");
+   elm_object_disabled_set(ui, EINA_FALSE);
+
+   ui = evas_object_name_find(evas, "world,height,load");
+   elm_object_disabled_set(ui, EINA_FALSE);
 }
 

@@ -7,17 +7,15 @@
 
 #define __UNUSED__
 #define _pathgen_world_type "Pathgen_World"
-#define EVT_CHILDREN_NUMBER_CHANGED "children,changed"
+
+/* events */
 #define EVT_ZOOM "zoom"
-#define EVT_HEAT_RESET "heatmap,reset"
-#define EVT_HEAT_CLEAR "heatmap,clear"
 #define EVT_SIM_START "sim,start"
 #define EVT_SIM_FINISHED "sim,finished"
-#define EVT_SIM_STOP "sim,stop"
-#define EVT_SIM_RESET "sim,reset"
-#define EVT_WORLD_GENERATE "world,generate"
 #define EVT_SIM_TRAVELER_NEW "sim,traveler,new"
 #define EVT_PATH_SEARCH_COMPLETE "path,search,complete"
+
+#define EVT_WORLD_GENERATE "world,generate"
 
 typedef struct _Pathgen_World_Data Pathgen_World_Data;
 /*
@@ -123,59 +121,28 @@ pathgen_world_height_get_xy(Evas_Object *world, int x, int y);
 void
 pathgen_world_search_set(Evas_Object *world, Evas_Object *new);
 
-Evas_Object *
-pathgen_world_visual_get(Evas_Object *world);
-
 Eina_Bool
 pathgen_world_prepare(Evas_Object *world);
 
 /************************
-* World Smart Callbacks *
+* Smart Callbacks *
 ************************/
+
+/* world */
 static void
 _pathgen_world_zoom( void *data, Evas_Object *o, void *event_info );
 
-static void *
-_pathgen_world_heatmap_reset(
-   void *event_data, Evas_Object *o, void *event_info);
+static void
+_pathgen_world_generate( void *data, Evas_Object *o, void *event_info);
 
-static void *
-_pathgen_world_heatmap_clear(
-   void *event_data, Evas_Object *o, void *event_info);
-
-
-/**********************
-* Sim Smart Callbacks *
-***********************/
-
+/* sim */
 static void
 _pathgen_sim_start( void *data, Evas_Object *o, void *event_info );
 
 static void
-_pathgen_sim_finished( void *data, Evas_Object *o, void *event_info );
-
-static void
-_pathgen_sim_stop( void *data, Evas_Object *o, void *event_info );
-
-static void
-_pathgen_sim_reset( void *data, Evas_Object *o, void *event_info );
-
-static void
 _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info );
 
-/********
-* Other *
-********/
-
-Eina_Bool
-pathgen_world_travel(void *data);
-
-/*****************************
-* Interface Variable Getters *
-*****************************/
-
-Eina_Bool
-pathgen_i_display_path_search_get(Evas_Object *world);
-
+static void
+_pathgen_sim_finished( void *data, Evas_Object *o, void *event_info );
 
 #endif /*PATHGEN_WORLD*/
