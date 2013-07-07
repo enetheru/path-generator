@@ -7,7 +7,7 @@
 #include "i_sim.h"
 #include "i_world.h"
 #include "i_path.h"
-#include "noise.h"
+#include "r_noise.h"
 
 EAPI_MAIN int
 

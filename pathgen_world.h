@@ -44,33 +44,38 @@ struct _Pathgen_World_Data
              i_display_path;
 
    /* sim */
-   int       i_sim_travelers;
+   int i_sim_travelers;
 
    /* world */
-   int       i_world_gen_w,
-             i_world_gen_h,
-             i_world_gen_density,
-             i_world_height_mult;
+   int i_world_height_mult;
 
-   /* pathing */
-   int       i_path_search_iter_max,
-             i_path_walk_strength,
-             i_path_walk_degrade,
-             i_path_walk_degrade_int,
-             i_path_walk_degrade_count;
+   /* world generation */
+   int i_world_gen_w,
+       i_world_gen_h,
+       i_world_gen_density;
+
+   /* path Searching */
+   int       i_path_search_iter_max;
    float     i_path_search_iter_speed;
    Eina_Bool i_path_search_diagonal;
    int       i_path_search_algorithm;
 
+   /* Path walk */
+   Evas_Object *i_path_walk_brush;
+   int          i_path_walk_strength,
+                i_path_walk_degrade,
+                i_path_walk_degrade_int,
+                i_path_walk_degrade_count;
+
    /* path influence variables */
-   float     i_path_inf_dist_manhat,
-             i_path_inf_dist_euclid,
-             i_path_inf_desasc,
-             i_path_inf_path;
+   float i_path_inf_dist_manhat,
+         i_path_inf_dist_euclid,
+         i_path_inf_desasc,
+         i_path_inf_path;
 
    /* == world constants that are used in calculations == */
-   float     c_euclid_max;
-   int       c_manhat_max;
+   float c_euclid_max;
+   int   c_manhat_max;
 
 };
 

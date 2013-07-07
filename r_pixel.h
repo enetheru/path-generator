@@ -1,6 +1,7 @@
 #ifndef PIXEL_H
 #define PIXEL_H
 
+#define __UNUSED__
 static uint32_t
 pixel_add(uint32_t a, uint32_t b)
 {
@@ -53,7 +54,7 @@ pixel_subtract(uint32_t a, uint32_t b)
 }
 
 static uint32_t
-pixel_average(uint32_t a, uint32_t b)
+pixel_mix(uint32_t a, uint32_t b)
 {
    uint16_t ar,ag,ab,aa,br,bg,bb,ba,cr,cg,cb,ca;
    uint32_t c;
@@ -99,7 +100,7 @@ pixel_multiply_float(uint32_t a, float b)
 }
 
 static uint32_t
-pixel_desaturate(uint32_t a)
+pixel_desaturate(uint32_t a, uint32_t b __UNUSED__)
 {
    uint16_t ar,ag,ab,aa;
    uint32_t c;

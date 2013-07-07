@@ -2,7 +2,7 @@
 #define IMAGE_H
 #include <math.h>
 #include <Evas.h>
-#include "pixel.h"
+#include "r_pixel.h"
 #include "pathgen_path.h"
 #include "pathgen_node.h"
 

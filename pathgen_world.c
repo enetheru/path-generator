@@ -2,8 +2,8 @@
 #include "pathgen_world.h"
 #include "pathgen_path.h"
 #include "pathgen_node.h"
-#include "image.h"
-#include "pixel.h"
+#include "r_image.h"
+#include "r_pixel.h"
 
 static const Evas_Smart_Cb_Description _smart_callbacks[] = 
 {

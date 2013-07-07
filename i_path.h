@@ -137,6 +137,7 @@ _hoversel_path_algorithm_dijkstra(void *data, Evas_Object *o, void *event_info)
 
    priv->hueristic = hueristic_dijkstra;
    fprintf(stderr, "dijkstra Selected\n");
+   elm_object_text_set(o, "Dijkstra");
 
    win = elm_object_top_widget_get(o);
    world = evas_object_name_find(evas_object_evas_get(o), "world");\
@@ -146,7 +147,7 @@ _hoversel_path_algorithm_dijkstra(void *data, Evas_Object *o, void *event_info)
    frm = elm_frame_add(win);
    evas_object_size_hint_weight_set(frm, 0.0, 0.0);
    evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(frm, "Dijkstra Algorithm Options");
+   elm_object_text_set(frm, "Dijkstra Options");
    elm_frame_autocollapse_set(frm, EINA_TRUE);
    elm_box_pack_end(vbox, frm);
    evas_object_show(frm);
@@ -177,6 +178,7 @@ _hoversel_path_algorithm_custom(void *data, Evas_Object *o, void *event_info)
    priv->i_path_search_algorithm = 2;
    priv->hueristic = hueristic_custom;
    fprintf(stderr, "custom Selected\n");
+   elm_object_text_set(o, "Custom");
 
    win = elm_object_top_widget_get(o);
    world = evas_object_name_find(evas_object_evas_get(o), "world");\
@@ -186,7 +188,7 @@ _hoversel_path_algorithm_custom(void *data, Evas_Object *o, void *event_info)
    frm = elm_frame_add(win);
    evas_object_size_hint_weight_set(frm, 0.0, 0.0);
    evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(frm, "Custom Algorithm Options");
+   elm_object_text_set(frm, "Custom Options");
    elm_frame_autocollapse_set(frm, EINA_TRUE);
    elm_box_pack_end(vbox, frm);
    evas_object_show(frm);

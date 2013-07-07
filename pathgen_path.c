@@ -1,6 +1,6 @@
 #include "pathgen_world.h"
 #include "pathgen_path.h"
-#include "image.h"
+#include "r_image.h"
 
 Pathgen_Path *
 pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end)

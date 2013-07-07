@@ -1,7 +1,7 @@
 #ifndef I_SIM_H
 #define I_SIM_H
 
-#include "image.h"
+#include "r_image.h"
 
 static void
 _btn_sim_start(void *data, Evas_Object *o, void *event_info)

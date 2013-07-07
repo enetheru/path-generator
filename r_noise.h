@@ -1,7 +1,7 @@
 #ifndef NOISE_H
 #define NOISE_H
 
-#include "image.h"
+#include "r_image.h"
 
 static void 
 image_paint_noise(Evas_Object *image, int density)
@@ -59,39 +59,39 @@ image_paint_noise(Evas_Object *image, int density)
 //   }
 
    /* linear interpolation */
-  for(i = 0; i < w; i++) for(j = 0; j < h; j++)
-   {
-      px = (float)i / (float)w;
-      py = (float)j / (float)h;
+//  for(i = 0; i < w; i++) for(j = 0; j < h; j++)
+//   {
+//      px = (float)i / (float)w;
+//      py = (float)j / (float)h;
 
       /* grid locations that bound the pixel */
-      lft = floor(px / interval);
-      top = floor(py / interval);
-      rht = lft+1;
-      bot = top+1;
-      ratio1 = (px * density) - lft;
-      ratio2 = (py * density) - top;
+ //     lft = floor(px / interval);
+//      top = floor(py / interval);
+//      rht = lft+1;
+//      bot = top+1;
+//      ratio1 = (px * density) - lft;
+//      ratio2 = (py * density) - top;
 
       /* interpolate x positions */
-      tl = pixel_multiply_float(grid[top][lft], fabs(ratio1-1));
-      tr = pixel_multiply_float(grid[top][rht], ratio1);
-      bl = pixel_multiply_float(grid[bot][lft], fabs(ratio1-1));
-      br = pixel_multiply_float(grid[bot][rht], ratio1);
+//      tl = pixel_multiply_float(grid[top][lft], fabs(ratio1-1));
+//      tr = pixel_multiply_float(grid[top][rht], ratio1);
+//      bl = pixel_multiply_float(grid[bot][lft], fabs(ratio1-1));
+//      br = pixel_multiply_float(grid[bot][rht], ratio1);
 
       /* join values together */
-      pix1 = pixel_add(tl,tr);
-      pix2 = pixel_add(bl,br);
+//      pix1 = pixel_add(tl,tr);
+//      pix2 = pixel_add(bl,br);
 
       /* interpalate y positions */
-      pix1 = pixel_multiply_float(pix1, fabs(ratio2-1));
-      pix2 = pixel_multiply_float(pix2, ratio2);
+//      pix1 = pixel_multiply_float(pix1, fabs(ratio2-1));
+//      pix2 = pixel_multiply_float(pix2, ratio2);
 
       /* join values together */
-      pix3 = pixel_add(pix1,pix2);
+//      pix3 = pixel_add(pix1,pix2);
 
       /* set color of pixel to data at grid location */
-      pixels[i + w * j] = pixel_desaturate(pix3) | 0xFF000000;
-   }
+//      pixels[i + w * j] = pixel_desaturate(pix3) | 0xFF000000;
+ //  }
 
    /* pixel coordinates expressed from 0-1 */
    float u, v;
@@ -143,7 +143,7 @@ image_paint_noise(Evas_Object *image, int density)
       pix3 = pixel_add(pix1,pix2);
 
       /* set color of pixel to data at grid location */
-      pixels[i + w * j] = pixel_desaturate(pix3) | 0xFF000000;
+      pixels[i + w * j] = pix3 | 0xFF000000;
    }
 
 
