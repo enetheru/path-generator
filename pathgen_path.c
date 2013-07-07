@@ -270,7 +270,7 @@ pathgen_path_walk_slow(void *data)
    {
       while(pathgen_path_walk(path))
          image_func_image(priv->heatmap, path->current->x, path->current->y,
-            pixel_add, priv->i_path_walk_brush);
+            pixel_add, priv->i_path_walk_brush, priv->i_path_walk_strength);
   
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
    }

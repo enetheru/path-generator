@@ -22,7 +22,7 @@ image_generate_color(Evas *evas, int w, int h, uint32_t color)
 void
 image_func_pixel(Evas_Object *image,
    int x, int y,
-   uint32_t (*process)(uint32_t, uint32_t),
+   uint32_t (*process)(uint32_t, uint32_t, float),
    uint32_t color)
 {
    int w, h;
@@ -33,7 +33,7 @@ image_func_pixel(Evas_Object *image,
    if(!(0 < x < w && 0 < y < h))return;
    pixels = evas_object_image_data_get(image, EINA_TRUE);
 
-   if(process)pixels[x+w*y] = process(pixels[x+w*y], color);
+   if(process)pixels[x+w*y] = process(pixels[x+w*y], color, 0);
    else pixels[x+w*y] = color;
 
    evas_object_image_data_set(image, pixels);
@@ -42,7 +42,7 @@ image_func_pixel(Evas_Object *image,
 
 void
 image_func_fill(Evas_Object *image,
-   uint32_t (*process)(uint32_t, uint32_t),
+   uint32_t (*process)(uint32_t, uint32_t, float),
    uint32_t color)
 {
    int i, w, h;
@@ -53,7 +53,7 @@ image_func_fill(Evas_Object *image,
    pixels = evas_object_image_data_get(image, EINA_TRUE);
    for(i=0; i < w*h; i++)
    {
-      if(process)pixels[i] = process(pixels[i], color);
+      if(process)pixels[i] = process(pixels[i], color, 0);
       else pixels[i] = color;
    }
    evas_object_image_data_set(image, pixels);
@@ -63,8 +63,9 @@ image_func_fill(Evas_Object *image,
 void
 image_func_image(Evas_Object *image_o,
    int x, int y,
-   uint32_t (*process)(uint32_t, uint32_t),
-   Evas_Object *image_b)
+   uint32_t (*process)(uint32_t, uint32_t, float),
+   Evas_Object *image_b,
+   float strength)
 {
    int i, j, wo, ho, wb, hb;
    uint32_t *pixels_o, *pixels_b;
@@ -84,7 +85,7 @@ image_func_image(Evas_Object *image_o,
    for(i=0; i < wb*hb; i++)
    {
       j = x + wo * ( i / hb + y) + (i % wb);
-      pixels_o[j] = process(pixels_o[j],pixels_b[i]);
+      pixels_o[j] = process(pixels_o[j],pixels_b[i], strength);
    }
    evas_object_image_data_set(image_o, pixels_o);
    evas_object_image_data_update_add(image_o, 0, 0, wo, ho);

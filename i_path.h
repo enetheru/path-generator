@@ -97,10 +97,10 @@ _slid_path_walk_strength(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_path_walk_strength = (int)elm_slider_value_get(o);
+   priv->i_path_walk_strength = elm_slider_value_get(o);
    fprintf(stderr,
-      "i_path_walk_strength = %i\n",
-      (int)elm_slider_value_get(o));
+      "i_path_walk_strength = %0.1f\n",
+      elm_slider_value_get(o));
 }
 
 static void
@@ -354,8 +354,8 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    slid = elm_slider_add(win);
    evas_object_size_hint_align_set(slid, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(slid, "Walk Strength");
-   elm_slider_indicator_format_set(slid, "%.0f");
-   elm_slider_min_max_set(slid, 1, 254);
+   elm_slider_indicator_format_set(slid, "%.1f");
+   elm_slider_min_max_set(slid, 0.0, 1.0);
    elm_slider_value_set(slid, I_PATH_WALK_STRENGTH_DEFAULT);
    elm_box_pack_end(vbox, slid);
    evas_object_show(slid);

@@ -60,10 +60,10 @@ struct _Pathgen_World_Data
 
    /* Path walk */
    Evas_Object *i_path_walk_brush;
-   int          i_path_walk_strength,
-                i_path_walk_degrade,
+   int          i_path_walk_degrade,
                 i_path_walk_degrade_int,
                 i_path_walk_degrade_count;
+   float        i_path_walk_strength;
 
    /* path influence variables */
    float i_path_inf_dist_manhat,
