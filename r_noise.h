@@ -2,6 +2,8 @@
 #define NOISE_H
 
 #include "r_image.h"
+#include <math.h>
+#include "r_pixel.h"
 
 static void 
 image_paint_noise(Evas_Object *image, int density)

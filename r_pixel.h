@@ -54,7 +54,7 @@ pixel_subtract(uint32_t a, uint32_t b)
 }
 
 static uint32_t
-pixel_mix(uint32_t a, uint32_t b)
+pixel_average(uint32_t a, uint32_t b)
 {
    uint16_t ar,ag,ab,aa,br,bg,bb,ba,cr,cg,cb,ca;
    uint32_t c;

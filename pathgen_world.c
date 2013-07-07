@@ -402,7 +402,7 @@ _pathgen_world_generate(
       priv->i_world_gen_w, priv->i_world_gen_h);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
    image_paint_noise(image, priv->i_world_gen_density);
-   image_fill_function(image, pixel_desaturate, 0);
+   image_fill_func(image, pixel_desaturate, 0);
    pathgen_world_height_set(o, image);
 }
 
@@ -464,7 +464,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    }
    else
    {
-      image_fill_function(priv->heatmap, pixel_subtract,
+      image_fill_func(priv->heatmap, pixel_subtract,
          (uint32_t)priv->i_path_walk_degrade<<24);
       priv->i_path_walk_degrade_count = 0;
    }
@@ -484,7 +484,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 
    if(priv->i_display_search) /* walk the path slowly */
    {
-      image_fill_color(priv->search, 0x00000000);
+      image_fill_func(priv->search, NULL, 0x00000000);
       ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_search, path);
    }
    else while(pathgen_path_search(path));
@@ -523,7 +523,7 @@ _pathgen_path_search_complete( void *data, __UNUSED__
 
    if(priv->i_display_path)
    {
-      image_fill_color(priv->path, 0x00000000);
+      image_fill_func(priv->path, NULL, 0x00000000);
       ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_walk_slow, path);
    }
    else

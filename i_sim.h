@@ -17,7 +17,7 @@ _btn_sim_reset(void *data, Evas_Object *o, void *event_info)
    fprintf(stderr, "want to reset sim\n");
    PATHGEN_WORLD_DATA_GET(data, priv);
 
-   image_fill_color(priv->heatmap, 0x00000000);
+   image_fill_func(priv->heatmap, NULL, 0x00000000);
    return;
 }
 
