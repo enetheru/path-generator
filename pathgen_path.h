@@ -50,4 +50,7 @@ hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node);
 double
 hueristic_best_first(Pathgen_Path *path, Pathgen_Node *node);
 
+double
+hueristic_astar(Pathgen_Path *path, Pathgen_Node *node);
+
 #endif /*PATHGEN_PATH_H*/

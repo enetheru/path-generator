@@ -326,3 +326,28 @@ hueristic_best_first(Pathgen_Path *path, Pathgen_Node *node)
      + desasc * priv->i_path_inf_desasc
      + pathmap* priv->i_path_inf_path;
 }
+
+
+double
+hueristic_astar(Pathgen_Path *path, Pathgen_Node *node)
+{
+   int dist_m, dist_d, pathmap;
+   float desasc, dist_e;
+   PATHGEN_WORLD_DATA_GET(path->world, priv);
+
+   dist_m = pathgen_node_dist_manhat(node, path->goal) + pathgen_node_dist_manhat(node, path->start);
+   dist_d = pathgen_node_dist_diagon(node, path->goal) + pathgen_node_dist_diagon(node, path->start);
+   dist_e = pathgen_node_dist_euclid(node, path->goal) + pathgen_node_dist_euclid(node, path->start);
+
+   desasc = abs(node->z - path->current->z);
+
+   pathmap = 255 - image_pixel_value_get(priv->heatmap,
+      node->x, node->y, 0xFF000000, 24);
+
+   return
+       dist_m * priv->i_path_inf_dist_manhat
+     + dist_d * priv->i_path_inf_dist_diagon
+     + dist_e * priv->i_path_inf_dist_euclid
+     + desasc * priv->i_path_inf_desasc
+     + pathmap* priv->i_path_inf_path;
+}

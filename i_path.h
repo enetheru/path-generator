@@ -203,6 +203,39 @@ _hoversel_path_algorithm_best_first(void *data, Evas_Object *o, void *event_info
    evas_object_show(vbox);
 }
 
+static void 
+_hoversel_path_algorithm_astar(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   Evas_Object *win, *vbox, *frm, *lab, *slid;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   if(priv->i_path_search_algorithm == 3) return;
+   priv->i_path_search_algorithm = 3;
+
+   priv->hueristic = hueristic_astar;
+   fprintf(stderr, "A* Selected\n");
+   elm_object_text_set(o, "A*");
+
+   win = elm_object_top_widget_get(o);
+   world = evas_object_name_find(evas_object_evas_get(o), "world");\
+   vbox = evas_object_name_find(evas_object_evas_get(o), "i_algorithm");\
+   elm_box_clear(vbox);
+
+   frm = elm_frame_add(win);
+   evas_object_size_hint_weight_set(frm, 0.0, 0.0);
+   evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(frm, "A* Options");
+   elm_frame_autocollapse_set(frm, EINA_TRUE);
+   elm_box_pack_end(vbox, frm);
+   evas_object_show(frm);
+
+   /* button divider */
+   vbox = elm_box_add(win);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(frm, vbox);
+   evas_object_show(vbox);
+}
+
 static void
 i_path_setup(Evas_Object *win, Evas_Object *vbox)
 {
@@ -409,6 +442,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_object_text_set(hov, "Choose Path Finding Algorithm");
    elm_hoversel_item_add(hov, "Dijkstra", NULL, ELM_ICON_NONE, _hoversel_path_algorithm_dijkstra, world);
    elm_hoversel_item_add(hov, "Best First", NULL, ELM_ICON_NONE, _hoversel_path_algorithm_best_first, world);
+   elm_hoversel_item_add(hov, "A*", NULL, ELM_ICON_NONE, _hoversel_path_algorithm_astar, world);
    elm_box_pack_end(vbox, hov);
    evas_object_show(hov);
 
