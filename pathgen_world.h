@@ -145,4 +145,8 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info );
 static void
 _pathgen_sim_finished( void *data, Evas_Object *o, void *event_info );
 
+static void
+_pathgen_path_search_complete( void *data, Evas_Object *world, void *event_info );
+
+
 #endif /*PATHGEN_WORLD*/

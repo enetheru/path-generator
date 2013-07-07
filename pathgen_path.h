@@ -24,13 +24,6 @@ pathgen_path_del(Pathgen_Path *path);
 void
 pathgen_path_info(Pathgen_Path *path);
 
-
-/***********************
-* Path Smart Callbacks *
-***********************/
-void
-pathgen_path_search_complete( void *data, Evas_Object *world, void *event_info );
-
 /**************
 * Path Timers *
 ***************/

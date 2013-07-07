@@ -12,13 +12,6 @@ _btn_sim_start(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
-_btn_sim_stop(void *data, Evas_Object *o, void *event_info)
-{
-   fprintf(stderr, "want to stop sim\n");
-   return;
-}
-
-static void
 _btn_sim_reset(void *data, Evas_Object *o, void *event_info)
 {
    fprintf(stderr, "want to reset sim\n");
@@ -69,15 +62,6 @@ i_sim_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(btn);
 
    evas_object_smart_callback_add(btn, "clicked", _btn_sim_start, world);
-
-   /* add button to Stop sim */
-   btn = elm_button_add(win);
-   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(btn, "Stop Sim");
-//   elm_box_pack_end(vbox, btn);
-//   evas_object_show(btn);
-
-   evas_object_smart_callback_add(btn, "clicked", _btn_sim_stop, world);
 
    /* add button to reset sim */
    btn = elm_button_add(win);

@@ -172,7 +172,7 @@ pathgen_world_add( Evas *evas)
       (Evas_Smart_Cb) _pathgen_sim_traveler_new, NULL);
 
    evas_object_smart_callback_add( world, EVT_PATH_SEARCH_COMPLETE,
-      (Evas_Smart_Cb) pathgen_path_search_complete, NULL);
+      (Evas_Smart_Cb) _pathgen_path_search_complete, NULL);
 
    evas_object_smart_callback_add( world, EVT_WORLD_GENERATE,
       (Evas_Smart_Cb) _pathgen_world_generate, NULL);
@@ -507,5 +507,30 @@ _pathgen_sim_finished(void *data, Evas_Object *o, void *event_info)
 
    ui = evas_object_name_find(evas, "world,height,load");
    elm_object_disabled_set(ui, EINA_FALSE);
+}
+
+/*****************
+* Path Callbacks *
+*****************/
+
+static void
+_pathgen_path_search_complete( void *data, __UNUSED__
+    Evas_Object *o, void *event_info )
+{
+   Pathgen_Path *path = event_info;
+   PATHGEN_WORLD_DATA_GET(o, priv);
+
+
+   if(priv->i_display_path)
+   {
+      image_fill_color(priv->path, 0x00000000);
+      ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_walk_slow, path);
+   }
+   else
+   {
+      image_paint_path(priv->heatmap, path, (uint32_t)(priv->i_path_walk_strength)<<24);
+      evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
+   }
+   evas_object_smart_changed(o);
 }
 

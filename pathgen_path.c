@@ -273,31 +273,9 @@ pathgen_path_walk_slow(void *data)
    return ret;
 }
 
-/***********************
-* Path Smart Callbacks *
-************************/
-
-void
-pathgen_path_search_complete( void *data, __UNUSED__
-    Evas_Object *o, void *event_info )
-{
-   Pathgen_Path *path = event_info;
-   PATHGEN_WORLD_DATA_GET(o, priv);
-
-
-   if(priv->i_display_path)
-   {
-      image_fill_color(priv->path, 0x00000000);
-      ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_walk_slow, path);
-   }
-   else
-   {
-      image_paint_path(priv->heatmap, path, (uint32_t)(priv->i_path_walk_strength)<<24);
-      evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
-   }
-   evas_object_smart_changed(o);
-}
-
+/*************
+* Hueristics *
+*************/
 
 double
 hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node)
