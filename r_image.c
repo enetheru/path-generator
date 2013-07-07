@@ -4,53 +4,44 @@
 #include "r_pixel.h"
 
 Evas_Object *
-image_generate_random(Evas *evas, int w, int h)
-{
-   Evas_Object *image;
-   uint32_t *pixels, mask, value;
-   int i;
-
-   mask = 0x000000FF;
-
-   /* create default randomly generated image */
-   image = evas_object_image_filled_add(evas);
-   evas_object_image_size_set(image, w, h);
-   evas_object_image_smooth_scale_set(image, EINA_FALSE);
-
-   pixels = evas_object_image_data_get(image, EINA_TRUE);
-   /* generating the contents of the image */   
-   for(i = 0; i < w * h; i++)
-   {
-      /* build random grey image */
-      value = rand() & mask;
-      value = value | 0xFF000000 | (value * 0x00010000) | (value * 0x00000100);
-      pixels[i] = value;
-   }
-   evas_object_image_data_set(image, pixels);
-   evas_object_image_data_update_add(image, 0, 0, w, h);
-
-   return image;
-}
-
-Evas_Object *
 image_generate_color(Evas *evas, int w, int h, uint32_t color)
 {
    Evas_Object *image;
    uint32_t *pixels, value;
    int i;
 
-   /* create default 100x100 randomly generated maze */
    image = evas_object_image_filled_add(evas);
    evas_object_image_size_set(image, w, h);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
    evas_object_image_alpha_set(image, EINA_TRUE);
 
-   image_fill_func(image, NULL, color);
+   image_func_fill(image, NULL, color);
    return image;
 }
 
 void
-image_fill_func(Evas_Object *image,
+image_func_pixel(Evas_Object *image,
+   int x, int y,
+   uint32_t (*process)(uint32_t, uint32_t),
+   uint32_t color)
+{
+   int w, h;
+   uint32_t *pixels;
+
+   if(!image)return;
+   evas_object_image_size_get(image, &w, &h);
+   if(!(0 < x < w && 0 < y < h))return;
+   pixels = evas_object_image_data_get(image, EINA_TRUE);
+
+   if(process)pixels[x+w*y] = process(pixels[x+w*y], color);
+   else pixels[x+w*y] = color;
+
+   evas_object_image_data_set(image, pixels);
+   evas_object_image_data_update_add(image, 0, 0, w, h);
+}
+
+void
+image_func_fill(Evas_Object *image,
    uint32_t (*process)(uint32_t, uint32_t),
    uint32_t color)
 {
@@ -67,54 +58,6 @@ image_fill_func(Evas_Object *image,
    }
    evas_object_image_data_set(image, pixels);
    evas_object_image_data_update_add(image, 0, 0, w, h);
-}
-
-void
-image_paint_pixel(Evas_Object *image, int x, int y, uint32_t color)
-{
-   int w, h;
-   uint32_t *pixels;
-
-   if(!image)return;
-   evas_object_image_size_get(image, &w, &h);
-   if(!(0 < x < w && 0 < y < h))return;
-   pixels = evas_object_image_data_get(image, EINA_TRUE);
-   pixels[x+w*y] = color;
-   evas_object_image_data_set(image, pixels);
-   evas_object_image_data_update_add(image, 0,0,w,h);
-}
-
-void
-image_paint_path(Evas_Object *image, Pathgen_Path *path, uint32_t color)
-{
-   Evas_Object *brush;
-   brush = evas_object_image_filled_add(evas_object_evas_get(image));
-   evas_object_image_file_set(brush, "5x5.png", NULL);
-   while(pathgen_path_walk(path))
-      image_func_image(image, path->current->x, path->current->y,
-         pixel_add, brush);      
-}
-
-void
-image_paint_node(Evas_Object *image, Pathgen_Node *node, uint32_t color)
-{
-   if(!image || !node)return;
-   image_paint_pixel(image, node->x, node->y, color);
-}
-
-uint32_t
-image_pixel_value_get(Evas_Object *image, int x, int y, uint32_t mask, int shift)
-{
-   int w, h;
-   uint32_t *pixels;
-
-   if(!image)return 0;
-   evas_object_image_size_get(image, &w, &h);
-   if(!(0 < x < w && 0 < y < h))return 0; 
-   pixels = evas_object_image_data_get(image, EINA_FALSE);
-   evas_object_image_data_set(image, pixels);
-
-   return (pixels[x+w*y] & mask)>>shift;
 }
 
 void
@@ -145,4 +88,19 @@ image_func_image(Evas_Object *image_o,
    }
    evas_object_image_data_set(image_o, pixels_o);
    evas_object_image_data_update_add(image_o, 0, 0, wo, ho);
+}
+
+uint32_t
+image_pixel_value_get(Evas_Object *image, int x, int y, uint32_t mask, int shift)
+{
+   int w, h;
+   uint32_t *pixels;
+
+   if(!image)return 0;
+   evas_object_image_size_get(image, &w, &h);
+   if(!(0 < x < w && 0 < y < h))return 0; 
+   pixels = evas_object_image_data_get(image, EINA_FALSE);
+   evas_object_image_data_set(image, pixels);
+
+   return (pixels[x+w*y] & mask)>>shift;
 }

@@ -1,7 +1,10 @@
 #ifndef PIXEL_H
 #define PIXEL_H
 
+#include <math.h>
+
 #define __UNUSED__
+
 static uint32_t
 pixel_add(uint32_t a, uint32_t b)
 {

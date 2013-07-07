@@ -186,6 +186,10 @@ pathgen_world_add( Evas *evas)
    evas_object_smart_member_add(priv->background, world);
    evas_object_lower(priv->background);
 
+   /* add the brush object */
+   priv->i_path_walk_brush = evas_object_image_add(evas);
+   evas_object_image_file_set(priv->i_path_walk_brush, "5x5.png", NULL);
+
    priv->hueristic = &hueristic_dijkstra;
 
    /* set default variables */
@@ -212,6 +216,7 @@ pathgen_world_add( Evas *evas)
    priv->i_path_inf_dist_euclid = I_PATH_INF_DIST_EUCLID_DEFAULT;
    priv->i_path_inf_desasc = I_PATH_INF_DESASC_DEFAULT;
    priv->i_path_inf_path = I_PATH_INF_PATH_DEFAULT;
+
 
    return world;
 }
@@ -402,7 +407,7 @@ _pathgen_world_generate(
       priv->i_world_gen_w, priv->i_world_gen_h);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
    image_paint_noise(image, priv->i_world_gen_density);
-   image_fill_func(image, pixel_desaturate, 0);
+   image_func_fill(image, pixel_desaturate, 0);
    pathgen_world_height_set(o, image);
 }
 
@@ -464,7 +469,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    }
    else
    {
-      image_fill_func(priv->heatmap, pixel_subtract,
+      image_func_fill(priv->heatmap, pixel_subtract,
          (uint32_t)priv->i_path_walk_degrade<<24);
       priv->i_path_walk_degrade_count = 0;
    }
@@ -473,18 +478,14 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    /* create start and end points */
    start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
    end = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
-   if(priv->i_display_search)
-   {
-      image_paint_node(priv->search, start, 0xFFFF0000);
-      image_paint_node(priv->search, end, 0xFF00FF00);
-   }
 
    /* new path */
    path = pathgen_path_create(world, start, end);
 
    if(priv->i_display_search) /* walk the path slowly */
    {
-      image_fill_func(priv->search, NULL, 0x00000000);
+      image_func_fill(priv->search, NULL, 0x00000000);
+      image_func_pixel(priv->search, end->x, end->y, NULL, 0xFF00FF00);
       ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_search, path);
    }
    else while(pathgen_path_search(path));
@@ -523,12 +524,14 @@ _pathgen_path_search_complete( void *data, __UNUSED__
 
    if(priv->i_display_path)
    {
-      image_fill_func(priv->path, NULL, 0x00000000);
+      image_func_fill(priv->path, NULL, 0x00000000);
       ecore_timer_add(priv->i_path_search_iter_speed, pathgen_path_walk_slow, path);
    }
    else
    {
-      image_paint_path(priv->heatmap, path, (uint32_t)(priv->i_path_walk_strength)<<24);
+      while(pathgen_path_walk(path))
+         image_func_image(priv->heatmap, path->current->x, path->current->y,
+            pixel_add, priv->i_path_walk_brush);
       evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
    }
    evas_object_smart_changed(o);

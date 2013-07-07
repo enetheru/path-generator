@@ -1,6 +1,7 @@
 #include "pathgen_world.h"
 #include "pathgen_path.h"
 #include "r_image.h"
+#include "r_pixel.h"
 
 Pathgen_Path *
 pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *end)
@@ -102,7 +103,7 @@ pathgen_path_search(void *data)
    path->closed = eina_list_append(path->closed, best);
 
    if(priv->i_display_search)
-      image_paint_node(priv->search, best, 0x88000000);
+      image_func_pixel(priv->search, best->x, best->y, NULL, 0x88000000);
 
    /* examine the neighbours */
    /* clear any data */
@@ -189,7 +190,7 @@ pathgen_path_search(void *data)
 
       /* paint the node */
       if(priv->i_display_search)
-         image_paint_node(priv->search, peers[i], 0x88008888);
+         image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88008888);
    }
    evas_object_smart_changed(path->world);
    path->iter++;
@@ -259,7 +260,7 @@ pathgen_path_walk_slow(void *data)
    if(!data)ret = EINA_FALSE;
    else
    {
-      image_paint_node(priv->path, path->current, 0xFFFFFF00);
+      image_func_pixel(priv->path, path->current->x, path->current->y, NULL, 0xFFFFFF00);
       if(!pathgen_path_walk(path))
       {
          ret = EINA_FALSE;
@@ -267,7 +268,10 @@ pathgen_path_walk_slow(void *data)
    }
    if(!ret)
    {
-      image_paint_path(priv->heatmap, path, (uint32_t)(priv->i_path_walk_strength)<<24);
+      while(pathgen_path_walk(path))
+         image_func_image(priv->heatmap, path->current->x, path->current->y,
+            pixel_add, priv->i_path_walk_brush);
+  
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
    }
    return ret;
