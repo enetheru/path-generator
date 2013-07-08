@@ -64,7 +64,9 @@ struct _Pathgen_World_Data
          i_path_climb_up_min,
          i_path_climb_up_max,
          i_path_climb_down_min,
-         i_path_climb_down_max;
+         i_path_climb_down_max,
+         i_path_follow_min,
+         i_path_follow_max;
 
    /* path influence variables */
    float i_path_distance_start_mult,

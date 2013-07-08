@@ -138,6 +138,26 @@ _spin_path_climb_down_max(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
+_spin_path_follow_min(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_follow_min = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_follow_min = %i\n",
+      priv->i_path_follow_min);
+}
+
+static void
+_spin_path_follow_max(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_follow_max = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_follow_max = %i\n",
+      priv->i_path_follow_max);
+}
+
+static void
 i_path_setup(Evas_Object *win, Evas_Object *vbox)
 {
    Evas_Object *world, *vbox1, *hbox, *frm, *hov, *chk, *lab, *spin, *slid;
@@ -235,7 +255,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_path_distance_goal_mult, world);
 
-   /* sub divider */
+   /* tread Strength */
    hbox = elm_box_add(win);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    elm_box_homogeneous_set(hbox, EINA_TRUE);
@@ -244,7 +264,6 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_box_pack_end(vbox, hbox);
    evas_object_show(hbox);
 
-   /* speed */
    lab = elm_label_add(win);
    elm_object_text_set(lab, "Tread Weight");
    elm_box_pack_end(hbox, lab);
@@ -264,7 +283,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_path_tread_weight, world);
 
-   /* sub divider */
+   /* Climb Up */
    hbox = elm_box_add(win);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    elm_box_homogeneous_set(hbox, EINA_TRUE);
@@ -273,7 +292,6 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_box_pack_end(vbox, hbox);
    evas_object_show(hbox);
 
-   /* speed */
    lab = elm_label_add(win);
    elm_object_text_set(lab, "Climb Up");
    elm_box_pack_end(hbox, lab);
@@ -307,7 +325,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_path_climb_up_max, world);
 
-   /* sub divider */
+   /* Climb Down */
    hbox = elm_box_add(win);
    elm_box_horizontal_set(hbox, EINA_TRUE);
    elm_box_homogeneous_set(hbox, EINA_TRUE);
@@ -316,7 +334,6 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_box_pack_end(vbox, hbox);
    evas_object_show(hbox);
 
-   /* speed */
    lab = elm_label_add(win);
    elm_object_text_set(lab, "Climb Down");
    elm_box_pack_end(hbox, lab);
@@ -349,6 +366,49 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_path_climb_down_max, world);
+
+   /* path conformance */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   lab = elm_label_add(win);
+   elm_object_text_set(lab, "Follow Path");
+   elm_box_pack_end(hbox, lab);
+   evas_object_show(lab);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_FOLLOW_MIN_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_follow_min, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_FOLLOW_MAX_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_follow_max, world);
+
 }
 
 #endif /*I_PATH_H*/

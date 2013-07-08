@@ -192,6 +192,8 @@ pathgen_path_search(void *data)
          if(elevation > priv->i_path_climb_up_max)
          {
             path->closed = eina_list_append(path->closed, peers[i]);
+            if(priv->i_display_search)
+               image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
             continue;
          }
          else if(elevation > priv->i_path_climb_up_min)
@@ -203,19 +205,32 @@ pathgen_path_search(void *data)
          if(elevation > priv->i_path_climb_down_max)
          {
             path->closed = eina_list_append(path->closed, peers[i]);
+            if(priv->i_display_search)
+               image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
             continue;
          }
          else if(elevation > priv->i_path_climb_down_min)
             climb = elevation - priv->i_path_climb_down_min;
       }
 
-      float pathmap = 255 - image_pixel_value_get(priv->heatmap,
-      node->x, node->y, 0xFF000000, 24);
+      int path_follow = image_pixel_value_get(priv->heatmap,
+         peers[i]->x, peers[i]->y, 0xFF000000, 24);
+
+      if(path_follow < priv->i_path_follow_min)path_follow = 0;
+      if(path_follow > priv->i_path_follow_max)
+      {
+         path->closed = eina_list_append(path->closed, peers[i]);
+            if(priv->i_display_search)
+               image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
+         continue;
+      }
+
+      path_follow = 255 - path_follow;
 
       peers[i]->g =
            priv->i_path_distance_start_mult * dist_from
          + priv->i_path_distance_goal_mult  * dist_to
-         + climb;
+         + climb + path_follow;
      
       /* add the node to the open list */
       path->open = eina_list_append(path->open, peers[i]);

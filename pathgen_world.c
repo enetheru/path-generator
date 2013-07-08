@@ -222,6 +222,8 @@ pathgen_world_add( Evas *evas)
    priv->i_path_climb_up_max = I_PATH_CLIMB_UP_MAX_DEFAULT;
    priv->i_path_climb_down_min = I_PATH_CLIMB_DOWN_MIN_DEFAULT;
    priv->i_path_climb_down_max = I_PATH_CLIMB_DOWN_MAX_DEFAULT;
+   priv->i_path_follow_min = I_PATH_FOLLOW_MIN_DEFAULT;
+   priv->i_path_follow_max = I_PATH_FOLLOW_MAX_DEFAULT;
 
    priv->i_path_distance_start_mult = I_PATH_DISTANCE_START_MULT_DEFAULT;
    priv->i_path_distance_goal_mult = I_PATH_DISTANCE_GOAL_MULT_DEFAULT;
