@@ -1,3 +1,5 @@
+#include "r_image.h"
+
 static void 
 _on_done(void *data, Evas_Object *obj, void *event_info)
 {
@@ -43,3 +45,22 @@ _btn_save_path_heatmap(void *data, Evas_Object *o, void *event_info)
    evas_object_image_save(priv->heatmap, (const char *)event_info, NULL, NULL);
    return;
 }
+
+static void
+_btn_sim_start(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "want to start sim\n");
+   evas_object_smart_callback_call( data, "sim,start", event_info);
+   return;
+}
+
+static void
+_btn_sim_reset(void *data, Evas_Object *o, void *event_info)
+{
+   fprintf(stderr, "want to reset sim\n");
+   PATHGEN_WORLD_DATA_GET(data, priv);
+
+   image_func_fill(priv->heatmap, NULL, 0x00000000);
+   return;
+}
+

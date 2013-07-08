@@ -29,7 +29,6 @@ struct _Pathgen_World_Data
    Evas_Object *background, *height, *interest, *pathmap,
       *teleport, *heatmap, *search, *path;
    int w,h;
-   int travelers;
 
    /* solver hueristic */
    double (*hueristic)(Pathgen_Path *, Pathgen_Node *);
@@ -40,32 +39,39 @@ struct _Pathgen_World_Data
              i_display_heatmap,
              i_display_search,
              i_display_path;
+   float i_display_speed;
 
    /* sim */
-   int i_sim_travelers;
+   int path_count,
+       path_fade_count,
+       i_sim_path_max,
+       i_sim_search_iter_max,
+       i_sim_path_fade_strength,
+       i_sim_path_fade_interval;
 
    /* world */
-   int i_world_height_mult;
+   float i_world_height_mult;
 
    /* world generation */
-   int i_world_gen_w,
-       i_world_gen_h,
-       i_world_gen_density;
+   int i_worldgen_w,
+       i_worldgen_h,
+       i_worldgen_density;
 
    /* path Searching */
-   int       i_path_search_iter_max;
-   float     i_path_search_iter_speed;
    Eina_Bool i_path_search_diagonal;
    int       i_path_search_algorithm;
 
    /* Path walk */
    Evas_Object *i_path_walk_brush;
-   int          i_path_walk_degrade,
-                i_path_walk_degrade_int,
-                i_path_walk_degrade_count;
-   float        i_path_walk_strength;
+   float        i_path_tread_weight;
+   int   i_path_climb_up_min,
+         i_path_climb_up_max,
+         i_path_climb_down_min,
+         i_path_climb_down_max;
 
    /* path influence variables */
+   float i_path_distance_start_mult,
+         i_path_distance_goal_mult;
    float i_path_inf_dist_manhat,
          i_path_inf_dist_diagon,
          i_path_inf_dist_euclid,

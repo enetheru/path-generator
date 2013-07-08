@@ -4,30 +4,36 @@
 #include "r_image.h"
 
 static void
-_btn_sim_start(void *data, Evas_Object *o, void *event_info)
-{
-   fprintf(stderr, "want to start sim\n");
-   evas_object_smart_callback_call( data, "sim,start", event_info);
-   return;
+_spin_sim_path_max(void *data, Evas_Object *o, void *event_info) {
+   if(!data)return;   
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_sim_path_max = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_sim_path_max = %i\n", priv->i_sim_path_max);
+
 }
 
 static void
-_btn_sim_reset(void *data, Evas_Object *o, void *event_info)
-{
-   fprintf(stderr, "want to reset sim\n");
+_spin_sim_search_iter_max(void *data, Evas_Object *o, void *event_info) {
+   if(!data)return;   
    PATHGEN_WORLD_DATA_GET(data, priv);
-
-   image_func_fill(priv->heatmap, NULL, 0x00000000);
-   return;
+   priv->i_sim_search_iter_max = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_sim_search_iter_max = %i\n", priv->i_sim_search_iter_max);
 }
 
 static void
-_spin_sim_travelers(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   
+_spin_sim_path_fade_strength(void *data, Evas_Object *o, void *event_info) {
+   if(!data)return;   
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_sim_travelers = (int)elm_spinner_value_get(o);
+   priv->i_sim_path_fade_strength = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_sim_path_fade_strength = %i\n", priv->i_sim_path_fade_strength);
+}
+
+static void
+_spin_sim_path_fade_interval(void *data, Evas_Object *o, void *event_info) {
+   if(!data)return;   
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_sim_path_fade_interval = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_sim_path_fade_interval = %i\n", priv->i_sim_path_fade_interval);
 }
 
 
@@ -53,25 +59,6 @@ i_sim_setup(Evas_Object *win, Evas_Object *vbox)
    elm_object_content_set(frm, vbox);
    evas_object_show(vbox);
 
-   /* add button to start sim */
-   btn = elm_button_add(win);
-   evas_object_name_set(btn, "sim,start");
-   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(btn, "Start Sim");
-   elm_box_pack_end(vbox, btn);
-   evas_object_show(btn);
-
-   evas_object_smart_callback_add(btn, "clicked", _btn_sim_start, world);
-
-   /* add button to reset sim */
-   btn = elm_button_add(win);
-   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
-   elm_object_text_set(btn, "Reset Heatmap");
-   elm_box_pack_end(vbox, btn);
-   evas_object_show(btn);
-
-   evas_object_smart_callback_add(btn, "clicked", _btn_sim_reset, world);
-
    /* sub divider */
    hbox = elm_box_add(win);
    elm_box_horizontal_set(hbox, EINA_TRUE);
@@ -82,22 +69,108 @@ i_sim_setup(Evas_Object *win, Evas_Object *vbox)
 
    /* number of paths to cast */
    lab = elm_label_add(win);
-   elm_object_text_set(lab, "number of travelers");
+   elm_object_text_set(lab, "Number of Paths");
    elm_box_pack_end(hbox, lab);
    evas_object_show(lab);
 
    spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "%.0f travelers");
+   elm_spinner_label_format_set(spin, "%.0f");
    elm_spinner_min_max_set(spin, 1, INT_MAX);
    elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_SIM_PATHS_MAX_DEFAULT);
+
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
-   elm_spinner_value_set(spin, I_SIM_TRAVELERS_DEFAULT);
+   evas_object_size_hint_weight_set(spin, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(hbox, spin);
    evas_object_show(spin);
    
    evas_object_smart_callback_add(spin, "delay,changed",
-      _spin_sim_travelers, world);
+      _spin_sim_path_max, world);
+
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* max iterations before quit */
+   lab = elm_label_add(win);
+   elm_object_text_set(lab, "Search Iteration Limit");
+   elm_box_pack_end(hbox, lab);
+   evas_object_show(lab);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "%.0f");
+   elm_spinner_min_max_set(spin, 1, INT_MAX);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_SIM_SEARCH_ITER_MAX_DEFAULT);
+
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_sim_search_iter_max, world);
+
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* max iterations before quit */
+   lab = elm_label_add(win);
+   elm_object_text_set(lab, "Path Fade Strength");
+   elm_box_pack_end(hbox, lab);
+   evas_object_show(lab);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "%.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_SIM_PATH_FADE_STRENGTH_DEFAULT);
+
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_sim_path_fade_strength, world);
+
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* max iterations before quit */
+   lab = elm_label_add(win);
+   elm_object_text_set(lab, "Path Fade Interval");
+   elm_box_pack_end(hbox, lab);
+   evas_object_show(lab);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "%.0f");
+   elm_spinner_min_max_set(spin, 0, INT_MAX);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_SIM_PATH_FADE_INTERVAL_DEFAULT);
+
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_sim_path_fade_interval, world);
 }
 
 #endif /*I_SIM_H*/

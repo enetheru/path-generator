@@ -81,7 +81,7 @@ pathgen_path_search(void *data)
    path->current = best;
 
    /* bail if its taking too long */
-   if(path->iter >= priv->i_path_search_iter_max)
+   if(path->iter >= priv->i_sim_search_iter_max)
    {
 //      fprintf(stderr, "INF:path_search, maximum steps reached stopping\n");
       evas_object_smart_callback_call(path->world,
@@ -270,7 +270,7 @@ pathgen_path_walk_slow(void *data)
    {
       while(pathgen_path_walk(path))
          image_func_image(priv->heatmap, path->current->x, path->current->y,
-            pixel_add, priv->i_path_walk_brush, priv->i_path_walk_strength);
+            pixel_add, priv->i_path_walk_brush, priv->i_path_tread_weight);
   
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
    }

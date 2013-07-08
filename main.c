@@ -6,6 +6,7 @@
 #include "i_display.h"
 #include "i_sim.h"
 #include "i_world.h"
+#include "i_worldgen.h"
 #include "i_path.h"
 #include "r_noise.h"
 
@@ -84,14 +85,34 @@ elm_main(int argc, char **argv)
    elm_object_content_set(scroll, vbox);
    evas_object_show(vbox);
 
-   i_display_setup(win, vbox);
-   i_sim_setup(win, vbox);
-   i_world_setup(win, vbox);
-   i_path_setup(win, vbox);
+   /* add button to start sim */
+   btn = elm_button_add(win);
+   evas_object_name_set(btn, "sim,start");
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(btn, "Start Sim");
+   elm_box_pack_end(vbox, btn);
+   evas_object_show(btn);
 
-/***********
-* the rest *
-************/
+   evas_object_smart_callback_add(btn, "clicked", _btn_sim_start, world);
+
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* add button to reset sim */
+   btn = elm_button_add(win);
+   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(btn, EVAS_HINT_EXPAND, 0.0);
+   elm_object_text_set(btn, "Reset Heatmap");
+   elm_box_pack_end(hbox, btn);
+   evas_object_show(btn);
+
+   evas_object_smart_callback_add(btn, "clicked", _btn_sim_reset, world);
 
    /* add button to save heatmap */
    btn = elm_fileselector_button_add(win);
@@ -99,11 +120,23 @@ elm_main(int argc, char **argv)
    elm_fileselector_button_is_save_set(btn, EINA_TRUE);
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(btn, "Save Path Heatmap");
-   elm_box_pack_end(vbox, btn);
+   elm_box_pack_end(hbox, btn);
    evas_object_show(btn);
 
    evas_object_smart_callback_add(btn, "file,chosen",
       _btn_save_path_heatmap, NULL);
+
+
+   i_display_setup(win, vbox);
+   i_sim_setup(win, vbox);
+   i_world_setup(win, vbox);
+   i_worldgen_setup(win, vbox);
+   i_path_setup(win, vbox);
+
+/***********
+* the rest *
+************/
+
 
    // now we are done, show the window
    evas_object_resize(win, 800, 600);
