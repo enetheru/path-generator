@@ -218,12 +218,16 @@ pathgen_world_add( Evas *evas)
    priv->i_path_search_diagonal = I_PATH_SEARCH_DIAGONAL_DEFAULT;
 
    priv->i_path_tread_weight = I_PATH_TREAD_WEIGHT_DEFAULT;
-   priv->i_path_climb_up_min = I_PATH_CLIMB_UP_MIN_DEFAULT;
-   priv->i_path_climb_up_max = I_PATH_CLIMB_UP_MAX_DEFAULT;
-   priv->i_path_climb_down_min = I_PATH_CLIMB_DOWN_MIN_DEFAULT;
-   priv->i_path_climb_down_max = I_PATH_CLIMB_DOWN_MAX_DEFAULT;
-   priv->i_path_follow_min = I_PATH_FOLLOW_MIN_DEFAULT;
-   priv->i_path_follow_max = I_PATH_FOLLOW_MAX_DEFAULT;
+
+   priv->i_path_climb_up_tolerance = I_PATH_CLIMB_UP_TOLERANCE_DEFAULT;
+   priv->i_path_climb_up_limit = I_PATH_CLIMB_UP_LIMIT_DEFAULT;
+   priv->i_path_climb_up_value = I_PATH_CLIMB_UP_VALUE_DEFAULT;
+
+   priv->i_path_climb_down_tolerance = I_PATH_CLIMB_DOWN_TOLERANCE_DEFAULT;
+   priv->i_path_climb_down_limit = I_PATH_CLIMB_DOWN_LIMIT_DEFAULT;
+   priv->i_path_climb_down_value = I_PATH_CLIMB_DOWN_VALUE_DEFAULT;
+
+   priv->i_path_follow_value = I_PATH_FOLLOW_VALUE_DEFAULT;
 
    priv->i_path_distance_start_mult = I_PATH_DISTANCE_START_MULT_DEFAULT;
    priv->i_path_distance_goal_mult = I_PATH_DISTANCE_GOAL_MULT_DEFAULT;
@@ -444,15 +448,6 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
       return;
    }
 
-   ui = evas_object_name_find(evas, "sim,start");
-   elm_object_disabled_set(ui, EINA_TRUE);
-
-   ui = evas_object_name_find(evas, "world,generate");
-   elm_object_disabled_set(ui, EINA_TRUE);
-
-   ui = evas_object_name_find(evas, "world,height,load");
-   elm_object_disabled_set(ui, EINA_TRUE);
-
    pathgen_world_prepare(world);
 
    priv->path_count=0;
@@ -485,6 +480,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
       image_func_fill(priv->heatmap, pixel_subtract,
          (uint32_t)priv->i_sim_path_fade_strength<<24);
       priv->path_fade_count = 0;
+      evas_render(evas_object_evas_get(world));
    }
 
 

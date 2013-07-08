@@ -59,6 +59,7 @@ i_worldgen_setup(Evas_Object *win, Evas_Object *vbox)
 
    /* add button to reset sim */
    btn = elm_button_add(win);
+   evas_object_name_set(btn, "world,generate");
    evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
    elm_object_text_set(btn, "Generate Random World");
    elm_box_pack_end(vbox, btn);

@@ -60,13 +60,17 @@ struct _Pathgen_World_Data
 
    /* Path walk */
    Evas_Object *i_path_walk_brush;
-   int   i_path_tread_weight,
-         i_path_climb_up_min,
-         i_path_climb_up_max,
-         i_path_climb_down_min,
-         i_path_climb_down_max,
-         i_path_follow_min,
-         i_path_follow_max;
+   int   i_path_tread_weight;
+
+   int   i_path_climb_up_tolerance,
+         i_path_climb_up_limit;
+   float i_path_climb_up_value;
+
+   int   i_path_climb_down_tolerance,
+         i_path_climb_down_limit;
+   float i_path_climb_down_value;
+
+   float i_path_follow_value;
 
    /* path influence variables */
    float i_path_distance_start_mult,

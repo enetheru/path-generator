@@ -189,43 +189,34 @@ pathgen_path_search(void *data)
       unsigned int climb = 0;
       if(elevation >= 0)
       {
-         if(elevation > priv->i_path_climb_up_max)
+         if(elevation > priv->i_path_climb_up_limit)
          {
             path->closed = eina_list_append(path->closed, peers[i]);
             if(priv->i_display_search)
                image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
             continue;
          }
-         else if(elevation > priv->i_path_climb_up_min)
-            climb = elevation - priv->i_path_climb_up_min;
+         else if(elevation > priv->i_path_climb_up_tolerance)
+            climb = elevation - priv->i_path_climb_up_tolerance;
+            climb *= priv->i_path_climb_up_value;
       }
       else
       {
          elevation = abs(elevation);
-         if(elevation > priv->i_path_climb_down_max)
+         if(elevation > priv->i_path_climb_down_limit)
          {
             path->closed = eina_list_append(path->closed, peers[i]);
             if(priv->i_display_search)
                image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
             continue;
          }
-         else if(elevation > priv->i_path_climb_down_min)
-            climb = elevation - priv->i_path_climb_down_min;
+         else if(elevation > priv->i_path_climb_down_tolerance)
+            climb = elevation - priv->i_path_climb_down_tolerance;
+            climb *= priv->i_path_climb_down_value;
       }
 
-      int path_follow = image_pixel_value_get(priv->heatmap,
-         peers[i]->x, peers[i]->y, 0xFF000000, 24);
-
-      if(path_follow < priv->i_path_follow_min)path_follow = 0;
-      if(path_follow > priv->i_path_follow_max)
-      {
-         path->closed = eina_list_append(path->closed, peers[i]);
-            if(priv->i_display_search)
-               image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
-         continue;
-      }
-
-      path_follow = 255 - path_follow;
+      int path_follow = (255 - image_pixel_value_get(priv->heatmap,
+         peers[i]->x, peers[i]->y, 0xFF000000, 24)) * priv->i_path_follow_value;
 
       peers[i]->g =
            priv->i_path_distance_start_mult * dist_from
