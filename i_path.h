@@ -92,8 +92,8 @@ _spin_path_tread_weight(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_path_tread_weight = (float)elm_spinner_value_get(o);
-   fprintf(stderr, "i_path_tread_weight = %f\n",
+   priv->i_path_tread_weight = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_tread_weight = %i\n",
       priv->i_path_tread_weight);
 }
 
@@ -251,9 +251,9 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_show(lab);
 
    spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "%0.3f");
-   elm_spinner_min_max_set(spin, 0.0, 1.0);
-   elm_spinner_step_set(spin, 0.003);
+   elm_spinner_label_format_set(spin, "%0.0f");
+   elm_spinner_min_max_set(spin, 0.0, 255.0);
+   elm_spinner_step_set(spin, 1.0);
    elm_spinner_value_set(spin, I_PATH_TREAD_WEIGHT_DEFAULT);
 
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);

@@ -134,15 +134,15 @@ image_paint_noise(Evas_Object *image, int density)
       br = pixel_multiply_float(grid[b][r], vx);
 
       /* join values together */
-      pix1 = pixel_add(tl,tr, 1);
-      pix2 = pixel_add(bl,br, 1);
+      pix1 = pixel_add(tl,tr, 255);
+      pix2 = pixel_add(bl,br, 255);
 
       /* interpalate y positions */
       pix1 = pixel_multiply_float(pix1, fabs(vy-1));
       pix2 = pixel_multiply_float(pix2, vy);
 
       /* join values together */
-      pix3 = pixel_add(pix1,pix2, 1);
+      pix3 = pixel_add(pix1,pix2, 255);
 
       /* set color of pixel to data at grid location */
       pixels[i + w * j] = pix3 | 0xFF000000;

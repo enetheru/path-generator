@@ -190,17 +190,17 @@ pathgen_world_add( Evas *evas)
    priv->i_path_walk_brush = evas_object_image_add(evas);
    evas_object_image_file_set(priv->i_path_walk_brush, "5x5.png", NULL);
 
-   priv->hueristic = &hueristic_dijkstra;
-
    /* set default variables */
    /* display */
-   priv->i_display_search = I_DISPLAY_SEARCH_DEFAULT;
-   priv->i_display_path = I_DISPLAY_PATH_DEFAULT;
+   priv->i_display_height = I_DISPLAY_HEIGHT_DEFAULT;
    priv->i_display_heatmap = I_DISPLAY_HEATMAP_DEFAULT;
+   priv->i_display_search = I_DISPLAY_SEARCH_DEFAULT;
    priv->i_display_path = I_DISPLAY_PATH_DEFAULT;
    priv->i_display_speed = I_DISPLAY_SPEED_DEFAULT;
 
    /* sim */
+   priv->path_count = 0;
+   priv->path_fade_count = 0;
    priv->i_sim_path_max = I_SIM_PATHS_MAX_DEFAULT;
    priv->i_sim_search_iter_max = I_SIM_SEARCH_ITER_MAX_DEFAULT;
    priv->i_sim_path_fade_strength = I_SIM_PATH_FADE_STRENGTH_DEFAULT;
@@ -216,7 +216,18 @@ pathgen_world_add( Evas *evas)
 
    /* path */
    priv->i_path_search_diagonal = I_PATH_SEARCH_DIAGONAL_DEFAULT;
+
    priv->i_path_tread_weight = I_PATH_TREAD_WEIGHT_DEFAULT;
+   priv->i_path_climb_up_min = I_PATH_CLIMB_UP_MIN_DEFAULT;
+   priv->i_path_climb_up_max = I_PATH_CLIMB_UP_MAX_DEFAULT;
+   priv->i_path_climb_down_min = I_PATH_CLIMB_DOWN_MIN_DEFAULT;
+   priv->i_path_climb_down_max = I_PATH_CLIMB_DOWN_MAX_DEFAULT;
+
+   priv->i_path_distance_start_mult = I_PATH_DISTANCE_START_MULT_DEFAULT;
+   priv->i_path_distance_goal_mult = I_PATH_DISTANCE_GOAL_MULT_DEFAULT;
+
+   priv->distance_from_start = pathgen_node_dist_euclid;
+   priv->distance_to_goal = pathgen_node_dist_euclid;
 
    return world;
 }

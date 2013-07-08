@@ -11,6 +11,7 @@ pixel_add(uint32_t a, uint32_t b, float strength)
    uint16_t ar,ag,ab,aa,br,bg,bb,ba,cr,cg,cb,ca;
    uint32_t c;
 
+   strength = strength / 255;
    
    aa = (a & 0xFF000000) >> 24;
    ar = (a & 0x00FF0000) >> 16;

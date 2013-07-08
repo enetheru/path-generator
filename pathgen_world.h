@@ -30,8 +30,6 @@ struct _Pathgen_World_Data
       *teleport, *heatmap, *search, *path;
    int w,h;
 
-   /* solver hueristic */
-   double (*hueristic)(Pathgen_Path *, Pathgen_Node *);
 
    /* == interface variables == */
    /* display settings */
@@ -39,7 +37,7 @@ struct _Pathgen_World_Data
              i_display_heatmap,
              i_display_search,
              i_display_path;
-   float i_display_speed;
+   float     i_display_speed;
 
    /* sim */
    int path_count,
@@ -59,12 +57,11 @@ struct _Pathgen_World_Data
 
    /* path Searching */
    Eina_Bool i_path_search_diagonal;
-   int       i_path_search_algorithm;
 
    /* Path walk */
    Evas_Object *i_path_walk_brush;
-   float        i_path_tread_weight;
-   int   i_path_climb_up_min,
+   int   i_path_tread_weight,
+         i_path_climb_up_min,
          i_path_climb_up_max,
          i_path_climb_down_min,
          i_path_climb_down_max;
@@ -72,11 +69,9 @@ struct _Pathgen_World_Data
    /* path influence variables */
    float i_path_distance_start_mult,
          i_path_distance_goal_mult;
-   float i_path_inf_dist_manhat,
-         i_path_inf_dist_diagon,
-         i_path_inf_dist_euclid,
-         i_path_inf_desasc,
-         i_path_inf_path;
+
+   double (*distance_from_start)(Pathgen_Node *, Pathgen_Node *);
+   double (*distance_to_goal)(Pathgen_Node *, Pathgen_Node *);
 
    /* == world constants that are used in calculations == */
    float c_euclid_max;

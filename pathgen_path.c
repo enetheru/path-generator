@@ -182,8 +182,40 @@ pathgen_path_search(void *data)
          continue;
       }
       peers[i]->parent = best;
-      
-      peers[i]->g = priv->hueristic(path, peers[i]);
+
+      double dist_to = priv->distance_to_goal(peers[i], path->goal);
+      double dist_from = priv->distance_from_start(peers[i], path->start);
+      double elevation = peers[i]->z - peers[i]->parent->z;
+      unsigned int climb = 0;
+      if(elevation >= 0)
+      {
+         if(elevation > priv->i_path_climb_up_max)
+         {
+            path->closed = eina_list_append(path->closed, peers[i]);
+            continue;
+         }
+         else if(elevation > priv->i_path_climb_up_min)
+            climb = elevation - priv->i_path_climb_up_min;
+      }
+      else
+      {
+         elevation = abs(elevation);
+         if(elevation > priv->i_path_climb_down_max)
+         {
+            path->closed = eina_list_append(path->closed, peers[i]);
+            continue;
+         }
+         else if(elevation > priv->i_path_climb_down_min)
+            climb = elevation - priv->i_path_climb_down_min;
+      }
+
+      float pathmap = 255 - image_pixel_value_get(priv->heatmap,
+      node->x, node->y, 0xFF000000, 24);
+
+      peers[i]->g =
+           priv->i_path_distance_start_mult * dist_from
+         + priv->i_path_distance_goal_mult  * dist_to
+         + climb;
      
       /* add the node to the open list */
       path->open = eina_list_append(path->open, peers[i]);
@@ -281,73 +313,3 @@ pathgen_path_walk_slow(void *data)
 * Hueristics *
 *************/
 
-double
-hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node)
-{
-   int dist_m, dist_d, pathmap;
-   float desasc, dist_e;
-   PATHGEN_WORLD_DATA_GET(path->world, priv);
-
-   dist_m = pathgen_node_dist_manhat(node, path->start);
-   dist_d = pathgen_node_dist_diagon(node, path->start);
-   dist_e = pathgen_node_dist_euclid(node, path->start);
-   desasc = abs(node->z - path->current->z);
-   pathmap = 255 - image_pixel_value_get(priv->heatmap,
-      node->x, node->y, 0xFF000000, 24);
-
-   return
-       dist_m * priv->i_path_inf_dist_manhat
-     + dist_d * priv->i_path_inf_dist_diagon
-     + dist_e * priv->i_path_inf_dist_euclid
-     + desasc * priv->i_path_inf_desasc
-     + pathmap* priv->i_path_inf_path;
-}
-
-double
-hueristic_best_first(Pathgen_Path *path, Pathgen_Node *node)
-{
-   int dist_m, dist_d, pathmap;
-   float desasc, dist_e;
-   PATHGEN_WORLD_DATA_GET(path->world, priv);
-
-   dist_m = pathgen_node_dist_manhat(node, path->goal);
-   dist_d = pathgen_node_dist_diagon(node, path->goal);
-   dist_e = pathgen_node_dist_euclid(node, path->goal);
-
-   desasc = abs(node->z - path->current->z);
-
-   pathmap = 255 - image_pixel_value_get(priv->heatmap,
-      node->x, node->y, 0xFF000000, 24);
-
-   return
-       dist_m * priv->i_path_inf_dist_manhat
-     + dist_d * priv->i_path_inf_dist_diagon
-     + dist_e * priv->i_path_inf_dist_euclid
-     + desasc * priv->i_path_inf_desasc
-     + pathmap* priv->i_path_inf_path;
-}
-
-
-double
-hueristic_astar(Pathgen_Path *path, Pathgen_Node *node)
-{
-   int dist_m, dist_d, pathmap;
-   float desasc, dist_e;
-   PATHGEN_WORLD_DATA_GET(path->world, priv);
-
-   dist_m = pathgen_node_dist_manhat(node, path->goal) + pathgen_node_dist_manhat(node, path->start);
-   dist_d = pathgen_node_dist_diagon(node, path->goal) + pathgen_node_dist_diagon(node, path->start);
-   dist_e = pathgen_node_dist_euclid(node, path->goal) + pathgen_node_dist_euclid(node, path->start);
-
-   desasc = abs(node->z - path->current->z);
-
-   pathmap = 255 - image_pixel_value_get(priv->heatmap,
-      node->x, node->y, 0xFF000000, 24);
-
-   return
-       dist_m * priv->i_path_inf_dist_manhat
-     + dist_d * priv->i_path_inf_dist_diagon
-     + dist_e * priv->i_path_inf_dist_euclid
-     + desasc * priv->i_path_inf_desasc
-     + pathmap* priv->i_path_inf_path;
-}
