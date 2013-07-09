@@ -69,6 +69,9 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    elm_object_content_set(frm, vbox);
    evas_object_show(vbox);
 
+   /***********************
+   * Height Image Options *
+   ***********************/
   /* sub divider */
    hbox = elm_box_add(win);
    elm_box_horizontal_set(hbox, EINA_TRUE);
@@ -81,7 +84,7 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    fs_entry = elm_fileselector_button_add(win);
    evas_object_name_set(fs_entry, "world,height,load");
    elm_fileselector_button_expandable_set(fs_entry, EINA_FALSE);
-   elm_object_text_set(fs_entry, "Load a Heightmap File");
+   elm_object_text_set(fs_entry, "Load Height");
    evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
    evas_object_size_hint_weight_set(fs_entry, EVAS_HINT_EXPAND, 0.0);
    elm_box_pack_end(hbox, fs_entry);
@@ -90,35 +93,20 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_smart_callback_add(
       fs_entry, "file,chosen", _fs_world_load_height, world);
 
-   /* add button to save heatmap */
-   btn = elm_fileselector_button_add(win);
-   elm_fileselector_button_window_title_set(btn, "Save Heightmap");
-   elm_fileselector_button_is_save_set(btn, EINA_TRUE);
-   elm_object_text_set(btn, "Save Heightmap");
-   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(fs_entry, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(hbox, btn);
-   evas_object_show(btn);
+//   btn = elm_fileselector_button_add(win);
+//   elm_fileselector_button_window_title_set(btn, "Save Heightmap");
+//   elm_fileselector_button_is_save_set(btn, EINA_TRUE);
+//   elm_object_text_set(btn, "Save Heightmap");
+//   evas_object_size_hint_align_set(btn, EVAS_HINT_FILL, 0.0);
+//   evas_object_size_hint_weight_set(fs_entry, EVAS_HINT_EXPAND, 0.0);
+//   elm_box_pack_end(hbox, btn);
+//   evas_object_show(btn);
 
-   evas_object_smart_callback_add(btn, "file,chosen",
-      _btn_world_save_height, NULL);
-
-   /* height multiplier spinner */
-   /* sub divider */
-   hbox = elm_box_add(win);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   elm_box_homogeneous_set(hbox, EINA_TRUE);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
-   elm_box_pack_end(vbox, hbox);
-   evas_object_show(hbox);
-
-   lab = elm_label_add(win);
-   elm_object_text_set(lab, "Height Multiplier");
-   elm_box_pack_end(hbox, lab);
-   evas_object_show(lab);
+//  evas_object_smart_callback_add(btn, "file,chosen",
+//      _btn_world_save_height, NULL);
 
    spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "%.3f");
+   elm_spinner_label_format_set(spin, "value: %.3f");
    elm_spinner_min_max_set(spin, I_WORLD_HEIGHT_MULT_MIN,
       I_WORLD_HEIGHT_MULT_MAX);
    elm_spinner_value_set(spin, I_WORLD_HEIGHT_MULT_DEFAULT);
@@ -132,6 +120,146 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_world_height_mult, world);
 
+   /***********************
+   * Path Image Options *
+   ***********************/
+  /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* file selector entry */
+   fs_entry = elm_fileselector_button_add(win);
+   evas_object_name_set(fs_entry, "world,path,load");
+   elm_fileselector_button_expandable_set(fs_entry, EINA_FALSE);
+   elm_object_text_set(fs_entry, "Load Path");
+   evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(fs_entry, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, fs_entry);
+   evas_object_show(fs_entry);
+
+//   evas_object_smart_callback_add(
+//      fs_entry, "file,chosen", _fs_world_path_load, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "Value: %.3f");
+   elm_spinner_min_max_set(spin, I_WORLD_PATH_MULT_MIN,
+      I_WORLD_PATH_MULT_MAX);
+   elm_spinner_value_set(spin, I_WORLD_PATH_MULT_DEFAULT);
+   elm_spinner_step_set(spin, I_WORLD_PATH_MULT_STEP);
+
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+//   evas_object_smart_callback_add(spin, "delay,changed",
+//      _spin_world_height_mult, world);
+
+   /***********************
+   * Interest Image Options *
+   ***********************/
+  /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* file selector entry */
+   fs_entry = elm_fileselector_button_add(win);
+   evas_object_name_set(fs_entry, "world,interest,load");
+   elm_fileselector_button_expandable_set(fs_entry, EINA_FALSE);
+   elm_object_text_set(fs_entry, "Load Interest");
+   evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(fs_entry, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, fs_entry);
+   evas_object_show(fs_entry);
+
+//   evas_object_smart_callback_add(
+//      fs_entry, "file,chosen", _fs_world_interest_load, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "Value: %.3f");
+   elm_spinner_min_max_set(spin, I_WORLD_INTEREST_MULT_MIN,
+      I_WORLD_INTEREST_MULT_MAX);
+   elm_spinner_value_set(spin, I_WORLD_INTEREST_MULT_DEFAULT);
+   elm_spinner_step_set(spin, I_WORLD_INTEREST_MULT_STEP);
+
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+//   evas_object_smart_callback_add(spin, "delay,changed",
+//      _spin_world_interest_mult, world);
+
+   /***********************
+   * Avoidance Image Options *
+   ***********************/
+  /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* file selector entry */
+   fs_entry = elm_fileselector_button_add(win);
+   evas_object_name_set(fs_entry, "world,avoid,load");
+   elm_fileselector_button_expandable_set(fs_entry, EINA_FALSE);
+   elm_object_text_set(fs_entry, "Load Avoidance");
+   evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(fs_entry, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, fs_entry);
+   evas_object_show(fs_entry);
+
+//   evas_object_smart_callback_add(
+//      fs_entry, "file,chosen", _fs_world_avoid_load, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "Value: %.3f");
+   elm_spinner_min_max_set(spin, I_WORLD_AVOID_MULT_MIN,
+      I_WORLD_AVOID_MULT_MAX);
+   elm_spinner_value_set(spin, I_WORLD_AVOID_MULT_DEFAULT);
+   elm_spinner_step_set(spin, I_WORLD_AVOID_MULT_STEP);
+
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+//   evas_object_smart_callback_add(spin, "delay,changed",
+//      _spin_world_avoid_mult, world);
+
+   /***********************
+   * Teleport ID Image Options *
+   ***********************/
+  /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   /* file selector entry */
+   fs_entry = elm_fileselector_button_add(win);
+   evas_object_name_set(fs_entry, "world,teleport,load");
+   elm_fileselector_button_expandable_set(fs_entry, EINA_FALSE);
+   elm_object_text_set(fs_entry, "Load Teleport");
+   evas_object_size_hint_align_set(fs_entry, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(fs_entry, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(hbox, fs_entry);
+   evas_object_show(fs_entry);
+
+//   evas_object_smart_callback_add(
+//      fs_entry, "file,chosen", _fs_world_teleport_load, world);
 }
 
 #endif /*I_WORLD_H*/
