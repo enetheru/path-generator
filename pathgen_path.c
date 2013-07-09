@@ -26,6 +26,7 @@ pathgen_path_del(Pathgen_Path *path)
 {
    void *data;
    if(!path)return;
+
    /* delete lists of nodes */
    EINA_LIST_FREE(path->open, data)
       pathgen_node_del((Pathgen_Node *)data);
@@ -34,24 +35,11 @@ pathgen_path_del(Pathgen_Path *path)
       pathgen_node_del((Pathgen_Node *)data);
 
    /* delete start, end, current nodes */
-   pathgen_node_del(path->start);
-   pathgen_node_del(path->goal);
-   pathgen_node_del(path->current);
-
+   if(path->goal)
+   {
+      pathgen_node_del(path->goal);
+   }
    free(path);
-   path = NULL;
-}
-
-
-void
-pathgen_path_info(Pathgen_Path *path)
-{
-   fprintf(stderr,
-      "p: w=%p, s=%p, e=%p, c=%p, o=%i, c=%i\n", 
-      path->world, path->start, path->goal, path->current, 
-      eina_list_count(path->open),
-      eina_list_count(path->closed));
-   return;
 }
 
 Eina_Bool
@@ -242,14 +230,9 @@ pathgen_path_best(Pathgen_Path *path)
    Eina_List *l;
    void *list_data;
    Pathgen_Node *best, *current;
-   float maga, magb;
 
-   if(!path)
-   {
-      fprintf(stderr,
-         "ERR: no path given\n");  
-      return NULL;
-   }
+   if(!path)return NULL;
+
    if(eina_list_count(path->open) == 0)
    {
       fprintf(stderr,
@@ -266,8 +249,6 @@ pathgen_path_best(Pathgen_Path *path)
          if(current->g < best->g)best = current;
          else if(current->g == best->g && rand() % 10 < 5)best = current;
    }
-//   pathgen_node_info(best);
-
    return best;
 }
 
@@ -311,6 +292,7 @@ pathgen_path_walk_slow(void *data)
             pixel_add, priv->i_path_walk_brush, priv->i_path_tread_weight);
   
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);
+      pathgen_path_del(path);
    }
    return ret;
 }

@@ -542,6 +542,7 @@ _pathgen_path_search_complete( void *data, __UNUSED__
          image_func_image(priv->heatmap, path->current->x, path->current->y,
             pixel_add, priv->i_path_walk_brush, priv->i_path_tread_weight);
       evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
+      pathgen_path_del(path);
    }
    evas_object_smart_changed(o);
 }
