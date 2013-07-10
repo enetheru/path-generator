@@ -19,7 +19,7 @@ _fs_world_load_height(void *data, Evas_Object *obj, void *event_info)
    evas_object_image_file_set(image, file, NULL);
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
 
-   pathgen_world_height_set(data, image);
+   pathgen_world_layer_set(data, image, 0);
 }
 
 static void

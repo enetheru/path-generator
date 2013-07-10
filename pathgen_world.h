@@ -126,7 +126,7 @@ void
 pathgen_world_size_get(Evas_Object *world, int *w, int *h);
 
 void
-pathgen_world_height_set(Evas_Object *o, Evas_Object *height);
+pathgen_world_layer_set(Evas_Object *o, Evas_Object *height, int id);
 
 int
 pathgen_world_height_get_xy(Evas_Object *world, int x, int y);

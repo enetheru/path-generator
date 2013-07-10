@@ -368,7 +368,7 @@ _pathgen_world_generate(
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
    image_paint_noise(image, priv->i_worldgen_density);
    image_func_fill(image, pixel_desaturate, 0);
-   pathgen_world_height_set(o, image);
+   pathgen_world_layer_set(o, image, 0);
 }
 
 /**********************
@@ -494,72 +494,24 @@ _pathgen_path_search_complete( void *data, __UNUSED__
 /* set to return any previous object set to the height of the
  * world or NULL, if any (or on errors) */
 void
-pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
+pathgen_world_layer_set(Evas_Object *world, Evas_Object *new, int id)
 {
-   fprintf(stderr, "setting new height map.\n");
-   Evas_Object *old;
-
    PATHGEN_WORLD_DATA_GET(world, priv);
-   old = priv->l[0];
 
-   if(!new)
-   {
-      fprintf(stderr, "no heightmap specefied.\n");
-      return;
-   }
+   if(!new || new == priv->l[id])return;
 
-   if(old == new)
+   if(priv->l[id])
    {
-      fprintf(stderr, "Maps must be unique objects\n");
-      return;
-   }
-
-   if(old)
-   {
-      fprintf(stderr, "Deleting old heightmap.\n");
-      /* delete existing height */
-      evas_object_smart_member_del(old);
-      evas_object_del(old);
+      evas_object_smart_member_del(priv->l[id]);
+      evas_object_del(priv->l[id]);
    }
 
    // Assign new object
-   evas_object_smart_member_add(new, world);
-   priv->l[0] = new;
+   priv->l[id] = new;
+   evas_object_smart_member_add(priv->l[id], world);
 
-   evas_object_stack_above(priv->l[0], priv->background);
-
-   evas_object_image_size_get(priv->l[0], &(priv->w), &(priv->h));
-   evas_object_show(priv->l[0]);
+   evas_object_image_size_get(priv->l[id], &(priv->w), &(priv->h));
+   evas_object_show(priv->l[id]);
 
    evas_object_smart_changed(world);
 }
-
-/* spawnmap */
-void
-pathgen_world_spawnmap_set(Evas_Object *world, Evas_Object *new)
-{
-   fprintf(stderr, "setting new spawn map.\n");
-   Evas_Object *old;
-
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   old = priv->l[4];
-
-   if(!new || new == priv->l[4])return;
-
-   if(priv->l[4])
-   {
-      fprintf(stderr, "Deleting old spawn map.\n");
-      /* delete existing height */
-      evas_object_smart_member_del(priv->l[4]);
-      evas_object_del(priv->l[4]);
-   }
-
-   // Assign new object
-   priv->l[4] = new;
-   evas_object_smart_member_add(priv->l[4], world);
-   evas_object_stack_above(priv->l[4], priv->l[0]);
-   evas_object_show(priv->l[4]);
-
-   evas_object_smart_changed(world);
-}
-
