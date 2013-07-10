@@ -496,9 +496,18 @@ _pathgen_path_search_complete( void *data, __UNUSED__
 void
 pathgen_world_layer_set(Evas_Object *world, Evas_Object *new, int id)
 {
+   int w, h;
    PATHGEN_WORLD_DATA_GET(world, priv);
 
    if(!new || new == priv->l[id])return;
+
+   evas_object_image_size_get(new, &w, &h);
+
+   if(w != priv->w || h != priv->h && id != 0)
+   {
+      fprintf(stderr, "ERR: for the moment the dimensions of the image must match the height");
+      return;
+   }
 
    if(priv->l[id])
    {
@@ -509,8 +518,9 @@ pathgen_world_layer_set(Evas_Object *world, Evas_Object *new, int id)
    // Assign new object
    priv->l[id] = new;
    evas_object_smart_member_add(priv->l[id], world);
+   if(id == 0)
+      evas_object_image_size_get(priv->l[id], &(priv->w), &(priv->h));
 
-   evas_object_image_size_get(priv->l[id], &(priv->w), &(priv->h));
    evas_object_show(priv->l[id]);
 
    evas_object_smart_changed(world);
