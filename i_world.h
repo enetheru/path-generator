@@ -71,7 +71,7 @@ _spin_world_pathmap_mult(void *data, Evas_Object *o, void *event_info)
    if(!data)return;
 
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_world_height_mult = (float)elm_spinner_value_get(o);
+   priv->i_world_pathmap_mult = (float)elm_spinner_value_get(o);
 }
 
 static void 
@@ -116,7 +116,7 @@ _spin_world_avoid_mult(void *data, Evas_Object *o, void *event_info)
    if(!data)return;
 
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_world_height_mult = (float)elm_spinner_value_get(o);
+   priv->i_world_avoid_mult = (float)elm_spinner_value_get(o);
 }
 
 static void 

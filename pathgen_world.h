@@ -54,6 +54,8 @@ struct _Pathgen_World_Data
 
    /* world */
    float i_world_height_mult;
+   float i_world_pathmap_mult;
+   float i_world_avoid_mult;
 
    /* world generation */
    int i_worldgen_w,
