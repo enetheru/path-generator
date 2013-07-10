@@ -26,17 +26,22 @@ typedef struct _Pathgen_World_Data Pathgen_World_Data;
 struct _Pathgen_World_Data
 {
    Evas_Object_Smart_Clipped_Data base;
-   Evas_Object *background, *height, *heatmap, *search, *path;
-   Evas_Object *spawnmap;
+   Evas_Object *background;
+   Evas_Object *l[8];
+// 7 path
+// 6 search
+// 5 heat
+// 4 spawnmap
+// 3 pathmap
+// 2 avoid
+// 1 teleport
+// 0 height
    int w,h;
 
 
    /* == interface variables == */
    /* display settings */
-   Eina_Bool i_display_height,
-             i_display_heatmap,
-             i_display_search,
-             i_display_path;
+   Eina_Bool i_display_[8];
    float     i_display_speed;
 
    /* sim */

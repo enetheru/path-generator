@@ -40,9 +40,9 @@ _btn_save_path_heatmap(void *data, Evas_Object *o, void *event_info)
    world = evas_object_name_find(evas, "world");
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->heatmap)return;
+   if(!priv->l[5])return;
 
-   evas_object_image_save(priv->heatmap, (const char *)event_info, NULL, NULL);
+   evas_object_image_save(priv->l[5], (const char *)event_info, NULL, NULL);
    return;
 }
 
@@ -73,7 +73,7 @@ _btn_sim_reset(void *data, Evas_Object *o, void *event_info)
    fprintf(stderr, "want to reset sim\n");
    PATHGEN_WORLD_DATA_GET(data, priv);
 
-   image_func_fill(priv->heatmap, NULL, 0x00000000);
+   image_func_fill(priv->l[5], NULL, 0x00000000);
    return;
 }
 

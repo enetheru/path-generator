@@ -9,7 +9,7 @@ _chk_path_search_diagonal(void *data, Evas_Object *o, void *event_info)
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->height)return;
+   if(!priv->l[0])return;
 
    if(elm_check_state_get(o))
    {

@@ -47,16 +47,11 @@ _pathgen_world_smart_del(Evas_Object *o)
 static void
 _pathgen_world_smart_show(Evas_Object *o)
 {
+   int i;
    PATHGEN_WORLD_DATA_GET(o, priv);
    evas_object_show(priv->background);
-   if(priv->i_display_height)
-      evas_object_show(priv->height);
-   if(priv->i_display_heatmap)
-      evas_object_show(priv->heatmap);
-   if(priv->i_display_search)
-      evas_object_show(priv->search);
-   if(priv->i_display_path)
-      evas_object_show(priv->path);
+   for(i=0; i<8; i++)
+      if(priv->i_display_[i])evas_object_show(priv->l[i]);
 
    _pathgen_world_parent_sc->show(o);
 }
@@ -64,16 +59,13 @@ _pathgen_world_smart_show(Evas_Object *o)
 static void
 _pathgen_world_smart_hide(Evas_Object *o)
 {
+   int i;
    PATHGEN_WORLD_DATA_GET(o, priv);
    evas_object_hide(priv->background);
-   if(priv->i_display_height)
-      evas_object_hide(priv->height);
-   if(!priv->i_display_heatmap)
-      evas_object_hide(priv->heatmap);
-   if(!priv->i_display_search)
-      evas_object_hide(priv->search);
-   if(!priv->i_display_path)
-      evas_object_hide(priv->path);
+   for(i=0; i<8; i++)
+   {
+      if(priv->i_display_[i])evas_object_show(priv->l[i]);
+   }
 
    _pathgen_world_parent_sc->hide(o);
 }
@@ -103,29 +95,29 @@ _pathgen_world_smart_calculate(Evas_Object *o)
    evas_object_resize(priv->background, w, h);
    evas_object_move(priv->background, x, y);
 
-   evas_object_resize(priv->height, w, h);
-   evas_object_move(priv->height, x, y);
+   evas_object_resize(priv->l[0], w, h);
+   evas_object_move(priv->l[0], x, y);
 
 //   evas_object_resize(priv->interest, w, h);
 //   evas_object_move(priv->interest, x, y);
-//   evas_object_stack_above(priv->interest, priv->height);
+//   evas_object_stack_above(priv->interest, priv->l[0]);
 
-//   evas_object_resize(priv->path, w, h);
-//   evas_object_move(priv->path, x, y);
-//   evas_object_stack_above(priv->path, priv->interest);
+//   evas_object_resize(priv->l[7], w, h);
+//   evas_object_move(priv->l[7], x, y);
+//   evas_object_stack_above(priv->l[7], priv->interest);
 
 //   evas_object_resize(priv->teleport, w, h);
 //   evas_object_move(priv->teleport, x, y);
-//   evas_object_stack_above(priv->teleport, priv->path);
+//   evas_object_stack_above(priv->teleport, priv->l[7]);
 
-   evas_object_resize(priv->heatmap, w, h);
-   evas_object_move(priv->heatmap, x, y);
+   evas_object_resize(priv->l[5], w, h);
+   evas_object_move(priv->l[5], x, y);
 
-   evas_object_resize(priv->search, w, h);
-   evas_object_move(priv->search, x, y);
+   evas_object_resize(priv->l[6], w, h);
+   evas_object_move(priv->l[6], x, y);
 
-   evas_object_resize(priv->path, w, h);
-   evas_object_move(priv->path, x, y);
+   evas_object_resize(priv->l[7], w, h);
+   evas_object_move(priv->l[7], x, y);
 }
 
 /* setting our smart interface */
@@ -186,10 +178,10 @@ pathgen_world_add( Evas *evas)
 
    /* set default variables */
    /* display */
-   priv->i_display_height = I_DISPLAY_HEIGHT_DEFAULT;
-   priv->i_display_heatmap = I_DISPLAY_HEATMAP_DEFAULT;
-   priv->i_display_search = I_DISPLAY_SEARCH_DEFAULT;
-   priv->i_display_path = I_DISPLAY_PATH_DEFAULT;
+   priv->i_display_[0] = I_DISPLAY_HEIGHT_DEFAULT;
+   priv->i_display_[5] = I_DISPLAY_HEATMAP_DEFAULT;
+   priv->i_display_[6] = I_DISPLAY_SEARCH_DEFAULT;
+   priv->i_display_[7] = I_DISPLAY_PATH_DEFAULT;
    priv->i_display_speed = I_DISPLAY_SPEED_DEFAULT;
 
    /* sim */
@@ -243,66 +235,66 @@ pathgen_world_prepare(Evas_Object *world)
    PATHGEN_WORLD_DATA_GET(world, priv);
    evas = evas_object_evas_get(world);
 
-   if(!priv->height)return EINA_FALSE;
+   if(!priv->l[0])return EINA_FALSE;
 
    /* preparing heatmap*/
-   if(priv->heatmap)
+   if(priv->l[5])
    {
-      evas_object_image_size_get(priv->heatmap, &w, &h);
+      evas_object_image_size_get(priv->l[5], &w, &h);
       if(!(w == priv->w && h == priv->h))
       {
-         evas_object_smart_member_del(priv->heatmap);
-         evas_object_del(priv->heatmap);
-         priv->heatmap == NULL;
+         evas_object_smart_member_del(priv->l[5]);
+         evas_object_del(priv->l[5]);
+         priv->l[5] == NULL;
       }
    }
-   if(!priv->heatmap)
+   if(!priv->l[5])
    {
-      priv->heatmap = image_generate_color(evas, priv->w, priv->h, 0x00000000);
+      priv->l[5] = image_generate_color(evas, priv->w, priv->h, 0x00000000);
 
-      evas_object_smart_member_add(priv->heatmap, world);
-      evas_object_stack_above(priv->heatmap, priv->height);
-      evas_object_show(priv->heatmap);
+      evas_object_smart_member_add(priv->l[5], world);
+      evas_object_stack_above(priv->l[5], priv->l[0]);
+      evas_object_show(priv->l[5]);
    }
 
    /* preparing visual */
-   if(priv->search)
+   if(priv->l[6])
    {
-      evas_object_image_size_get(priv->search, &w, &h);
+      evas_object_image_size_get(priv->l[6], &w, &h);
       if(!(w == priv->w && h == priv->h))
       {
-         evas_object_smart_member_del(priv->search);
-         evas_object_del(priv->search);
-         priv->search == NULL;
+         evas_object_smart_member_del(priv->l[6]);
+         evas_object_del(priv->l[6]);
+         priv->l[6] == NULL;
       }
    }
-   if(!priv->search)
+   if(!priv->l[6])
    {
-      priv->search = image_generate_color(evas, priv->w, priv->h, 0x00000000);
+      priv->l[6] = image_generate_color(evas, priv->w, priv->h, 0x00000000);
 
-      evas_object_smart_member_add(priv->search, world);
-      evas_object_stack_above(priv->search, priv->heatmap);
-      evas_object_show(priv->search);
+      evas_object_smart_member_add(priv->l[6], world);
+      evas_object_stack_above(priv->l[6], priv->l[5]);
+      evas_object_show(priv->l[6]);
    }
 
    /* preparing visual */
-   if(priv->path)
+   if(priv->l[7])
    {
-      evas_object_image_size_get(priv->path, &w, &h);
+      evas_object_image_size_get(priv->l[7], &w, &h);
       if(!(w == priv->w && h == priv->h))
       {
-         evas_object_smart_member_del(priv->path);
-         evas_object_del(priv->path);
-         priv->path == NULL;
+         evas_object_smart_member_del(priv->l[7]);
+         evas_object_del(priv->l[7]);
+         priv->l[7] == NULL;
       }
    }
-   if(!priv->path)
+   if(!priv->l[7])
    {
-      priv->path = image_generate_color(evas, priv->w, priv->h, 0x00000000);
+      priv->l[7] = image_generate_color(evas, priv->w, priv->h, 0x00000000);
 
-      evas_object_smart_member_add(priv->path, world);
-      evas_object_stack_above(priv->path, priv->search);
-      evas_object_show(priv->path);
+      evas_object_smart_member_add(priv->l[7], world);
+      evas_object_stack_above(priv->l[7], priv->l[6]);
+      evas_object_show(priv->l[7]);
    }
 
    evas_object_smart_changed(world);
@@ -324,10 +316,10 @@ pathgen_world_height_get_xy(Evas_Object *world, int x, int y)
    int w, h, k, *pixels;
    if(!world)return 0;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->height)return 0;
-   evas_object_image_size_get(priv->height, &w, &h);
+   if(!priv->l[0])return 0;
+   evas_object_image_size_get(priv->l[0], &w, &h);
    if(!(0 < x < w && 0 < y < h))return 0; 
-   pixels = evas_object_image_data_get(priv->height, EINA_FALSE);
+   pixels = evas_object_image_data_get(priv->l[0], EINA_FALSE);
    k =  (pixels[x+w*y] & 0x000000FF) * priv->i_world_height_mult;
 //   fprintf(stderr, "height at (%i, %i) is %i\n", x,y,k);
    return k;
@@ -393,7 +385,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
    PATHGEN_WORLD_DATA_GET(world, priv);
    evas = evas_object_evas_get(world);
 
-   if(!priv->height)
+   if(!priv->l[0])
    {
       fprintf(stderr, "no height map, cannot run sim.\n");
       return;
@@ -428,7 +420,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    }
    else
    {
-      image_func_fill(priv->heatmap, pixel_subtract,
+      image_func_fill(priv->l[5], pixel_subtract,
          (uint32_t)priv->i_sim_path_fade_strength<<24);
       priv->path_fade_count = 0;
       evas_render(evas_object_evas_get(world));
@@ -442,10 +434,10 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    /* new path */
    path = pathgen_path_create(world, start, goal);
 
-   if(priv->i_display_search) /* walk the path slowly */
+   if(priv->i_display_[6]) /* walk the path slowly */
    {
-      image_func_fill(priv->search, NULL, 0x00000000);
-      image_func_pixel(priv->search, goal->x, goal->y, NULL, 0xFF00FF00);
+      image_func_fill(priv->l[6], NULL, 0x00000000);
+      image_func_pixel(priv->l[6], goal->x, goal->y, NULL, 0xFF00FF00);
       ecore_timer_add(priv->i_display_speed, pathgen_path_search, path);
    }
    else while(pathgen_path_search(path));
@@ -482,15 +474,15 @@ _pathgen_path_search_complete( void *data, __UNUSED__
    PATHGEN_WORLD_DATA_GET(o, priv);
 
 
-   if(priv->i_display_path)
+   if(priv->i_display_[7])
    {
-      image_func_fill(priv->path, NULL, 0x00000000);
+      image_func_fill(priv->l[7], NULL, 0x00000000);
       ecore_timer_add(priv->i_display_speed, pathgen_path_walk_slow, path);
    }
    else
    {
       while(pathgen_path_walk(path))
-         image_func_image(priv->heatmap, path->current->x, path->current->y,
+         image_func_image(priv->l[5], path->current->x, path->current->y,
             pixel_add, priv->i_path_walk_brush, priv->i_path_tread_weight);
       evas_object_smart_callback_call(o, EVT_SIM_TRAVELER_NEW, NULL);
       pathgen_path_del(path);
@@ -508,7 +500,7 @@ pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
    Evas_Object *old;
 
    PATHGEN_WORLD_DATA_GET(world, priv);
-   old = priv->height;
+   old = priv->l[0];
 
    if(!new)
    {
@@ -532,12 +524,12 @@ pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
 
    // Assign new object
    evas_object_smart_member_add(new, world);
-   priv->height = new;
+   priv->l[0] = new;
 
-   evas_object_stack_above(priv->height, priv->background);
+   evas_object_stack_above(priv->l[0], priv->background);
 
-   evas_object_image_size_get(priv->height, &(priv->w), &(priv->h));
-   evas_object_show(priv->height);
+   evas_object_image_size_get(priv->l[0], &(priv->w), &(priv->h));
+   evas_object_show(priv->l[0]);
 
    evas_object_smart_changed(world);
 }
@@ -550,23 +542,23 @@ pathgen_world_spawnmap_set(Evas_Object *world, Evas_Object *new)
    Evas_Object *old;
 
    PATHGEN_WORLD_DATA_GET(world, priv);
-   old = priv->spawnmap;
+   old = priv->l[4];
 
-   if(!new || new == priv->spawnmap)return;
+   if(!new || new == priv->l[4])return;
 
-   if(priv->spawnmap)
+   if(priv->l[4])
    {
       fprintf(stderr, "Deleting old spawn map.\n");
       /* delete existing height */
-      evas_object_smart_member_del(priv->spawnmap);
-      evas_object_del(priv->spawnmap);
+      evas_object_smart_member_del(priv->l[4]);
+      evas_object_del(priv->l[4]);
    }
 
    // Assign new object
-   priv->spawnmap = new;
-   evas_object_smart_member_add(priv->spawnmap, world);
-   evas_object_stack_above(priv->spawnmap, priv->height);
-   evas_object_show(priv->spawnmap);
+   priv->l[4] = new;
+   evas_object_smart_member_add(priv->l[4], world);
+   evas_object_stack_above(priv->l[4], priv->l[0]);
+   evas_object_show(priv->l[4]);
 
    evas_object_smart_changed(world);
 }

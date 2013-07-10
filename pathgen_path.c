@@ -90,8 +90,8 @@ pathgen_path_search(void *data)
    path->open = eina_list_remove(path->open, best);
    path->closed = eina_list_append(path->closed, best);
 
-   if(priv->i_display_search)
-      image_func_pixel(priv->search, best->x, best->y, NULL, 0x88000000);
+   if(priv->i_display_[6])
+      image_func_pixel(priv->l[6], best->x, best->y, NULL, 0x88000000);
 
    /* examine the neighbours */
    /* clear any data */
@@ -180,8 +180,8 @@ pathgen_path_search(void *data)
          if(elevation > priv->i_path_climb_up_limit)
          {
             path->closed = eina_list_append(path->closed, peers[i]);
-            if(priv->i_display_search)
-               image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
+            if(priv->i_display_[6])
+               image_func_pixel(priv->l[6], peers[i]->x, peers[i]->y, NULL, 0x88000000);
             continue;
          }
          else if(elevation > priv->i_path_climb_up_tolerance)
@@ -194,8 +194,8 @@ pathgen_path_search(void *data)
          if(elevation > priv->i_path_climb_down_limit)
          {
             path->closed = eina_list_append(path->closed, peers[i]);
-            if(priv->i_display_search)
-               image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88000000);
+            if(priv->i_display_[6])
+               image_func_pixel(priv->l[6], peers[i]->x, peers[i]->y, NULL, 0x88000000);
             continue;
          }
          else if(elevation > priv->i_path_climb_down_tolerance)
@@ -203,7 +203,7 @@ pathgen_path_search(void *data)
             climb *= priv->i_path_climb_down_value;
       }
 
-      int path_follow = (255 - image_pixel_value_get(priv->heatmap,
+      int path_follow = (255 - image_pixel_value_get(priv->l[5],
          peers[i]->x, peers[i]->y, 0xFF000000, 24)) * priv->i_path_follow_value;
 
       peers[i]->g =
@@ -215,8 +215,8 @@ pathgen_path_search(void *data)
       path->open = eina_list_append(path->open, peers[i]);
 
       /* paint the node */
-      if(priv->i_display_search)
-         image_func_pixel(priv->search, peers[i]->x, peers[i]->y, NULL, 0x88008888);
+      if(priv->i_display_[6])
+         image_func_pixel(priv->l[6], peers[i]->x, peers[i]->y, NULL, 0x88008888);
    }
    evas_object_smart_changed(path->world);
    path->iter++;
@@ -279,7 +279,7 @@ pathgen_path_walk_slow(void *data)
    if(!data)ret = EINA_FALSE;
    else
    {
-      image_func_pixel(priv->path, path->current->x, path->current->y, NULL, 0xFFFFFF00);
+      image_func_pixel(priv->l[7], path->current->x, path->current->y, NULL, 0xFFFFFF00);
       if(!pathgen_path_walk(path))
       {
          ret = EINA_FALSE;
@@ -288,7 +288,7 @@ pathgen_path_walk_slow(void *data)
    if(!ret)
    {
       while(pathgen_path_walk(path))
-         image_func_image(priv->heatmap, path->current->x, path->current->y,
+         image_func_image(priv->l[5], path->current->x, path->current->y,
             pixel_add, priv->i_path_walk_brush, priv->i_path_tread_weight);
   
       evas_object_smart_callback_call(path->world, EVT_SIM_TRAVELER_NEW, NULL);

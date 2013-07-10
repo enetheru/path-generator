@@ -9,17 +9,17 @@ _chk_display_height(void *data, Evas_Object *o, void *event_info)
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->height)return;
+   if(!priv->l[0])return;
 
    if(elm_check_state_get(o))
    {
       fprintf(stderr, "i_display_height = true\n");
-      priv->i_display_height = EINA_TRUE;
-      evas_object_show(priv->height);
+      priv->i_display_[0] = EINA_TRUE;
+      evas_object_show(priv->l[0]);
    } else {
       fprintf(stderr, "i_display_height = false\n");
-      priv->i_display_height = EINA_FALSE;
-      evas_object_hide(priv->height);
+      priv->i_display_[0] = EINA_FALSE;
+      evas_object_hide(priv->l[0]);
    }
 }
 
@@ -31,21 +31,21 @@ _chk_display_heatmap(void *data, Evas_Object *o, void *event_info)
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->heatmap)return;
+   if(!priv->l[5])return;
 
    if(elm_check_state_get(o))
    {
       fprintf(stderr,
          "i_display_heatmap = on\n");
-      priv->i_display_heatmap = EINA_TRUE;
-      evas_object_show(priv->heatmap);
+      priv->i_display_[5] = EINA_TRUE;
+      evas_object_show(priv->l[5]);
    }
    else
    {
       fprintf(stderr,
          "i_display_heatmap = off\n");
-      priv->i_display_heatmap = EINA_FALSE;
-      evas_object_hide(priv->heatmap);
+      priv->i_display_[5] = EINA_FALSE;
+      evas_object_hide(priv->l[5]);
    }
 }
 
@@ -57,21 +57,21 @@ _chk_display_search(void *data, Evas_Object *o, void *event_info)
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->search)return;
+   if(!priv->l[6])return;
 
    if(elm_check_state_get(o))
    {
       fprintf(stderr,
          "i_display_search = on\n");
-      priv->i_display_search = EINA_TRUE;
-      evas_object_show(priv->search);
+      priv->i_display_[6] = EINA_TRUE;
+      evas_object_show(priv->l[6]);
    }
    else 
    {
       fprintf(stderr,
          "i_display_search = off\n");
-      priv->i_display_search = EINA_FALSE;
-      evas_object_hide(priv->search);
+      priv->i_display_[6] = EINA_FALSE;
+      evas_object_hide(priv->l[6]);
    }
 }
 static void
@@ -82,21 +82,21 @@ _chk_display_path(void *data, Evas_Object *o, void *event_info)
    world = (Evas_Object *)data;
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
-   if(!priv->path)return;
+   if(!priv->l[7])return;
 
    if(elm_check_state_get(o))
    {
       fprintf(stderr,
          "i_display_path = on\n");
-      priv->i_display_path = EINA_TRUE;
-      evas_object_show(priv->path);
+      priv->i_display_[7] = EINA_TRUE;
+      evas_object_show(priv->l[7]);
    }
    else 
    {
       fprintf(stderr,
          "i_display_path = off\n");
-      priv->i_display_path = EINA_FALSE;
-      evas_object_hide(priv->path);
+      priv->i_display_[7] = EINA_FALSE;
+      evas_object_hide(priv->l[7]);
    }
 }
 
