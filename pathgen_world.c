@@ -64,7 +64,7 @@ _pathgen_world_smart_hide(Evas_Object *o)
    evas_object_hide(priv->background);
    for(i=0; i<8; i++)
    {
-      if(priv->i_display_[i])evas_object_show(priv->l[i]);
+      if(!priv->i_display_[i])evas_object_hide(priv->l[i]);
    }
 
    _pathgen_world_parent_sc->hide(o);
@@ -88,6 +88,7 @@ static void
 _pathgen_world_smart_calculate(Evas_Object *o)
 {
    Evas_Coord x, y, w, h;
+   int i;
 
    PATHGEN_WORLD_DATA_GET_OR_RETURN(o, priv);
    evas_object_geometry_get(o, &x, &y, &w, &h);
@@ -98,26 +99,13 @@ _pathgen_world_smart_calculate(Evas_Object *o)
    evas_object_resize(priv->l[0], w, h);
    evas_object_move(priv->l[0], x, y);
 
-//   evas_object_resize(priv->interest, w, h);
-//   evas_object_move(priv->interest, x, y);
-//   evas_object_stack_above(priv->interest, priv->l[0]);
+   for(i=1; i<8; i++)
+   {
+      evas_object_resize(priv->l[i], w, h);
+      evas_object_move(priv->l[i], x, y);
+      //evas_object_stack_above(priv->l[i], priv->l[i-1]);
+   }
 
-//   evas_object_resize(priv->l[7], w, h);
-//   evas_object_move(priv->l[7], x, y);
-//   evas_object_stack_above(priv->l[7], priv->interest);
-
-//   evas_object_resize(priv->teleport, w, h);
-//   evas_object_move(priv->teleport, x, y);
-//   evas_object_stack_above(priv->teleport, priv->l[7]);
-
-   evas_object_resize(priv->l[5], w, h);
-   evas_object_move(priv->l[5], x, y);
-
-   evas_object_resize(priv->l[6], w, h);
-   evas_object_move(priv->l[6], x, y);
-
-   evas_object_resize(priv->l[7], w, h);
-   evas_object_move(priv->l[7], x, y);
 }
 
 /* setting our smart interface */
@@ -179,6 +167,10 @@ pathgen_world_add( Evas *evas)
    /* set default variables */
    /* display */
    priv->i_display_[0] = I_DISPLAY_HEIGHT_DEFAULT;
+   priv->i_display_[1] = I_DISPLAY_HEIGHT_DEFAULT;
+   priv->i_display_[2] = I_DISPLAY_HEIGHT_DEFAULT;
+   priv->i_display_[3] = I_DISPLAY_HEIGHT_DEFAULT;
+   priv->i_display_[4] = I_DISPLAY_HEIGHT_DEFAULT;
    priv->i_display_[5] = I_DISPLAY_HEATMAP_DEFAULT;
    priv->i_display_[6] = I_DISPLAY_SEARCH_DEFAULT;
    priv->i_display_[7] = I_DISPLAY_PATH_DEFAULT;
@@ -503,9 +495,9 @@ pathgen_world_layer_set(Evas_Object *world, Evas_Object *new, int id)
 
    evas_object_image_size_get(new, &w, &h);
 
-   if(w != priv->w || h != priv->h && id != 0)
+   if((w != priv->w || h != priv->h) && id != 0)
    {
-      fprintf(stderr, "ERR: for the moment the dimensions of the image must match the height");
+      fprintf(stderr, "ERR: for the moment the dimensions of the image must match the height\n");
       return;
    }
 

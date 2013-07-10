@@ -24,6 +24,94 @@ _chk_display_height(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
+_chk_display_teleport(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->l[1])return;
+
+   if(elm_check_state_get(o))
+   {
+      fprintf(stderr, "i_display_teleport = true\n");
+      priv->i_display_[1] = EINA_TRUE;
+      evas_object_show(priv->l[1]);
+   } else {
+      fprintf(stderr, "i_display_teleport = false\n");
+      priv->i_display_[1] = EINA_FALSE;
+      evas_object_hide(priv->l[1]);
+   }
+}
+
+static void
+_chk_display_avoid(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->l[2])return;
+
+   if(elm_check_state_get(o))
+   {
+      fprintf(stderr, "i_display_avoid = true\n");
+      priv->i_display_[2] = EINA_TRUE;
+      evas_object_show(priv->l[2]);
+   } else {
+      fprintf(stderr, "i_display_avoid = false\n");
+      priv->i_display_[2] = EINA_FALSE;
+      evas_object_hide(priv->l[2]);
+   }
+}
+
+static void
+_chk_display_pathmap(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->l[3])return;
+
+   if(elm_check_state_get(o))
+   {
+      fprintf(stderr, "i_display_pathmap = true\n");
+      priv->i_display_[3] = EINA_TRUE;
+      evas_object_show(priv->l[3]);
+   } else {
+      fprintf(stderr, "i_display_pathmap = false\n");
+      priv->i_display_[3] = EINA_FALSE;
+      evas_object_hide(priv->l[3]);
+   }
+}
+
+static void
+_chk_display_spawnmap(void *data, Evas_Object *o, void *event_info)
+{
+   Evas_Object *world;
+   
+   world = (Evas_Object *)data;
+   if(!world)return;
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   if(!priv->l[4])return;
+
+   if(elm_check_state_get(o))
+   {
+      fprintf(stderr, "i_display_spawnmap = true\n");
+      priv->i_display_[4] = EINA_TRUE;
+      evas_object_show(priv->l[4]);
+   } else {
+      fprintf(stderr, "i_display_spawnmap = false\n");
+      priv->i_display_[4] = EINA_FALSE;
+      evas_object_hide(priv->l[4]);
+   }
+}
+
+static void
 _chk_display_heatmap(void *data, Evas_Object *o, void *event_info)
 {
    Evas_Object *world;
@@ -112,7 +200,7 @@ _spin_display_speed(void *data, Evas_Object *o, void *event_info)
 static void
 i_display_setup(Evas_Object *win, Evas_Object *vbox)
 {
-   Evas_Object *world, *lab, *chk, *hbox, *frm, *spin;
+   Evas_Object *world, *vbox1, *lab, *chk, *hbox, *frm, *spin;
 
    world = evas_object_name_find(evas_object_evas_get(win),"world");
 
@@ -140,40 +228,81 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
    elm_box_pack_end(vbox, hbox);
    evas_object_show(hbox);
 
+    /* button divider */
+   vbox1 = elm_box_add(win);
+   evas_object_size_hint_weight_set(vbox1, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbox1, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, vbox1);
+   evas_object_show(vbox1);
+
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(chk, EVAS_HINT_EXPAND, 0.0);
    elm_check_state_set(chk, I_DISPLAY_HEIGHT_DEFAULT);
-   elm_object_part_text_set(chk, NULL,  "Show Height");
-   elm_box_pack_end(hbox, chk);
+   elm_object_part_text_set(chk, NULL,  "Show Spawnmap");
+   elm_box_pack_end(vbox1, chk);
    evas_object_show(chk);
 
-   evas_object_smart_callback_add(chk, "changed", _chk_display_height, world);
+   evas_object_smart_callback_add(chk, "changed", _chk_display_spawnmap, world);
 
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
    elm_check_state_set(chk, I_DISPLAY_HEATMAP_DEFAULT);
-   elm_object_part_text_set(chk, NULL,  "Show Heatmap");
-   elm_box_pack_end(hbox, chk);
+   elm_object_part_text_set(chk, NULL,  "Show Pathmap");
+   elm_box_pack_end(vbox1, chk);
    evas_object_show(chk);
 
-   evas_object_smart_callback_add(chk, "changed", _chk_display_heatmap, world);
-
-   /* sub divider */
-   hbox = elm_box_add(win);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   elm_box_homogeneous_set(hbox, EINA_TRUE);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(vbox, hbox);
-   evas_object_show(hbox);
+   evas_object_smart_callback_add(chk, "changed", _chk_display_pathmap, world);
 
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
    evas_object_size_hint_weight_set(chk, EVAS_HINT_EXPAND, 0.0);
    elm_check_state_set(chk, I_DISPLAY_SEARCH_DEFAULT);
+   elm_object_part_text_set(chk, NULL,  "Show Avoidmap");
+   elm_box_pack_end(vbox1, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_display_avoid, world);
+
+   chk = elm_check_add(win);
+   evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
+   elm_check_state_set(chk, I_DISPLAY_PATH_DEFAULT);
+   elm_object_part_text_set(chk, NULL,  "Show Teleport");
+   elm_box_pack_end(vbox1, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_display_teleport, world);
+
+   chk = elm_check_add(win);
+   evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
+   elm_check_state_set(chk, I_DISPLAY_PATH_DEFAULT);
+   elm_object_part_text_set(chk, NULL,  "Show Heightmap");
+   elm_box_pack_end(vbox1, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_display_height, world);
+
+    /* button divider */
+   vbox1 = elm_box_add(win);
+   evas_object_size_hint_weight_set(vbox1, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbox1, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, vbox1);
+   evas_object_show(vbox1);
+
+   chk = elm_check_add(win);
+   evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
+   elm_check_state_set(chk, I_DISPLAY_PATH_DEFAULT);
+   elm_object_part_text_set(chk, NULL,  "Show Paths");
+   elm_box_pack_end(vbox1, chk);
+   evas_object_show(chk);
+
+   evas_object_smart_callback_add(chk, "changed", _chk_display_path, world);
+
+   chk = elm_check_add(win);
+   evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
+   elm_check_state_set(chk, I_DISPLAY_PATH_DEFAULT);
    elm_object_part_text_set(chk, NULL,  "Show Path Search");
-   elm_box_pack_end(hbox, chk);
+   elm_box_pack_end(vbox1, chk);
    evas_object_show(chk);
 
    evas_object_smart_callback_add(chk, "changed", _chk_display_search, world);
@@ -181,11 +310,11 @@ i_display_setup(Evas_Object *win, Evas_Object *vbox)
    chk = elm_check_add(win);
    evas_object_size_hint_align_set(chk, 0.0, EVAS_HINT_FILL);
    elm_check_state_set(chk, I_DISPLAY_PATH_DEFAULT);
-   elm_object_part_text_set(chk, NULL,  "Show Path");
-   elm_box_pack_end(hbox, chk);
+   elm_object_part_text_set(chk, NULL,  "Show Heatmap");
+   elm_box_pack_end(vbox1, chk);
    evas_object_show(chk);
 
-   evas_object_smart_callback_add(chk, "changed", _chk_display_path, world);
+   evas_object_smart_callback_add(chk, "changed", _chk_display_heatmap, world);
 
    /* sub divider */
    hbox = elm_box_add(win);
