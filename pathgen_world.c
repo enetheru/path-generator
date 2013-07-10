@@ -50,10 +50,7 @@ _pathgen_world_smart_show(Evas_Object *o)
    PATHGEN_WORLD_DATA_GET(o, priv);
    evas_object_show(priv->background);
    if(priv->i_display_height)
-   evas_object_show(priv->height);
-   evas_object_show(priv->interest);
-   evas_object_show(priv->path);
-   evas_object_show(priv->teleport);
+      evas_object_show(priv->height);
    if(priv->i_display_heatmap)
       evas_object_show(priv->heatmap);
    if(priv->i_display_search)
@@ -71,9 +68,6 @@ _pathgen_world_smart_hide(Evas_Object *o)
    evas_object_hide(priv->background);
    if(priv->i_display_height)
       evas_object_hide(priv->height);
-   evas_object_hide(priv->interest);
-   evas_object_hide(priv->path);
-   evas_object_hide(priv->teleport);
    if(!priv->i_display_heatmap)
       evas_object_hide(priv->heatmap);
    if(!priv->i_display_search)
@@ -238,49 +232,6 @@ pathgen_world_add( Evas *evas)
    return world;
 }
 
-/* set to return any previous object set to the height of the
- * world or NULL, if any (or on errors) */
-void
-pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
-{
-   fprintf(stderr, "setting new height map.\n");
-   Evas_Object *old;
-
-   PATHGEN_WORLD_DATA_GET(world, priv);
-   old = priv->height;
-
-   if(!new)
-   {
-      fprintf(stderr, "no heightmap specefied.\n");
-      return;
-   }
-
-   if(old == new)
-   {
-      fprintf(stderr, "Maps must be unique objects\n");
-      return;
-   }
-
-   if(old)
-   {
-      fprintf(stderr, "Deleting old heightmap.\n");
-      /* delete existing height */
-      evas_object_smart_member_del(old);
-      evas_object_del(old);
-   }
-
-   // Assign new object
-   evas_object_smart_member_add(new, world);
-   priv->height = new;
-
-   evas_object_stack_above(priv->height, priv->background);
-
-   evas_object_image_size_get(priv->height, &(priv->w), &(priv->h));
-   evas_object_show(priv->height);
-
-   evas_object_smart_changed(world);
-
-}
 
 Eina_Bool
 pathgen_world_prepare(Evas_Object *world)
@@ -545,5 +496,78 @@ _pathgen_path_search_complete( void *data, __UNUSED__
       pathgen_path_del(path);
    }
    evas_object_smart_changed(o);
+}
+
+
+/* set to return any previous object set to the height of the
+ * world or NULL, if any (or on errors) */
+void
+pathgen_world_height_set(Evas_Object *world, Evas_Object *new)
+{
+   fprintf(stderr, "setting new height map.\n");
+   Evas_Object *old;
+
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   old = priv->height;
+
+   if(!new)
+   {
+      fprintf(stderr, "no heightmap specefied.\n");
+      return;
+   }
+
+   if(old == new)
+   {
+      fprintf(stderr, "Maps must be unique objects\n");
+      return;
+   }
+
+   if(old)
+   {
+      fprintf(stderr, "Deleting old heightmap.\n");
+      /* delete existing height */
+      evas_object_smart_member_del(old);
+      evas_object_del(old);
+   }
+
+   // Assign new object
+   evas_object_smart_member_add(new, world);
+   priv->height = new;
+
+   evas_object_stack_above(priv->height, priv->background);
+
+   evas_object_image_size_get(priv->height, &(priv->w), &(priv->h));
+   evas_object_show(priv->height);
+
+   evas_object_smart_changed(world);
+}
+
+/* spawnmap */
+void
+pathgen_world_spawnmap_set(Evas_Object *world, Evas_Object *new)
+{
+   fprintf(stderr, "setting new spawn map.\n");
+   Evas_Object *old;
+
+   PATHGEN_WORLD_DATA_GET(world, priv);
+   old = priv->spawnmap;
+
+   if(!new || new == priv->spawnmap)return;
+
+   if(priv->spawnmap)
+   {
+      fprintf(stderr, "Deleting old spawn map.\n");
+      /* delete existing height */
+      evas_object_smart_member_del(priv->spawnmap);
+      evas_object_del(priv->spawnmap);
+   }
+
+   // Assign new object
+   priv->spawnmap = new;
+   evas_object_smart_member_add(priv->spawnmap, world);
+   evas_object_stack_above(priv->spawnmap, priv->height);
+   evas_object_show(priv->spawnmap);
+
+   evas_object_smart_changed(world);
 }
 

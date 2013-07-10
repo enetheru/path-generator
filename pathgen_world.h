@@ -26,8 +26,8 @@ typedef struct _Pathgen_World_Data Pathgen_World_Data;
 struct _Pathgen_World_Data
 {
    Evas_Object_Smart_Clipped_Data base;
-   Evas_Object *background, *height, *interest, *pathmap,
-      *teleport, *heatmap, *search, *path;
+   Evas_Object *background, *height, *heatmap, *search, *path;
+   Evas_Object *spawnmap;
    int w,h;
 
 
