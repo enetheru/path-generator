@@ -103,7 +103,7 @@ _pathgen_world_smart_calculate(Evas_Object *o)
    {
       evas_object_resize(priv->l[i], w, h);
       evas_object_move(priv->l[i], x, y);
-      evas_object_stack_above(priv->l[i], priv->l[i-1]);
+      evas_object_raise(priv->l[i]);
       evas_object_color_set(priv->l[i], 128,128,128,128);
    }
 
