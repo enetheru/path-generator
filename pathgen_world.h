@@ -77,14 +77,18 @@ struct _Pathgen_World_Data
          i_path_climb_down_limit;
    float i_path_climb_down_value;
 
+   int   i_path_avoid_tolerance,
+         i_path_avoid_limit;
+   float i_path_avoid_value;
+
    float i_path_follow_value;
 
    /* path influence variables */
    float i_path_distance_start_mult,
          i_path_distance_goal_mult;
 
-   double (*distance_from_start)(Pathgen_Node *, Pathgen_Node *);
-   double (*distance_to_goal)(Pathgen_Node *, Pathgen_Node *);
+   double (*distance_from_start)(int, int, int, int);
+   double (*distance_to_goal)(int, int, int, int);
 
    /* == world constants that are used in calculations == */
    float c_euclid_max;

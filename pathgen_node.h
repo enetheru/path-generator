@@ -9,7 +9,8 @@ struct pathgen_node {
    /* node coordinates */
    int x, y, z;
    /* path variables */
-   double g; /* path cost */ 
+   double f, g, h; /* path cost */ 
+   Eina_Bool open, closed;
 };
 
 Pathgen_Node *
@@ -22,12 +23,12 @@ void
 pathgen_node_info(Pathgen_Node *node);
 
 double
-pathgen_node_dist_euclid(Pathgen_Node *a, Pathgen_Node *b);
+pathgen_node_dist_euclid(int x1, int y1, int x2, int y2);
 
 int
-pathgen_node_dist_manhat(Pathgen_Node *a, Pathgen_Node *b);
+pathgen_node_dist_manhat(int x1, int y1, int x2, int y2);
 
 int
-pathgen_node_dist_diagon(Pathgen_Node *a, Pathgen_Node *b);
+pathgen_node_dist_diagon(int x1, int y1, int x2, int y2);
 
 #endif /*PATHGEN_NODE_H*/

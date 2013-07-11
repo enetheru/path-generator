@@ -6,7 +6,8 @@
 typedef struct pathgen_path Pathgen_Path;
 struct pathgen_path {
    Evas_Object *world;
-   Pathgen_Node *start, *end, *goal, *current, *peers[8];
+   Pathgen_Node *start, *end, *current, *n[8];
+   int gx, gy; // goal position
    Eina_List *open, *closed;
    int iter;
 };
@@ -16,7 +17,7 @@ struct pathgen_path {
 ********/
 
 Pathgen_Path *
-pathgen_path_create(Evas_Object *world, Pathgen_Node *start, Pathgen_Node *goal);
+pathgen_path_create(Evas_Object *world, Pathgen_Node *start, int gx, int gy);
 
 void
 pathgen_path_del(Pathgen_Path *path);
@@ -45,12 +46,9 @@ Pathgen_Node *
 pathgen_path_best(Pathgen_Path *path);
 
 double
-hueristic_dijkstra(Pathgen_Path *path, Pathgen_Node *node);
+pathgen_path_g(Pathgen_Path *path, int x, int y);
 
 double
-hueristic_best_first(Pathgen_Path *path, Pathgen_Node *node);
-
-double
-hueristic_astar(Pathgen_Path *path, Pathgen_Node *node);
+pathgen_path_h(Pathgen_Path *path, int x, int y, int elev, int avoid);
 
 #endif /*PATHGEN_PATH_H*/

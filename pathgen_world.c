@@ -206,6 +206,10 @@ pathgen_world_add( Evas *evas)
    priv->i_path_climb_down_limit = I_PATH_CLIMB_DOWN_LIMIT_DEFAULT;
    priv->i_path_climb_down_value = I_PATH_CLIMB_DOWN_VALUE_DEFAULT;
 
+   priv->i_path_avoid_tolerance = I_PATH_AVOID_TOLERANCE_DEFAULT;
+   priv->i_path_avoid_limit = I_PATH_AVOID_LIMIT_DEFAULT;
+   priv->i_path_avoid_value = I_PATH_AVOID_VALUE_DEFAULT;
+
    priv->i_path_follow_value = I_PATH_FOLLOW_VALUE_DEFAULT;
 
    priv->i_path_distance_start_mult = I_PATH_DISTANCE_START_MULT_DEFAULT;
@@ -365,7 +369,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 static void 
 _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 {
-   Pathgen_Node *start, *goal;
+   Pathgen_Node *start;
    Pathgen_Path *path;
 
    Evas *evas;
@@ -407,7 +411,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    {
       x = rand() % priv->w;
       y = rand() % priv->h;
-      if(image_pixel_value_get(priv->l[4], x, y, 0xFF000000, 24) > 1)
+      if(image_pixel_value_get(priv->l[4], x, y, 0xFF000000, 24) > 1 || !priv->l[4])
          spawn = EINA_TRUE;
    }
    start = pathgen_node_create(world, x, y);
@@ -417,18 +421,17 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    {
       x = rand() % priv->w;
       y = rand() % priv->h;
-      if(image_pixel_value_get(priv->l[4], x, y, 0xFF000000, 24) > 1)
+      if(image_pixel_value_get(priv->l[4], x, y, 0xFF000000, 24) > 1 || !priv->l[4])
          spawn = EINA_TRUE;
    }
-   goal = pathgen_node_create(world, x, y);
 
    /* new path */
-   path = pathgen_path_create(world, start, goal);
+   path = pathgen_path_create(world, start, x, y);
 
    if(priv->i_display_[6]) /* walk the path slowly */
    {
       image_func_fill(priv->l[6], NULL, 0x00000000);
-      image_func_pixel(priv->l[6], goal->x, goal->y, NULL, 0xFF00FF00);
+      image_func_pixel(priv->l[6], x, y, NULL, 0xFF00FF00);
       ecore_timer_add(priv->i_display_speed, pathgen_path_search, path);
    }
    else while(pathgen_path_search(path));
