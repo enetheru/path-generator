@@ -370,6 +370,8 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 
    Evas *evas;
    Evas_Object *pbar;
+   int x, y;
+   Eina_Bool spawn;
 
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
@@ -383,8 +385,8 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 
    evas = evas_object_evas_get(world);
    pbar = evas_object_name_find(evas, "pbar");
-
-   elm_progressbar_value_set(pbar, (float)priv->path_count / (float)priv->i_sim_path_max);
+   elm_progressbar_value_set(pbar,
+      (float)priv->path_count / (float)priv->i_sim_path_max);
 
 
    if(priv->path_fade_count < priv->i_sim_path_fade_interval)
@@ -399,10 +401,26 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
       evas_render(evas_object_evas_get(world));
    }
 
-
    /* create start and end points */
-   start = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
-   goal = pathgen_node_create(world, rand() % priv->w, rand() % priv->h);
+   spawn = EINA_FALSE;
+   while(!spawn)
+   {
+      x = rand() % priv->w;
+      y = rand() % priv->h;
+      if(image_pixel_value_get(priv->l[4], x, y, 0xFF000000, 24) > 1)
+         spawn = EINA_TRUE;
+   }
+   start = pathgen_node_create(world, x, y);
+
+   spawn = EINA_FALSE;
+   while(!spawn)
+   {
+      x = rand() % priv->w;
+      y = rand() % priv->h;
+      if(image_pixel_value_get(priv->l[4], x, y, 0xFF000000, 24) > 1)
+         spawn = EINA_TRUE;
+   }
+   goal = pathgen_node_create(world, x, y);
 
    /* new path */
    path = pathgen_path_create(world, start, goal);

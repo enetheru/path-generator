@@ -203,19 +203,28 @@ pathgen_path_search(void *data)
             climb *= priv->i_path_climb_down_value;
       }
 
+      float avoid = image_pixel_value_get(priv->l[2],
+         peers[i]->x, peers[i]->y, 0xFF000000, 24);
+
+      if(avoid > priv->i_world_avoid_mult)
+      {
+         path->closed = eina_list_append(path->closed, peers[i]);
+         if(priv->i_display_[6])
+            image_func_pixel(priv->l[6], peers[i]->x, peers[i]->y, NULL, 0x88000000);
+         continue;
+      }
+
       float path_follow = (255 - image_pixel_value_get(priv->l[5],
          peers[i]->x, peers[i]->y, 0xFF000000, 24)) * priv->i_path_follow_value;
 
       float path_follow2 = (255 - image_pixel_value_get(priv->l[3],
          peers[i]->x, peers[i]->y, 0xFF000000, 24)) * priv->i_world_pathmap_mult;
 
-      float avoid = image_pixel_value_get(priv->l[2],
-         peers[i]->x, peers[i]->y, 0xFF000000, 24) * priv->i_world_avoid_mult;
 
       peers[i]->g =
            priv->i_path_distance_start_mult * dist_from
          + priv->i_path_distance_goal_mult  * dist_to
-         + climb + path_follow + path_follow2 + avoid;
+         + climb + path_follow + path_follow2;
      
       /* add the node to the open list */
       path->open = eina_list_append(path->open, peers[i]);
