@@ -332,7 +332,7 @@ static void
 _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 {
    Evas *evas;
-   Evas_Object *pbar;
+   Evas_Object *ui;
    Pathgen_Path *path;
 
    PATHGEN_WORLD_DATA_GET(world, priv);
@@ -343,14 +343,21 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
       fprintf(stderr, "ERR: no height map, cannot run sim.\n");
       return;
    }
-
-   pathgen_world_prepare(world);
-
    priv->path_count=0;
    priv->path_fade_count = 0;
+   pathgen_world_prepare(world);
 
-   pbar = evas_object_name_find(evas, "pbar");
-   elm_progressbar_value_set(pbar, 0.0);
+   ui = evas_object_name_find(evas, "sim,start");
+   elm_object_disabled_set(ui, EINA_TRUE);
+
+   ui = evas_object_name_find(evas, "world,generate");
+   elm_object_disabled_set(ui, EINA_TRUE);
+
+   ui = evas_object_name_find(evas, "world,height,load");
+   elm_object_disabled_set(ui, EINA_TRUE);
+
+   ui = evas_object_name_find(evas, "pbar");
+   elm_progressbar_value_set(ui, 0.0);
 
    evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
 }

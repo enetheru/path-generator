@@ -49,20 +49,6 @@ _btn_save_path_heatmap(void *data, Evas_Object *o, void *event_info)
 static void
 _btn_sim_start(void *data, Evas_Object *o, void *event_info)
 {
-   Evas *evas;
-   Evas_Object *ui;
-
-   evas = evas_object_evas_get(o);
-
-   ui = evas_object_name_find(evas, "sim,start");
-   elm_object_disabled_set(ui, EINA_TRUE);
-
-   ui = evas_object_name_find(evas, "world,generate");
-   elm_object_disabled_set(ui, EINA_TRUE);
-
-   ui = evas_object_name_find(evas, "world,height,load");
-   elm_object_disabled_set(ui, EINA_TRUE);
-
    evas_object_smart_callback_call( data, "sim,start", event_info);
    return;
 }
