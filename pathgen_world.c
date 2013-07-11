@@ -210,12 +210,16 @@ pathgen_world_add( Evas *evas)
    priv->i_path_avoid_limit = I_PATH_AVOID_LIMIT_DEFAULT;
    priv->i_path_avoid_value = I_PATH_AVOID_VALUE_DEFAULT;
 
-   priv->i_path_follow_value = I_PATH_FOLLOW_VALUE_DEFAULT;
+   priv->i_path_map_tolerance = I_PATH_MAP_TOLERANCE_DEFAULT;
+   priv->i_path_map_limit = I_PATH_MAP_LIMIT_DEFAULT;
+   priv->i_path_map_value = I_PATH_MAP_VALUE_DEFAULT;
 
-   priv->i_path_distance_start_mult = I_PATH_DISTANCE_START_MULT_DEFAULT;
+   priv->i_path_heat_tolerance = I_PATH_HEAT_TOLERANCE_DEFAULT;
+   priv->i_path_heat_limit = I_PATH_HEAT_LIMIT_DEFAULT;
+   priv->i_path_heat_value = I_PATH_HEAT_VALUE_DEFAULT;
+
    priv->i_path_distance_goal_mult = I_PATH_DISTANCE_GOAL_MULT_DEFAULT;
 
-   priv->distance_from_start = pathgen_node_dist_euclid;
    priv->distance_to_goal = pathgen_node_dist_euclid;
 
    return world;
@@ -275,11 +279,7 @@ pathgen_world_height_get_xy(Evas_Object *world, int x, int y)
    if(!world)return 0;
    PATHGEN_WORLD_DATA_GET(world, priv);
    if(!priv->l[0])return 0;
-   evas_object_image_size_get(priv->l[0], &w, &h);
-   if(!(0 < x < w && 0 < y < h))return 0; 
-   pixels = evas_object_image_data_get(priv->l[0], EINA_FALSE);
-   k =  (pixels[x+w*y] & 0x000000FF) * priv->i_world_height_mult;
-//   fprintf(stderr, "height at (%i, %i) is %i\n", x,y,k);
+   k =  image_pixel_value_get(priv->l[0], x, y, 0x000000FF, 0);
    return k;
 }
 

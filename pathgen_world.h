@@ -32,7 +32,7 @@ struct _Pathgen_World_Data
 // 6 search
 // 5 heat
 // 4 spawnmap
-// 3 pathmap
+// 3 map
 // 2 avoid
 // 1 teleport
 // 0 height
@@ -69,6 +69,18 @@ struct _Pathgen_World_Data
    Evas_Object *i_path_walk_brush;
    int   i_path_tread_weight;
 
+   int   i_path_heat_tolerance,
+         i_path_heat_limit;
+   float i_path_heat_value;
+
+   int   i_path_map_tolerance,
+         i_path_map_limit;
+   float i_path_map_value;
+
+   int   i_path_avoid_tolerance,
+         i_path_avoid_limit;
+   float i_path_avoid_value;
+
    int   i_path_climb_up_tolerance,
          i_path_climb_up_limit;
    float i_path_climb_up_value;
@@ -77,17 +89,12 @@ struct _Pathgen_World_Data
          i_path_climb_down_limit;
    float i_path_climb_down_value;
 
-   int   i_path_avoid_tolerance,
-         i_path_avoid_limit;
-   float i_path_avoid_value;
-
    float i_path_follow_value;
 
    /* path influence variables */
    float i_path_distance_start_mult,
          i_path_distance_goal_mult;
 
-   double (*distance_from_start)(int, int, int, int);
    double (*distance_to_goal)(int, int, int, int);
 
    /* == world constants that are used in calculations == */

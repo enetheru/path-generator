@@ -1,6 +1,7 @@
 #ifndef I_WORLD_H
 #define I_WORLD_H
 
+#include "pathgen_node.h"
 #include "r_image.h"
 #include "r_noise.h"
 
@@ -138,10 +139,45 @@ _fs_world_teleport_load(void *data, Evas_Object *obj, void *event_info)
 }
 
 static void
+_hoversel_path_distance_goal_manhat(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->distance_to_goal = pathgen_node_dist_manhat;
+}
+
+static void
+_hoversel_path_distance_goal_diagon(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->distance_to_goal = pathgen_node_dist_diagon;
+}
+
+static void
+_hoversel_path_distance_goal_euclid(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->distance_to_goal = pathgen_node_dist_euclid;
+}
+
+static void
+_spin_path_distance_goal_mult(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_distance_goal_mult = (float)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_distance_goal_mult = %f\n",
+      priv->i_path_distance_goal_mult);
+}
+
+
+static void
 i_world_setup(Evas_Object *win, Evas_Object *vbox)
 {
    Evas_Object *world, *frm, *lab, *spin, *btn, *fs_entry, *hbox,
-      *vbox1, *vbox2;
+      *vbox1, *vbox2, *hov;
 
    world = evas_object_name_find(evas_object_evas_get(win),"world");
 
@@ -335,6 +371,46 @@ i_world_setup(Evas_Object *win, Evas_Object *vbox)
    
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_world_height_mult, world);
+
+   /*********************
+   * Distance Algorithm *
+   *********************/
+
+   /* sub divider */
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(vbox, hbox);
+   evas_object_show(hbox);
+
+   hov = elm_hoversel_add(win);
+   elm_hoversel_hover_parent_set(hov, win);
+   evas_object_size_hint_align_set(hov, EVAS_HINT_FILL, 0);
+   evas_object_size_hint_weight_set(hov, EVAS_HINT_EXPAND, 0);
+   elm_object_text_set(hov, "Distance to Goal");
+   elm_hoversel_item_add(hov, "Manhatten", NULL, ELM_ICON_NONE, _hoversel_path_distance_goal_manhat, world);
+   elm_hoversel_item_add(hov, "Diagonal", NULL, ELM_ICON_NONE, _hoversel_path_distance_goal_diagon, world);
+   elm_hoversel_item_add(hov, "Euclidean", NULL, ELM_ICON_NONE, _hoversel_path_distance_goal_euclid, world);
+   elm_box_pack_end(hbox, hov);
+   evas_object_show(hov);
+
+  spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "%0.3f");
+   elm_spinner_min_max_set(spin, 0.0, 10.0);
+   elm_spinner_step_set(spin, 0.001);
+   elm_spinner_value_set(spin, I_PATH_DISTANCE_GOAL_MULT_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_distance_goal_mult, world);
+
+
 }
 
 #endif /*I_WORLD_H*/

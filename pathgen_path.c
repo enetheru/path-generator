@@ -129,14 +129,41 @@ pathgen_path_search(void *data)
          if(priv->i_path_avoid_limit < avoid)continue;
       }
 
-      /* determine the cost of movement */
-      if(priv->i_display_[6] && i > 3)
+      /* determine the movement cost */
+      if(priv->i_path_search_diagonal && i > 3)
       {
-         g = best->g + 1.4;
+         g = best->g + 1.414; 
       }
       else g= best->g+1;
-      h = priv->distance_to_goal(x, y, path->gx, path->gy)
+      g += abs(elev) * priv->i_world_height_mult;
+
+      /* Calculate the Hueristic */ 
+      // Distance to target
+      h =  priv->distance_to_goal(x, y, path->gx, path->gy)
          * priv->i_path_distance_goal_mult;
+      // Path Heat
+      h += fmin(255 - image_pixel_value_get(priv->l[5], x, y, 0xFF000000, 24)
+            + priv->i_path_heat_tolerance, 255)
+         * priv->i_path_heat_value;
+      // Path Map
+      h += fmin(255 - image_pixel_value_get(priv->l[3], x, y, 0xFF000000, 24)
+            + priv->i_path_map_tolerance, 255 )
+         * priv->i_path_map_value;
+      // Path Avoidance
+      h += fmax( image_pixel_value_get(priv->l[2], x, y, 0xFF000000, 24)
+            - priv->i_path_avoid_tolerance, 0 )
+         * priv->i_path_avoid_value;
+      // Climb Up/down
+      if( elev > priv->i_path_climb_up_tolerance)
+         h += ( elev
+            - priv->i_path_climb_up_tolerance)
+            * priv->i_path_climb_up_value;
+      else if( abs(elev) > priv->i_path_climb_down_tolerance )
+         h += ( abs(elev)
+            - priv->i_path_climb_down_tolerance )
+            * priv->i_path_climb_down_value;
+
+
       f = g + h;
 
       EINA_LIST_FOREACH_SAFE(path->open, l, l_next, list_data)
@@ -187,67 +214,6 @@ pathgen_path_search(void *data)
       }
 
    }
-
-/*
-      double dist_to = priv->distance_to_goal(peers[i], path->gx, path->gy);
-      double dist_from = priv->distance_from_start(peers[i], path->start->x, path->start->y);
-      double elevation = peers[i]->z - peers[i]->parent->z;
-      unsigned int climb = 0;
-      if(elevation >= 0)
-      {
-         if(elevation > priv->i_path_climb_up_limit)
-         {
-            path->closed = eina_list_append(path->closed, peers[i]);
-            if(priv->i_display_[6])
-               image_func_pixel(priv->l[6], peers[i]->x, peers[i]->y, NULL, 0x88000000);
-            continue;
-         }
-         else if(elevation > priv->i_path_climb_up_tolerance)
-            climb = elevation - priv->i_path_climb_up_tolerance;
-            climb *= priv->i_path_climb_up_value;
-      }
-      else
-      {
-         elevation = abs(elevation);
-         if(elevation > priv->i_path_climb_down_limit)
-         {
-            path->closed = eina_list_append(path->closed, peers[i]);
-            if(priv->i_display_[6])
-               image_func_pixel(priv->l[6], peers[i]->x, peers[i]->y, NULL, 0x88000000);
-            continue;
-         }
-         else if(elevation > priv->i_path_climb_down_tolerance)
-            climb = elevation - priv->i_path_climb_down_tolerance;
-            climb *= priv->i_path_climb_down_value;
-      }
-
-      float avoid = image_pixel_value_get(priv->l[2],
-         peers[i]->x, peers[i]->y, 0xFF000000, 24);
-
-      if(avoid > priv->i_world_avoid_mult)
-      {
-         path->closed = eina_list_append(path->closed, peers[i]);
-         if(priv->i_display_[6])
-            image_func_pixel(priv->l[6], peers[i]->x, peers[i]->y, NULL, 0x88000000);
-         continue;
-      }
-
-      float path_follow = (255 - image_pixel_value_get(priv->l[5],
-         peers[i]->x, peers[i]->y, 0xFF000000, 24)) * priv->i_path_follow_value;
-
-      float path_follow2 = (255 - image_pixel_value_get(priv->l[3],
-         peers[i]->x, peers[i]->y, 0xFF000000, 24)) * priv->i_world_pathmap_mult;
-
-
-      peers[i]->g =
-           priv->i_path_distance_start_mult * dist_from
-         + priv->i_path_distance_goal_mult  * dist_to
-         + climb + path_follow + path_follow2;
-     
-      path->open = eina_list_append(path->open, peers[i]);
-
-   }
-*/
 
    evas_object_smart_changed(path->world);
    path->iter++;
@@ -326,30 +292,4 @@ pathgen_path_walk_slow(void *data)
       pathgen_path_del(path);
    }
    return ret;
-}
-
-/*************
-* Hueristics *
-*************/
-
-double
-pathgen_path_h(Pathgen_Path *path, int x, int y, int elev, int avoid)
-{
-   double dist_to;
-   PATHGEN_WORLD_DATA_GET(path->world, priv);
-
-   dist_to = priv->distance_to_goal(x, y, path->gx, path->gy);
-
-   return dist_to * priv->i_path_distance_goal_mult;
-}
-
-double
-pathgen_path_g(Pathgen_Path *path, int x, int y)
-{
-   double dist_from;
-   PATHGEN_WORLD_DATA_GET(path->world, priv);
-
-   dist_from = priv->distance_from_start(x, y, path->start->x, path->start->y);
-
-   return dist_from * priv->i_path_distance_start_mult;
 }

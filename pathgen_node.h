@@ -25,10 +25,10 @@ pathgen_node_info(Pathgen_Node *node);
 double
 pathgen_node_dist_euclid(int x1, int y1, int x2, int y2);
 
-int
+double
 pathgen_node_dist_manhat(int x1, int y1, int x2, int y2);
 
-int
+double
 pathgen_node_dist_diagon(int x1, int y1, int x2, int y2);
 
 #endif /*PATHGEN_NODE_H*/

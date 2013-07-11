@@ -45,10 +45,4 @@ pathgen_path_walk_slow(void *data);
 Pathgen_Node *
 pathgen_path_best(Pathgen_Path *path);
 
-double
-pathgen_path_g(Pathgen_Path *path, int x, int y);
-
-double
-pathgen_path_h(Pathgen_Path *path, int x, int y, int elev, int avoid);
-
 #endif /*PATHGEN_PATH_H*/

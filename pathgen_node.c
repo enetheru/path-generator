@@ -32,7 +32,6 @@ pathgen_node_create(Evas_Object *world, int x, int y)
    for(i=0; i<8; i++)node->n[i] =NULL;
    node->open = EINA_FALSE;
    node->closed = EINA_FALSE;
-//   pathgen_node_info(node);
    return node;
 }
 
@@ -63,7 +62,7 @@ pathgen_node_dist_euclid(int x1, int y1, int x2, int y2)
    return sqrt(dx * dx + dy * dy);
 }
 
-int
+double
 pathgen_node_dist_manhat(int x1, int y1, int x2, int y2)
 {
    int dx, dy;
@@ -72,7 +71,7 @@ pathgen_node_dist_manhat(int x1, int y1, int x2, int y2)
    return dx + dy;
 }
 
-int
+double
 pathgen_node_dist_diagon(int x1, int y1, int x2, int y2)
 {
    int dx, dy;

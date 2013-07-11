@@ -25,67 +25,6 @@ _chk_path_search_diagonal(void *data, Evas_Object *o, void *event_info)
    }
 }
 
-static void
-_hoversel_path_distance_start_manhat(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-}
-
-static void
-_hoversel_path_distance_start_diagon(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-}
-
-static void
-_hoversel_path_distance_start_euclid(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-}
-
-static void
-_spin_path_distance_start_mult(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_path_distance_start_mult = (float)elm_spinner_value_get(o);
-   fprintf(stderr, "i_path_distance_start_mult = %f\n",
-      priv->i_path_distance_start_mult);
-}
-
-static void
-_hoversel_path_distance_goal_manhat(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-}
-
-static void
-_hoversel_path_distance_goal_diagon(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-}
-
-static void
-_hoversel_path_distance_goal_euclid(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-}
-
-static void
-_spin_path_distance_goal_mult(void *data, Evas_Object *o, void *event_info)
-{
-   if(!data)return;
-   PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_path_distance_goal_mult = (float)elm_spinner_value_get(o);
-   fprintf(stderr, "i_path_distance_goal_mult = %f\n",
-      priv->i_path_distance_goal_mult);
-}
 
 static void
 _spin_path_tread_weight(void *data, Evas_Object *o, void *event_info)
@@ -158,14 +97,95 @@ _spin_path_climb_down_limit(void *data, Evas_Object *o, void *event_info)
 }
 
 static void
-_spin_path_follow_value(void *data, Evas_Object *o, void *event_info)
+_spin_path_avoid_value(void *data, Evas_Object *o, void *event_info)
 {
    if(!data)return;
    PATHGEN_WORLD_DATA_GET(data, priv);
-   priv->i_path_follow_value = (float)elm_spinner_value_get(o);
-   fprintf(stderr, "i_path_follow_value = %f\n",
-      priv->i_path_follow_value);
+   priv->i_path_avoid_value = (float)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_avoid_value = %f\n",
+      priv->i_path_avoid_value);
 }
+
+static void
+_spin_path_avoid_tolerance(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_avoid_tolerance = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_avoid_tolerance = %i\n",
+      priv->i_path_avoid_tolerance);
+}
+
+static void
+_spin_path_avoid_limit(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_avoid_limit = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_avoid_limit = %i\n",
+      priv->i_path_avoid_limit);
+}
+
+static void
+_spin_path_map_value(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_map_value = (float)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_map_value = %f\n",
+      priv->i_path_map_value);
+}
+
+static void
+_spin_path_map_tolerance(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_map_tolerance = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_map_tolerance = %i\n",
+      priv->i_path_map_tolerance);
+}
+
+static void
+_spin_path_map_limit(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_map_limit = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_map_limit = %i\n",
+      priv->i_path_map_limit);
+}
+
+static void
+_spin_path_heat_value(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_heat_value = (float)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_heat_value = %f\n",
+      priv->i_path_heat_value);
+}
+
+static void
+_spin_path_heat_tolerance(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_heat_tolerance = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_heat_tolerance = %i\n",
+      priv->i_path_heat_tolerance);
+}
+
+static void
+_spin_path_heat_limit(void *data, Evas_Object *o, void *event_info)
+{
+   if(!data)return;
+   PATHGEN_WORLD_DATA_GET(data, priv);
+   priv->i_path_heat_limit = (int)elm_spinner_value_get(o);
+   fprintf(stderr, "i_path_heat_limit = %i\n",
+      priv->i_path_heat_limit);
+}
+
 
 static void
 i_path_setup(Evas_Object *win, Evas_Object *vbox)
@@ -197,73 +217,6 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    evas_object_smart_callback_add(chk, "changed", _chk_path_search_diagonal, world);
 
-   /* sub divider */
-   hbox = elm_box_add(win);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   elm_box_homogeneous_set(hbox, EINA_TRUE);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(vbox, hbox);
-   evas_object_show(hbox);
-
-   hov = elm_hoversel_add(win);
-   elm_hoversel_hover_parent_set(hov, win);
-   evas_object_size_hint_align_set(hov, EVAS_HINT_FILL, 0);
-   evas_object_size_hint_weight_set(hov, EVAS_HINT_EXPAND, 0);
-   elm_object_text_set(hov, "Distance from Start");
-   elm_hoversel_item_add(hov, "Manhatten", NULL, ELM_ICON_NONE, _hoversel_path_distance_start_manhat, world);
-   elm_hoversel_item_add(hov, "Diagonal", NULL, ELM_ICON_NONE, _hoversel_path_distance_start_diagon, world);
-   elm_hoversel_item_add(hov, "Euclidean", NULL, ELM_ICON_NONE, _hoversel_path_distance_start_euclid, world);
-   elm_box_pack_end(hbox, hov);
-   evas_object_show(hov);
-
-  spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "%0.3f");
-   elm_spinner_min_max_set(spin, 0.0, 10.0);
-   elm_spinner_step_set(spin, 0.001);
-   elm_spinner_value_set(spin, I_PATH_DISTANCE_START_MULT_DEFAULT);
-
-   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
-   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
-   elm_box_pack_end(hbox, spin);
-   evas_object_show(spin);
-   
-   evas_object_smart_callback_add(spin, "delay,changed",
-      _spin_path_distance_start_mult, world);
-
-   /* sub divider */
-   hbox = elm_box_add(win);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   elm_box_homogeneous_set(hbox, EINA_TRUE);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(vbox, hbox);
-   evas_object_show(hbox);
-
-   hov = elm_hoversel_add(win);
-   elm_hoversel_hover_parent_set(hov, win);
-   evas_object_size_hint_align_set(hov, EVAS_HINT_FILL, 0);
-   evas_object_size_hint_weight_set(hov, EVAS_HINT_EXPAND, 0);
-   elm_object_text_set(hov, "Distance to Goal");
-   elm_hoversel_item_add(hov, "Manhatten", NULL, ELM_ICON_NONE, _hoversel_path_distance_goal_manhat, world);
-   elm_hoversel_item_add(hov, "Diagonal", NULL, ELM_ICON_NONE, _hoversel_path_distance_goal_diagon, world);
-   elm_hoversel_item_add(hov, "Euclidean", NULL, ELM_ICON_NONE, _hoversel_path_distance_goal_euclid, world);
-   elm_box_pack_end(hbox, hov);
-   evas_object_show(hov);
-
-  spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "%0.3f");
-   elm_spinner_min_max_set(spin, 0.0, 10.0);
-   elm_spinner_step_set(spin, 0.001);
-   elm_spinner_value_set(spin, I_PATH_DISTANCE_GOAL_MULT_DEFAULT);
-
-   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
-   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
-   elm_box_pack_end(hbox, spin);
-   evas_object_show(spin);
-   
-   evas_object_smart_callback_add(spin, "delay,changed",
-      _spin_path_distance_goal_mult, world);
 
    /* tread Strength */
    hbox = elm_box_add(win);
@@ -292,34 +245,6 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_path_tread_weight, world);
-
-   /* path conformance */
-   hbox = elm_box_add(win);
-   elm_box_horizontal_set(hbox, EINA_TRUE);
-   elm_box_homogeneous_set(hbox, EINA_TRUE);
-   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
-   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
-   elm_box_pack_end(vbox, hbox);
-   evas_object_show(hbox);
-
-   lab = elm_label_add(win);
-   elm_object_text_set(lab, "Follow Path");
-   elm_box_pack_end(hbox, lab);
-   evas_object_show(lab);
-
-   spin = elm_spinner_add(win);
-   elm_spinner_label_format_set(spin, "%0.3f");
-   elm_spinner_min_max_set(spin, 0, 10);
-   elm_spinner_step_set(spin, 0.001);
-   elm_spinner_value_set(spin, I_PATH_FOLLOW_VALUE_DEFAULT);
-
-   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
-   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
-   elm_box_pack_end(hbox, spin);
-   evas_object_show(spin);
-   
-   evas_object_smart_callback_add(spin, "delay,changed",
-      _spin_path_follow_value, world);
 
    /* Climbing Up */
    frm = elm_frame_add(win);
@@ -411,7 +336,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_spinner_label_format_set(spin, "val:%0.3f");
    elm_spinner_min_max_set(spin, 0, 10);
    elm_spinner_step_set(spin, .01);
-   elm_spinner_value_set(spin, I_PATH_CLIMB_UP_VALUE_DEFAULT);
+   elm_spinner_value_set(spin, I_PATH_CLIMB_DOWN_VALUE_DEFAULT);
 
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
@@ -425,7 +350,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_spinner_label_format_set(spin, "tol:%0.0f");
    elm_spinner_min_max_set(spin, 0, 255);
    elm_spinner_step_set(spin, 1);
-   elm_spinner_value_set(spin, I_PATH_CLIMB_UP_TOLERANCE_DEFAULT);
+   elm_spinner_value_set(spin, I_PATH_CLIMB_DOWN_TOLERANCE_DEFAULT);
 
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
@@ -439,7 +364,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    elm_spinner_label_format_set(spin, "lim:%0.0f");
    elm_spinner_min_max_set(spin, 0, 255);
    elm_spinner_step_set(spin, 1);
-   elm_spinner_value_set(spin, I_PATH_CLIMB_UP_LIMIT_DEFAULT);
+   elm_spinner_value_set(spin, I_PATH_CLIMB_DOWN_LIMIT_DEFAULT);
 
    evas_object_size_hint_weight_set(spin, 0.5, 0.0);
    evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
@@ -448,6 +373,199 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
    
    evas_object_smart_callback_add(spin, "delay,changed",
       _spin_path_climb_down_limit, world);
+
+   /* Area Avoidance */
+   frm = elm_frame_add(win);
+   evas_object_size_hint_weight_set(frm, 0.0, 0.0);
+   evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(frm, "Avoidance Map");
+   elm_frame_autocollapse_set(frm, EINA_TRUE);
+   elm_box_pack_end(vbox, frm);
+   evas_object_show(frm);
+
+   vbox1 = elm_box_add(win);
+   evas_object_size_hint_align_set(vbox1, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(frm, vbox1);
+   evas_object_show(vbox);
+
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(vbox1, hbox);
+   evas_object_show(hbox);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "val:%0.3f");
+   elm_spinner_min_max_set(spin, 0, 10);
+   elm_spinner_step_set(spin, .01);
+   elm_spinner_value_set(spin, I_PATH_AVOID_VALUE_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_avoid_value, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "tol:%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_AVOID_TOLERANCE_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_avoid_tolerance, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "lim:%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_AVOID_LIMIT_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_avoid_limit, world);
+
+   /* Map Following */
+   frm = elm_frame_add(win);
+   evas_object_size_hint_weight_set(frm, 0.0, 0.0);
+   evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(frm, "Map Follow");
+   elm_frame_autocollapse_set(frm, EINA_TRUE);
+   elm_box_pack_end(vbox, frm);
+   evas_object_show(frm);
+
+   vbox1 = elm_box_add(win);
+   evas_object_size_hint_align_set(vbox1, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(frm, vbox1);
+   evas_object_show(vbox);
+
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(vbox1, hbox);
+   evas_object_show(hbox);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "val:%0.3f");
+   elm_spinner_min_max_set(spin, 0, 10);
+   elm_spinner_step_set(spin, .01);
+   elm_spinner_value_set(spin, I_PATH_MAP_VALUE_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_map_value, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "tol:%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_MAP_TOLERANCE_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_map_tolerance, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "lim:%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_MAP_LIMIT_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_map_limit, world);
+
+   /* Heat Following */
+   frm = elm_frame_add(win);
+   evas_object_size_hint_weight_set(frm, 0.0, 0.0);
+   evas_object_size_hint_align_set(frm, EVAS_HINT_FILL, 0.0);
+   elm_object_text_set(frm, "Heat Follow");
+   elm_frame_autocollapse_set(frm, EINA_TRUE);
+   elm_box_pack_end(vbox, frm);
+   evas_object_show(frm);
+
+   vbox1 = elm_box_add(win);
+   evas_object_size_hint_align_set(vbox1, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_object_content_set(frm, vbox1);
+   evas_object_show(vbox);
+
+   hbox = elm_box_add(win);
+   elm_box_horizontal_set(hbox, EINA_TRUE);
+   elm_box_homogeneous_set(hbox, EINA_TRUE);
+   evas_object_size_hint_align_set(hbox, EVAS_HINT_FILL, 0.0);
+   evas_object_size_hint_weight_set(hbox, EVAS_HINT_EXPAND, 0.0);
+   elm_box_pack_end(vbox1, hbox);
+   evas_object_show(hbox);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "val:%0.3f");
+   elm_spinner_min_max_set(spin, 0, 10);
+   elm_spinner_step_set(spin, .01);
+   elm_spinner_value_set(spin, I_PATH_HEAT_VALUE_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_heat_value, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "tol:%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_HEAT_TOLERANCE_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_heat_tolerance, world);
+
+   spin = elm_spinner_add(win);
+   elm_spinner_label_format_set(spin, "lim:%0.0f");
+   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_step_set(spin, 1);
+   elm_spinner_value_set(spin, I_PATH_HEAT_LIMIT_DEFAULT);
+
+   evas_object_size_hint_weight_set(spin, 0.5, 0.0);
+   evas_object_size_hint_align_set(spin, EVAS_HINT_FILL, 0.5);
+   elm_box_pack_end(hbox, spin);
+   evas_object_show(spin);
+   
+   evas_object_smart_callback_add(spin, "delay,changed",
+      _spin_path_heat_limit, world);
+
 
 }
 
