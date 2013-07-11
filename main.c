@@ -16,7 +16,7 @@ elm_main(int argc, char **argv)
 {
    Evas *evas;
    Evas_Object *win, *bg, *vbox, *hbox, *fs_entry, *sep, *btn, *scroll,
-      *label, *spinner, *chk, *inwin;
+      *label, *spinner, *chk, *inwin, *pbar;
 
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
@@ -48,12 +48,19 @@ elm_main(int argc, char **argv)
    elm_win_resize_object_add(win, hbox);
    evas_object_show(hbox);
 
+   /* button divider */
+   vbox = elm_box_add(win);
+   evas_object_size_hint_weight_set(vbox, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(vbox, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_start(hbox, vbox);
+   evas_object_show(vbox);
+
    /* scroll frame for map view */
    scroll = elm_scroller_add(win);
    evas_object_name_set(scroll, "scroller");
    evas_object_size_hint_weight_set(scroll, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
    evas_object_size_hint_align_set(scroll, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   elm_box_pack_start(hbox, scroll);
+   elm_box_pack_start(vbox, scroll);
    evas_object_show(scroll);
 
    evas_object_event_callback_add(scroll,
@@ -65,6 +72,15 @@ elm_main(int argc, char **argv)
    evas_object_name_set(world, "world");
    evas_object_size_hint_min_set(world, 500, 500);
    elm_object_content_set(scroll, world);
+
+   /* progress bar for the simulation */
+   pbar = elm_progressbar_add(win);
+   evas_object_name_set(pbar, "pbar");
+   elm_progressbar_unit_format_set(pbar, "%0.2f");
+   evas_object_size_hint_weight_set(pbar, EVAS_HINT_EXPAND, 0.0);
+   evas_object_size_hint_align_set(pbar, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(vbox, pbar);
+   evas_object_show(pbar);
 
 /***************
 * side buttons *

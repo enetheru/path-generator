@@ -221,7 +221,7 @@ pathgen_world_add( Evas *evas)
 Eina_Bool
 pathgen_world_prepare(Evas_Object *world)
 {
-   int w, h;
+   int w, h, i;
    Evas *evas;
    fprintf(stderr, "preparing world for sim.\n");
    if(!world)return EINA_FALSE;
@@ -230,64 +230,25 @@ pathgen_world_prepare(Evas_Object *world)
 
    if(!priv->l[0])return EINA_FALSE;
 
-   /* preparing heatmap*/
-   if(priv->l[5])
+   /* preparing visuals */
+   for(i=5; i<8; i++)
    {
-      evas_object_image_size_get(priv->l[5], &w, &h);
-      if(!(w == priv->w && h == priv->h))
+      if(priv->l[i])
       {
-         evas_object_smart_member_del(priv->l[5]);
-         evas_object_del(priv->l[5]);
-         priv->l[5] == NULL;
+         evas_object_image_size_get(priv->l[i], &w, &h);
+         if(!(w == priv->w && h == priv->h))
+         {
+            evas_object_smart_member_del(priv->l[i]);
+            evas_object_del(priv->l[i]);
+            priv->l[i] == NULL;
+         }
       }
-   }
-   if(!priv->l[5])
-   {
-      priv->l[5] = image_generate_color(evas, priv->w, priv->h, 0x00000000);
-
-      evas_object_smart_member_add(priv->l[5], world);
-      evas_object_stack_above(priv->l[5], priv->l[0]);
-      evas_object_show(priv->l[5]);
-   }
-
-   /* preparing visual */
-   if(priv->l[6])
-   {
-      evas_object_image_size_get(priv->l[6], &w, &h);
-      if(!(w == priv->w && h == priv->h))
+      if(!priv->l[i])
       {
-         evas_object_smart_member_del(priv->l[6]);
-         evas_object_del(priv->l[6]);
-         priv->l[6] == NULL;
+         priv->l[i] = image_generate_color(evas, priv->w, priv->h, 0x00000000);
+         evas_object_smart_member_add(priv->l[i], world);
+         evas_object_show(priv->l[i]);
       }
-   }
-   if(!priv->l[6])
-   {
-      priv->l[6] = image_generate_color(evas, priv->w, priv->h, 0x00000000);
-
-      evas_object_smart_member_add(priv->l[6], world);
-      evas_object_stack_above(priv->l[6], priv->l[5]);
-      evas_object_show(priv->l[6]);
-   }
-
-   /* preparing visual */
-   if(priv->l[7])
-   {
-      evas_object_image_size_get(priv->l[7], &w, &h);
-      if(!(w == priv->w && h == priv->h))
-      {
-         evas_object_smart_member_del(priv->l[7]);
-         evas_object_del(priv->l[7]);
-         priv->l[7] == NULL;
-      }
-   }
-   if(!priv->l[7])
-   {
-      priv->l[7] = image_generate_color(evas, priv->w, priv->h, 0x00000000);
-
-      evas_object_smart_member_add(priv->l[7], world);
-      evas_object_stack_above(priv->l[7], priv->l[6]);
-      evas_object_show(priv->l[7]);
    }
 
    evas_object_smart_changed(world);
@@ -370,9 +331,8 @@ _pathgen_world_generate(
 static void
 _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 {
-   fprintf(stderr, "want to start sim\n");
-   Evas_Object *ui;
    Evas *evas;
+   Evas_Object *pbar;
    Pathgen_Path *path;
 
    PATHGEN_WORLD_DATA_GET(world, priv);
@@ -380,7 +340,7 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 
    if(!priv->l[0])
    {
-      fprintf(stderr, "no height map, cannot run sim.\n");
+      fprintf(stderr, "ERR: no height map, cannot run sim.\n");
       return;
    }
 
@@ -388,6 +348,10 @@ _pathgen_sim_start( void *data, Evas_Object *world, void *event_info )
 
    priv->path_count=0;
    priv->path_fade_count = 0;
+
+   pbar = evas_object_name_find(evas, "pbar");
+   elm_progressbar_value_set(pbar, 0.0);
+
    evas_object_smart_callback_call(world, EVT_SIM_TRAVELER_NEW, NULL);
 }
 
@@ -396,6 +360,9 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 {
    Pathgen_Node *start, *goal;
    Pathgen_Path *path;
+
+   Evas *evas;
+   Evas_Object *pbar;
 
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
@@ -406,6 +373,12 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
       return;
    }
    priv->path_count++;
+
+   evas = evas_object_evas_get(world);
+   pbar = evas_object_name_find(evas, "pbar");
+
+   elm_progressbar_value_set(pbar, (float)priv->path_count / (float)priv->i_sim_path_max);
+
 
    if(priv->path_fade_count < priv->i_sim_path_fade_interval)
    {
