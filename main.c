@@ -15,6 +15,7 @@ EAPI_MAIN int
 elm_main(int argc, char **argv)
 {
    Evas_Object *win, *hbox, *vbox;
+   Evas_Object *scroller;
    Evas_Object *bg;
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
@@ -55,12 +56,17 @@ elm_main(int argc, char **argv)
    evas_object_show(hbox);
  
    /* map area */
+   scroller = elm_scroller_add(win);
+   evas_object_size_hint_weight_set(scroller, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+   evas_object_size_hint_align_set(scroller, EVAS_HINT_FILL, EVAS_HINT_FILL);
+   elm_box_pack_end(hbox, scroller);
+   evas_object_show(scroller);
+
+   /* map object */
    bg = elm_bg_add(win);
-   evas_object_size_hint_weight_set(bg, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-   evas_object_size_hint_align_set(bg, EVAS_HINT_FILL, EVAS_HINT_FILL);
-   evas_object_size_hint_min_set(bg, 32, 32);
-   evas_object_color_set(bg, 255, 255, 0, 255);
-   elm_box_pack_end(hbox, bg);
+   evas_object_size_hint_min_set(bg, 1024, 1024);
+   evas_object_color_set(bg, 0, 255, 0, 255);
+   elm_object_content_set(scroller, bg);
    evas_object_show(bg);
  
    /* right side buttons panel */
