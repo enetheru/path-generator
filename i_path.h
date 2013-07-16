@@ -234,7 +234,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "%0.0f");
-   elm_spinner_min_max_set(spin, 0.0, 255.0);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1.0);
    elm_spinner_value_set(spin, I_PATH_TREAD_WEIGHT_DEFAULT);
 
@@ -284,7 +284,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "tol:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_CLIMB_UP_TOLERANCE_DEFAULT);
 
@@ -298,7 +298,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "lim:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_CLIMB_UP_LIMIT_DEFAULT);
 
@@ -348,7 +348,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "tol:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_CLIMB_DOWN_TOLERANCE_DEFAULT);
 
@@ -362,7 +362,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "lim:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_CLIMB_DOWN_LIMIT_DEFAULT);
 
@@ -412,7 +412,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "tol:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_AVOID_TOLERANCE_DEFAULT);
 
@@ -426,7 +426,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "lim:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_AVOID_LIMIT_DEFAULT);
 
@@ -476,7 +476,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "tol:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_MAP_TOLERANCE_DEFAULT);
 
@@ -490,7 +490,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "lim:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_MAP_LIMIT_DEFAULT);
 
@@ -540,7 +540,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "tol:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_HEAT_TOLERANCE_DEFAULT);
 
@@ -554,7 +554,7 @@ i_path_setup(Evas_Object *win, Evas_Object *vbox)
 
    spin = elm_spinner_add(win);
    elm_spinner_label_format_set(spin, "lim:%0.0f");
-   elm_spinner_min_max_set(spin, 0, 255);
+   elm_spinner_min_max_set(spin, I_COLOR_MIN, I_COLOR_MAX);
    elm_spinner_step_set(spin, 1);
    elm_spinner_value_set(spin, I_PATH_HEAT_LIMIT_DEFAULT);
 

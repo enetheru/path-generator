@@ -379,6 +379,8 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
 
    if(!world)return;
    PATHGEN_WORLD_DATA_GET(world, priv);
+   priv->timer_path = NULL;
+
    if(priv->path_count >= priv->i_sim_path_max)
    {
       fprintf(stderr, "max travelers reached\n");
@@ -432,7 +434,7 @@ _pathgen_sim_traveler_new( void *data, Evas_Object *world, void *event_info )
    {
       image_func_fill(priv->l[6], NULL, 0x00000000);
       image_func_pixel(priv->l[6], x, y, NULL, 0xFF00FF00);
-      ecore_timer_add(priv->i_display_speed, pathgen_path_search, path);
+      priv->timer_search = ecore_timer_add(priv->i_display_speed, pathgen_path_search, path);
    }
    else while(pathgen_path_search(path));
 }
@@ -466,12 +468,13 @@ _pathgen_path_search_complete( void *data, __UNUSED__
 {
    Pathgen_Path *path = event_info;
    PATHGEN_WORLD_DATA_GET(o, priv);
+   priv->timer_search = NULL;
 
 
    if(priv->i_display_[7])
    {
       image_func_fill(priv->l[7], NULL, 0x00000000);
-      ecore_timer_add(priv->i_display_speed, pathgen_path_walk_slow, path);
+      priv->timer_path = ecore_timer_add(priv->i_display_speed, pathgen_path_walk_slow, path);
    }
    else
    {

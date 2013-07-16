@@ -1,5 +1,6 @@
 #ifndef PATHGEN_WORLD_H
 #define PATHGEN_WORLD_H
+#include <Ecore.h>
 #include <Ecore_Evas.h>
 #include "pathgen_path.h"
 #include "pathgen_node.h"
@@ -100,6 +101,9 @@ struct _Pathgen_World_Data
    /* == world constants that are used in calculations == */
    float c_euclid_max;
    int   c_manhat_max;
+
+   /* timers */
+   Ecore_Timer *timer_path, *timer_search;
 
 };
 

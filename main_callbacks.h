@@ -3,6 +3,23 @@
 static void 
 _on_done(void *data, Evas_Object *obj, void *event_info)
 {
+   Evas *evas = evas_object_evas_get(obj);
+   Evas_Object *world = evas_object_name_find(evas, "world");
+
+   PATHGEN_WORLD_DATA_GET(world, priv);
+
+   if(priv->timer_search)
+   {
+      fprintf(stderr, "not finished searching yet\n");
+      ecore_timer_del(priv->timer_search);
+      priv->timer_search = NULL;
+   }
+   if(priv->timer_path)
+   {
+      fprintf(stderr, "not finished walking the path yet\n");
+      ecore_timer_del(priv->timer_path);
+      priv->timer_path = NULL;
+   }
    // quit the mainloop (elm_run function will return)
    elm_exit();
 }
