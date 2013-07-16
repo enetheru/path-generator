@@ -4,6 +4,9 @@
 #include "pathgen_node.h"
 #include "r_image.h"
 #include "r_noise.h"
+#include "pg_data.h"
+
+extern PG_Data pg_data;
 
 static void 
 _fs_world_height_load(void *data, Evas_Object *obj, void *event_info)
@@ -21,6 +24,8 @@ _fs_world_height_load(void *data, Evas_Object *obj, void *event_info)
    evas_object_image_smooth_scale_set(image, EINA_FALSE);
 
    pathgen_world_layer_set(data, image, 0);
+
+   pg_world_layer_set(pg_data.world, image, 1);
 }
 
 static void
