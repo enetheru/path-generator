@@ -21,3 +21,16 @@ pg_world_layer_set(PG_World *world, Evas_Object *new, int id)
    evas_object_image_size_set(new, world->width, world->length);
    evas_object_show(world->l[id]);
 }
+
+PG_World *
+pg_world_new()
+{
+   int i;
+   PG_World *world = malloc(sizeof(PG_World));
+   for(i=0;i<7;i++)world->l[i] = NULL;
+   world->width = 0;
+   world->length = 0;
+   world->height = 0;
+   
+   return world;
+}
