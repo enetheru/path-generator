@@ -29,6 +29,11 @@ evas_object_show(button);
 evas_object_smart_callback_add(
    button, "clicked", _ui_sim_stop, NULL);
 
+spinner = elm_spinner_add(win);
+evas_object_name_set(spinner, "ui,path_max");
+elm_box_pack_end(vbox1, spinner);
+evas_object_show(spinner);
+
 
 
 for(i=0; i<5; i++)

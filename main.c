@@ -26,7 +26,7 @@ elm_main(int argc, char **argv)
    Evas *evas;
    Evas_Object *win, *hbox, *vbox, *vbox1;
    Evas_Object *scroller;
-   Evas_Object *bg, *button, *chk;
+   Evas_Object *bg, *button, *chk, *spinner;
    Evas_Object *map;
    int i;
 

@@ -1,9 +1,19 @@
 static Eina_Bool
-_path_more(void *data, int type, void *event)
+_path_more(void *data, int type, void *event_info)
 {
-   int *number = event;
-   const char *str = data;
-   fprintf(stderr, "_path_more\n");
+   Event_Data_Path_More *event_data = event_info;
+   Evas_Object *ui;
+   int i;
+
+   fprintf(stderr, "_path_more: type=%d\n", type);
+
+   ui = evas_object_name_find(event_data->evas, "ui,path_max");
+   i = (int)elm_spinner_value_get(ui);
+   while(pg_data.path_count < i)
+   {
+      fprintf(stderr, "moar paths!! %d\n", pg_data.path_count+1);
+      pg_data.path_count++;
+   }
 
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -13,7 +23,7 @@ _sim_stop(void *data, int type, void *event)
 {
    int *number = event;
    const char *str = data;
-   fprintf(stderr, "_sim_stop\n");
+   fprintf(stderr, "_sim_stop: type=%d\n", type);
 
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -76,11 +86,16 @@ _ui_toggle_image(void *data, Evas_Object *obj, void *event_info)
 static void
 _ui_sim_start(void *data, Evas_Object *obj, void *event_info)
 {
+   Evas *evas = evas_object_evas_get(obj);
    /* check data for OK to proceed */
+   pg_data.path_count = 0;
+   pg_data.path_fade_count = 0;
    /* disable user intarface that would cause problems */
    elm_object_disabled_set(obj, EINA_TRUE);
    /* begin simulation */
-   ecore_event_add(_event_id_path_more, NULL, NULL, NULL);
+   Event_Data_Path_More *evt_data = malloc(sizeof(Event_Data_Path_More));
+   evt_data->evas = evas;
+   ecore_event_add(_event_id_path_more, evt_data, NULL, NULL);
 }
 
 static void

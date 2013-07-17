@@ -18,7 +18,7 @@ struct _PG_Data
    Evas_Object *display;
 
    int path_count;
-   int path_fade_counter;
+   int path_fade_count;
 
    PG_World *world;
 
