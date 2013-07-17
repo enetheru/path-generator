@@ -3,6 +3,7 @@
 
 #include <Eina.h>
 #include <Evas.h>
+#include <Ecore.h>
 
 typedef struct _PG_Data PG_Data;
 typedef struct _PG_World PG_World;
@@ -20,6 +21,9 @@ struct _PG_Data
    int path_fade_counter;
 
    PG_World *world;
+
+   Ecore_Event_Handler *path_more;
+   Ecore_Event_Handler *sim_stop;
 };
 
 struct _PG_World

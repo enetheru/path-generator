@@ -2,24 +2,20 @@
 #include "pg_data.h"
 #include "pg_world.h"
 #include "pg_display.h"
+#include "pg_event.h"
 
 
 /* globals */
 PG_Data pg_data;
 
+
 static const char* ui_labels[] = {
-   "ui,load_display", "Load Display Image",
-   "ui,load_height", "Load Height Map",
-   "ui,load_avoid", "Load Avoidance Map",
-   "ui,load_map", "Load Road Map",
-   "ui,load_spawn", "Load Spawn Map",
-   "ui,load_teleport", "Load Teleport Map",
-   "ui,toggle_display", "",
-   "ui,toggle_height", "",
-   "ui,toggle_avoid", "",
-   "ui,toggle_map", "",
-   "ui,toggle_spawn", "",
-   "ui,toggle_teleport", "",
+   "ui,toggle_display", "ui,load_display", "Load Display Image",
+   "ui,toggle_height", "ui,load_height", "Load Height Map",
+   "ui,toggle_avoid", "ui,load_avoid", "Load Avoidance Map",
+   "ui,toggle_map", "ui,load_map", "Load Road Map",
+   "ui,toggle_spawn", "ui,load_spawn", "Load Spawn Map",
+   "ui,toggle_teleport", "ui,load_teleport", "Load Teleport Map",
 };
 
 #include "main_cb.h"
@@ -36,6 +32,12 @@ elm_main(int argc, char **argv)
 
    PG_World *pg_world = pg_world_new();
    pg_data.world = pg_world;
+
+   _event_id_path_more = ecore_event_type_new();
+   pg_data.path_more = ecore_event_handler_add(_event_id_path_more, _path_more, NULL);
+
+   _event_id_sim_stop = ecore_event_type_new();
+   pg_data.sim_stop = ecore_event_handler_add(_event_id_sim_stop, _sim_stop, NULL);
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
    elm_win_title_set(win, "path-generator");
