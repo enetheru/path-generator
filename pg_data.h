@@ -19,6 +19,8 @@ struct _PG_Data
 
    int path_count;
    int path_fade_count;
+   int path_que_count;
+   int path_que_size; //internal limit
 
    PG_World *world;
 

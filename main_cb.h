@@ -9,12 +9,22 @@ _path_more(void *data, int type, void *event_info)
 
    ui = evas_object_name_find(event_data->evas, "ui,path_max");
    i = (int)elm_spinner_value_get(ui);
-   while(pg_data.path_count < i)
+   while(pg_data.path_que_count < pg_data.path_que_size)
    {
+      if(pg_data.path_count >= i)break;
+
       fprintf(stderr, "moar paths!! %d\n", pg_data.path_count+1);
       pg_data.path_count++;
-   }
 
+      Event_Data_Path_More *evt_data = malloc(sizeof(Event_Data_Path_More));
+      evt_data->evas = event_data->evas;
+      ecore_event_add(_event_id_path_more, evt_data, NULL, NULL);
+
+      pg_data.path_que_count++;
+   }
+   if(pg_data.path_que_count == 0)
+      ecore_event_add(_event_id_sim_stop, NULL, NULL, NULL);
+   pg_data.path_que_count--;
    return ECORE_CALLBACK_PASS_ON;
 }
 
@@ -90,6 +100,7 @@ _ui_sim_start(void *data, Evas_Object *obj, void *event_info)
    /* check data for OK to proceed */
    pg_data.path_count = 0;
    pg_data.path_fade_count = 0;
+   pg_data.path_que_count=0;
    /* disable user intarface that would cause problems */
    elm_object_disabled_set(obj, EINA_TRUE);
    /* begin simulation */

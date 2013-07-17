@@ -32,6 +32,7 @@ elm_main(int argc, char **argv)
 
    PG_World *pg_world = pg_world_new();
    pg_data.world = pg_world;
+   pg_data.path_que_size =10;
 
    _event_id_path_more = ecore_event_type_new();
    pg_data.path_more = ecore_event_handler_add(_event_id_path_more, _path_more, NULL);
