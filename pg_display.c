@@ -34,8 +34,8 @@ _pg_display_smart_show(Evas_Object *o)
 {
    int i;
    PG_DISPLAY_DATA_GET(o, priv);
-   evas_object_show(priv->background);
-   for(i=0; i<8; i++)evas_object_show(priv->l[i]);
+//   evas_object_show(priv->background);
+//   for(i=0; i<8; i++)evas_object_show(priv->l[i]);
 
    _pg_display_parent_sc->show(o);
 }
@@ -45,8 +45,8 @@ _pg_display_smart_hide(Evas_Object *o)
 {
    int i;
    PG_DISPLAY_DATA_GET(o, priv);
-   evas_object_hide(priv->background);
-   for(i=0; i<8; i++)evas_object_hide(priv->l[i]);
+//   evas_object_hide(priv->background);
+//   for(i=0; i<8; i++)evas_object_hide(priv->l[i]);
 
    _pg_display_parent_sc->hide(o);
 }
@@ -124,7 +124,25 @@ pg_display_add( Evas *evas)
    evas_object_color_set(priv->background, 200, 200, 200, 255);
    evas_object_smart_member_add(priv->background, world);
    evas_object_lower(priv->background);
+   evas_object_show(priv->background);
 
    return world;
 }
 
+void
+pg_display_layer_set(Evas_Object *disp, Evas_Object *new, int id)
+{
+   PG_DISPLAY_DATA_GET_OR_RETURN(disp, priv);
+
+   if(!new || new == priv->l[id])return;
+
+   /* delet old object */
+   if(priv->l[id])evas_object_smart_member_del(priv->l[id]);
+
+   /* Assign new object */
+   priv->l[id] = new;
+   evas_object_smart_member_add(priv->l[id], disp);
+   evas_object_show(priv->l[id]);
+
+   evas_object_smart_changed(disp);
+}

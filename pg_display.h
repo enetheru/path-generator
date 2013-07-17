@@ -60,4 +60,7 @@ struct _PG_Display_Data
 Evas_Object *
 pg_display_add( Evas *evas);
 
+void
+pg_display_layer_set(Evas_Object *disp, Evas_Object *new, int id);
+
 #endif /*PG_DISPLAY*/

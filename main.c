@@ -14,7 +14,12 @@ static const char* ui_labels[] = {
    "ui,load_map", "Load Road Map",
    "ui,load_spawn", "Load Spawn Map",
    "ui,load_teleport", "Load Teleport Map",
-   NULL, NULL
+   "ui,toggle_display", "",
+   "ui,toggle_height", "",
+   "ui,toggle_avoid", "",
+   "ui,toggle_map", "",
+   "ui,toggle_spawn", "",
+   "ui,toggle_teleport", "",
 };
 
 #include "main_cb.h"
@@ -25,7 +30,7 @@ elm_main(int argc, char **argv)
    Evas *evas;
    Evas_Object *win, *hbox, *vbox, *vbox1;
    Evas_Object *scroller;
-   Evas_Object *bg, *button;
+   Evas_Object *bg, *button, *chk;
    Evas_Object *map;
    int i;
 
@@ -81,8 +86,8 @@ elm_main(int argc, char **argv)
 
    /* map object */
    map = pg_display_add(evas);
+   pg_data.display = map;
    evas_object_size_hint_min_set(map, 1024, 1024);
-   evas_object_resize(map, 1024, 1024);
    elm_object_content_set(scroller, map);
    evas_object_show(map);
  
