@@ -30,6 +30,7 @@ elm_main(int argc, char **argv)
    Evas_Object *map;
    int i;
 
+   ecore_thread_max_set(4);
    PG_World *pg_world = pg_world_new();
    pg_data.world = pg_world;
    pg_data.path_que_size =10;
@@ -46,6 +47,7 @@ elm_main(int argc, char **argv)
    evas_object_show(win);
 
    evas = evas_object_evas_get(win);
+   pg_data.evas = evas;
 
    evas_object_smart_callback_add(win, "delete,request", _on_done, NULL);
 

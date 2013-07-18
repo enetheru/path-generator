@@ -15,6 +15,7 @@ typedef struct _PG_Node_Rel PG_Node_Rel;
 struct _PG_Data
 {
    /* evas smart object to display the data*/
+   Evas *evas;
    Evas_Object *display;
 
    int path_count;

@@ -1,3 +1,40 @@
+static void
+th_do(void *data, Ecore_Thread *th)
+{
+   int i;
+   for(i=0;i<INT_MAX;i++)continue;fprintf(stderr, "pendig=%d, active=%d\n",
+      ecore_thread_pending_get(), ecore_thread_active_get() );
+}
+//
+// END - code running in my custom thread instance
+
+static void // thread job finished - collect results and put in img obj
+th_end(void *data, Ecore_Thread *th)
+{
+   fprintf(stderr, "thread finish\n\n\n");
+   pg_data.path_que_count--;
+   if(pg_data.path_que_count == 0)
+   {
+      /* construct new event data and add the event */
+      Event_Data_Sim_Stop *evt_stop = malloc(sizeof(Event_Data_Path_More));
+      evt_stop->evas = pg_data.evas;
+      ecore_event_add(_event_id_sim_stop, evt_stop, NULL, NULL);
+   }
+   else
+   {
+      /* construct new event data and add the event */
+      Event_Data_Path_More *evt_data = malloc(sizeof(Event_Data_Path_More));
+      evt_data->evas = pg_data.evas;
+      ecore_event_add(_event_id_path_more, evt_data, NULL, NULL);
+   }
+}
+
+static void // if the thread is cancelled - free pix, keep obj tho
+th_cancel(void *data, Ecore_Thread *th)
+{
+   fprintf(stderr, "thread cancel\n\n\n");
+}
+
 static Eina_Bool
 _path_more(void *data, int type, void *event_info)
 {
@@ -12,28 +49,28 @@ _path_more(void *data, int type, void *event_info)
    while(pg_data.path_que_count < pg_data.path_que_size)
    {
       if(pg_data.path_count >= i)break;
-
-      fprintf(stderr, "moar paths!! %d\n", pg_data.path_count+1);
+      
+      ecore_thread_run(th_do, th_end, th_cancel, NULL);
       pg_data.path_count++;
-
-      Event_Data_Path_More *evt_data = malloc(sizeof(Event_Data_Path_More));
-      evt_data->evas = event_data->evas;
-      ecore_event_add(_event_id_path_more, evt_data, NULL, NULL);
-
       pg_data.path_que_count++;
+
    }
-   if(pg_data.path_que_count == 0)
-      ecore_event_add(_event_id_sim_stop, NULL, NULL, NULL);
-   pg_data.path_que_count--;
+
    return ECORE_CALLBACK_PASS_ON;
 }
 
 static Eina_Bool
-_sim_stop(void *data, int type, void *event)
+_sim_stop(void *data, int type, void *event_info)
 {
-   int *number = event;
-   const char *str = data;
+   Event_Data_Sim_Stop *event_data = event_info;
+   Evas_Object *ui;
+   int i;
+
    fprintf(stderr, "_sim_stop: type=%d\n", type);
+
+   /* re-enable user interface */
+   ui = evas_object_name_find(event_data->evas, "ui,start");
+   elm_object_disabled_set(ui, EINA_FALSE);
 
    return ECORE_CALLBACK_PASS_ON;
 }
@@ -97,12 +134,15 @@ static void
 _ui_sim_start(void *data, Evas_Object *obj, void *event_info)
 {
    Evas *evas = evas_object_evas_get(obj);
+
    /* check data for OK to proceed */
    pg_data.path_count = 0;
    pg_data.path_fade_count = 0;
    pg_data.path_que_count=0;
+
    /* disable user intarface that would cause problems */
    elm_object_disabled_set(obj, EINA_TRUE);
+
    /* begin simulation */
    Event_Data_Path_More *evt_data = malloc(sizeof(Event_Data_Path_More));
    evt_data->evas = evas;
@@ -113,10 +153,12 @@ static void
 _ui_sim_stop(void *data, Evas_Object *obj, void *event_info)
 {
    Evas *evas = evas_object_evas_get(obj);
-   Evas_Object *ui;
+
    /* cancel path solving */
-   ecore_event_add(_event_id_sim_stop, NULL, NULL, NULL);
-   /* re-enable user interface */
-   ui = evas_object_name_find(evas, "ui,start");
-   elm_object_disabled_set(ui, EINA_FALSE);
+   Event_Data_Sim_Stop *evt_data = malloc(sizeof(Event_Data_Sim_Stop));
+   evt_data->evas = evas;
+   ecore_event_add(_event_id_sim_stop, evt_data, NULL, NULL);
 }
+
+
+

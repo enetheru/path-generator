@@ -31,6 +31,9 @@ evas_object_smart_callback_add(
 
 spinner = elm_spinner_add(win);
 evas_object_name_set(spinner, "ui,path_max");
+evas_object_size_hint_weight_set(spinner, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+evas_object_size_hint_align_set(spinner, EVAS_HINT_FILL, EVAS_HINT_FILL);
+elm_spinner_min_max_set(spinner, 1, INT_MAX);
 elm_box_pack_end(vbox1, spinner);
 evas_object_show(spinner);
 

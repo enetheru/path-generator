@@ -9,5 +9,10 @@ struct _event_data_path_more{
    Evas *evas;
 };
 
+typedef struct _event_data_sim_stop Event_Data_Sim_Stop;
+struct _event_data_sim_stop{
+   Evas *evas;
+};
+
 #endif /* PG_EVENT_H */
 
