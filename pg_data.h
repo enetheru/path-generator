@@ -26,6 +26,7 @@ struct _PG_Data
    PG_World *world;
 
    Ecore_Event_Handler *path_more;
+   Ecore_Event_Handler *path_fade;
    Ecore_Event_Handler *sim_stop;
 };
 
@@ -51,12 +52,12 @@ struct _PG_Path
    PG_Node_Rel *start, *end, *current;
 };
 
-struct _PG_Finder
+struct _PG_Path_Finder
 {
    PG_Path *path;
    PG_World *world;
    Eina_List *open, *closed;
-   PG_Node_Rel *goal, *start;
+   PG_Node_Rel *goal;
 
    int iteration_count;
    int iteration_max;

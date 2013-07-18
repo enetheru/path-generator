@@ -1,9 +1,11 @@
 static void
 th_do(void *data, Ecore_Thread *th)
 {
+   PG_Path_Finder *th_data = data;
    int i;
-   for(i=0;i<INT_MAX;i++)continue;fprintf(stderr, "pendig=%d, active=%d\n",
-      ecore_thread_pending_get(), ecore_thread_active_get() );
+   sleep(rand()%3);
+      fprintf(stderr, "pendig=%d, active=%d\n",
+         ecore_thread_pending_get(), ecore_thread_active_get() );
 }
 //
 // END - code running in my custom thread instance
@@ -11,49 +13,90 @@ th_do(void *data, Ecore_Thread *th)
 static void // thread job finished - collect results and put in img obj
 th_end(void *data, Ecore_Thread *th)
 {
-   fprintf(stderr, "thread finish\n\n\n");
+   fprintf(stderr, "thread finish\n");
+   Evas_Object *ui;
+   PG_Path_Finder *th_data = data;
+
+   /* decrement path que */
    pg_data.path_que_count--;
+
    if(pg_data.path_que_count == 0)
    {
       /* construct new event data and add the event */
-      Event_Data_Sim_Stop *evt_stop = malloc(sizeof(Event_Data_Path_More));
-      evt_stop->evas = pg_data.evas;
-      ecore_event_add(_event_id_sim_stop, evt_stop, NULL, NULL);
+      ecore_event_add(_event_id_sim_stop, NULL, NULL, NULL);
    }
    else
    {
       /* construct new event data and add the event */
-      Event_Data_Path_More *evt_data = malloc(sizeof(Event_Data_Path_More));
-      evt_data->evas = pg_data.evas;
-      ecore_event_add(_event_id_path_more, evt_data, NULL, NULL);
+      ecore_event_add(_event_id_path_more, NULL, NULL, NULL);
    }
+   /* if fade counter is at max, call fade callback and reset fade counter */
+   ui = evas_object_name_find(pg_data.evas, "ui,fade");
+   if(pg_data.path_fade_count > elm_spinner_value_get(ui))
+   {
+      ecore_event_add(_event_id_path_fade, NULL, NULL, NULL);
+      pg_data.path_fade_count = 0;
+   }
+   free(th_data);
 }
 
 static void // if the thread is cancelled - free pix, keep obj tho
 th_cancel(void *data, Ecore_Thread *th)
 {
+   PG_Path_Finder *th_data = data;
    fprintf(stderr, "thread cancel\n\n\n");
+   free(th_data);
 }
 
 static Eina_Bool
 _path_more(void *data, int type, void *event_info)
 {
-   Event_Data_Path_More *event_data = event_info;
    Evas_Object *ui;
-   int i;
+   int i, j, x, y, z;
 
    fprintf(stderr, "_path_more: type=%d\n", type);
 
-   ui = evas_object_name_find(event_data->evas, "ui,path_max");
-   i = (int)elm_spinner_value_get(ui);
    while(pg_data.path_que_count < pg_data.path_que_size)
    {
-      if(pg_data.path_count >= i)break;
-      
-      ecore_thread_run(th_do, th_end, th_cancel, NULL);
+      ui = evas_object_name_find(pg_data.evas, "ui,path_max");
+      if(pg_data.path_count >= elm_spinner_value_get(ui))break;
+
+      /* conditions cleared for a new path to be generated */
+      /* increment counters */
       pg_data.path_count++;
       pg_data.path_que_count++;
+      pg_data.path_fade_count++;
 
+
+   /* thoughts
+* create a new path
+* set its start node
+* create a path finder using the path as its data
+* set a goal
+* solve path
+* delete path finder and related data leaving the path for other things
+
+      /* allocate data for the search */
+      PG_Path_Finder *new_search = pg_path_finder_new();
+      new_search->path = malloc(sizeof(PG_Path));
+      /* set the start */
+      x = rand() % pg_data.world->width;
+      y = rand() % pg_data.world->length;
+      z = rand() % pg_data.world->height;
+      fprintf(stderr, "start location (%d, %d, %d)\n", x, y, z);
+//      new_search->start = malloc(sizeof(PG_Node_Rel));
+//      new_search->start->node = pg_world_get_node(pg_data.world, x, y, z);
+//      new_search->open = eina_list_append(new_search->open, new_search->start);
+      /* set the goal */
+      x = rand() % pg_data.world->width;
+      y = rand() % pg_data.world->length;
+      z = rand() % pg_data.world->height;
+      fprintf(stderr, "goal location (%d, %d, %d)\n", x, y, z);
+      new_search->goal = malloc(sizeof(PG_Node_Rel));
+      new_search->goal->node = pg_world_get_node(pg_data.world, x, y, z);
+      
+      /* push of onto new thread to solve without blocking the interface */
+      ecore_thread_run(th_do, th_end, th_cancel, new_search);
    }
 
    return ECORE_CALLBACK_PASS_ON;
@@ -62,18 +105,25 @@ _path_more(void *data, int type, void *event_info)
 static Eina_Bool
 _sim_stop(void *data, int type, void *event_info)
 {
-   Event_Data_Sim_Stop *event_data = event_info;
    Evas_Object *ui;
    int i;
 
    fprintf(stderr, "_sim_stop: type=%d\n", type);
 
    /* re-enable user interface */
-   ui = evas_object_name_find(event_data->evas, "ui,start");
+   ui = evas_object_name_find(pg_data.evas, "ui,start");
    elm_object_disabled_set(ui, EINA_FALSE);
 
    return ECORE_CALLBACK_PASS_ON;
 }
+
+static Eina_Bool
+_path_fade(void *data, int type, void *event_info)
+{
+   fprintf(stderr, "_path_fade\n");
+   //FIXME actually fade something 
+}
+
 
 static void 
 _on_done(void *data, Evas_Object *obj, void *event_info)
@@ -133,9 +183,10 @@ _ui_toggle_image(void *data, Evas_Object *obj, void *event_info)
 static void
 _ui_sim_start(void *data, Evas_Object *obj, void *event_info)
 {
-   Evas *evas = evas_object_evas_get(obj);
-
    /* check data for OK to proceed */
+   
+
+   /* clear counters */
    pg_data.path_count = 0;
    pg_data.path_fade_count = 0;
    pg_data.path_que_count=0;
@@ -144,20 +195,14 @@ _ui_sim_start(void *data, Evas_Object *obj, void *event_info)
    elm_object_disabled_set(obj, EINA_TRUE);
 
    /* begin simulation */
-   Event_Data_Path_More *evt_data = malloc(sizeof(Event_Data_Path_More));
-   evt_data->evas = evas;
-   ecore_event_add(_event_id_path_more, evt_data, NULL, NULL);
+   ecore_event_add(_event_id_path_more, NULL, NULL, NULL);
 }
 
 static void
 _ui_sim_stop(void *data, Evas_Object *obj, void *event_info)
 {
-   Evas *evas = evas_object_evas_get(obj);
-
    /* cancel path solving */
-   Event_Data_Sim_Stop *evt_data = malloc(sizeof(Event_Data_Sim_Stop));
-   evt_data->evas = evas;
-   ecore_event_add(_event_id_sim_stop, evt_data, NULL, NULL);
+   ecore_event_add(_event_id_sim_stop, NULL, NULL, NULL);
 }
 
 

@@ -1,18 +1,12 @@
 #ifndef PG_EVENT_H
 #define PG_EVENT_H
 
+/* to create more path searches */
 int _event_id_path_more = 0;
+/* for when the simulation is cancelled or finishes */
 int _event_id_sim_stop = 0;
-
-typedef struct _event_data_path_more Event_Data_Path_More;
-struct _event_data_path_more{
-   Evas *evas;
-};
-
-typedef struct _event_data_sim_stop Event_Data_Sim_Stop;
-struct _event_data_sim_stop{
-   Evas *evas;
-};
+/* used to fade the heatmap */
+int _event_id_path_fade = 0;
 
 #endif /* PG_EVENT_H */
 

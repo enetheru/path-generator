@@ -18,7 +18,8 @@ pathgen_SOURCES = main.c i_defaults.h \
    pg_data.h \
    pg_world.h pg_world.c \
    pg_display.h pg_display.c \
-   pg_event.h
+   pg_event.h \
+   pg_path_finder.h pg_path_finder.c
 
 pathgen_LDADD = @ELEMENTARY_LIBS@
 

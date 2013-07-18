@@ -33,3 +33,9 @@ pg_world_new()
    
    return world;
 }
+
+PG_Node *
+pg_world_get_node(PG_World *world, int x, int y, int z)
+{
+   return NULL;
+}

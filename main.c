@@ -3,6 +3,7 @@
 #include "pg_world.h"
 #include "pg_display.h"
 #include "pg_event.h"
+#include "pg_path_finder.h"
 
 
 /* globals */
@@ -33,13 +34,16 @@ elm_main(int argc, char **argv)
    ecore_thread_max_set(4);
    PG_World *pg_world = pg_world_new();
    pg_data.world = pg_world;
-   pg_data.path_que_size =10;
+   pg_data.path_que_size =8; //set to double the thread count
 
    _event_id_path_more = ecore_event_type_new();
    pg_data.path_more = ecore_event_handler_add(_event_id_path_more, _path_more, NULL);
 
    _event_id_sim_stop = ecore_event_type_new();
    pg_data.sim_stop = ecore_event_handler_add(_event_id_sim_stop, _sim_stop, NULL);
+
+   _event_id_path_fade = ecore_event_type_new();
+   pg_data.path_fade = ecore_event_handler_add(_event_id_path_fade, _path_fade, NULL);
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
    elm_win_title_set(win, "path-generator");
