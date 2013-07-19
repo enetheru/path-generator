@@ -75,6 +75,10 @@ pathgen_path_search(void *data)
       return EINA_FALSE;
    }
 
+   /* set our goal node*/
+   path->end = best;
+   path->current = best;
+
    /* Bail if we have reached our goal */
    if(best->x == path->gx && best->y == path->gy)
    {
@@ -83,15 +87,12 @@ pathgen_path_search(void *data)
       return EINA_FALSE;
    }
 
-   /* set our goal node*/
-   path->end = best;
-   path->current = best;
 
    /* move the node to the closed list */
    path->open = eina_list_remove(path->open, best);
-   best->open == EINA_FALSE;
+   best->open = EINA_FALSE;
    path->closed = eina_list_append(path->closed, best);
-   best->closed == EINA_TRUE;
+   best->closed = EINA_TRUE;
 
    if(priv->i_display_[6])
       image_func_pixel(priv->l[6], best->x, best->y, NULL, 0x88000000);

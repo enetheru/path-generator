@@ -1,58 +1,8 @@
-static void
-th_do(void *data, Ecore_Thread *th)
-{
-   PG_Path_Finder *th_data = data;
-   int i;
-   sleep(rand()%3);
-      fprintf(stderr, "pendig=%d, active=%d\n",
-         ecore_thread_pending_get(), ecore_thread_active_get() );
-}
-//
-// END - code running in my custom thread instance
-
-static void // thread job finished - collect results and put in img obj
-th_end(void *data, Ecore_Thread *th)
-{
-   fprintf(stderr, "thread finish\n");
-   Evas_Object *ui;
-   PG_Path_Finder *th_data = data;
-
-   /* decrement path que */
-   pg_data.path_que_count--;
-
-   if(pg_data.path_que_count == 0)
-   {
-      /* construct new event data and add the event */
-      ecore_event_add(_event_id_sim_stop, NULL, NULL, NULL);
-   }
-   else
-   {
-      /* construct new event data and add the event */
-      ecore_event_add(_event_id_path_more, NULL, NULL, NULL);
-   }
-   /* if fade counter is at max, call fade callback and reset fade counter */
-   ui = evas_object_name_find(pg_data.evas, "ui,fade");
-   if(pg_data.path_fade_count > elm_spinner_value_get(ui))
-   {
-      ecore_event_add(_event_id_path_fade, NULL, NULL, NULL);
-      pg_data.path_fade_count = 0;
-   }
-   free(th_data);
-}
-
-static void // if the thread is cancelled - free pix, keep obj tho
-th_cancel(void *data, Ecore_Thread *th)
-{
-   PG_Path_Finder *th_data = data;
-   fprintf(stderr, "thread cancel\n\n\n");
-   free(th_data);
-}
-
 static Eina_Bool
 _path_more(void *data, int type, void *event_info)
 {
    Evas_Object *ui;
-   int i, j, x, y, z;
+   int i, j, x, y;
 
    fprintf(stderr, "_path_more: type=%d\n", type);
 
@@ -62,41 +12,35 @@ _path_more(void *data, int type, void *event_info)
       if(pg_data.path_count >= elm_spinner_value_get(ui))break;
 
       /* conditions cleared for a new path to be generated */
+
       /* increment counters */
       pg_data.path_count++;
       pg_data.path_que_count++;
       pg_data.path_fade_count++;
 
-
-   /* thoughts
-* create a new path
-* set its start node
-* create a path finder using the path as its data
-* set a goal
-* solve path
-* delete path finder and related data leaving the path for other things
-
-      /* allocate data for the search */
-      PG_Path_Finder *new_search = pg_path_finder_new();
-      new_search->path = malloc(sizeof(PG_Path));
-      /* set the start */
+      /* set random position to use as start location */
       x = rand() % pg_data.world->width;
       y = rand() % pg_data.world->length;
-      z = rand() % pg_data.world->height;
-      fprintf(stderr, "start location (%d, %d, %d)\n", x, y, z);
-//      new_search->start = malloc(sizeof(PG_Node_Rel));
-//      new_search->start->node = pg_world_get_node(pg_data.world, x, y, z);
-//      new_search->open = eina_list_append(new_search->open, new_search->start);
-      /* set the goal */
+      fprintf(stderr, "start location (%d, %d)\n", x, y);
+
+      /* Create a new path */
+      PG_Path *new_path = pg_path_new(x,y);
+
+      /* set a goal */
       x = rand() % pg_data.world->width;
       y = rand() % pg_data.world->length;
-      z = rand() % pg_data.world->height;
-      fprintf(stderr, "goal location (%d, %d, %d)\n", x, y, z);
-      new_search->goal = malloc(sizeof(PG_Node_Rel));
-      new_search->goal->node = pg_world_get_node(pg_data.world, x, y, z);
-      
+
+      /* create a path finder */
+      PG_Path_Finder *pf = pg_path_finder_new(new_path, x, y);
+      fprintf(stderr, "%p\n", pf);
+      fprintf(stderr, "%p\n", pf->open);
+      fprintf(stderr, "%i\n", eina_list_count(pf->open));
+
       /* push of onto new thread to solve without blocking the interface */
-      ecore_thread_run(th_do, th_end, th_cancel, new_search);
+      ecore_thread_run(
+         pg_path_finder_th_do,
+         pg_path_finder_th_end,
+         pg_path_finder_th_cancel, pf);
    }
 
    return ECORE_CALLBACK_PASS_ON;

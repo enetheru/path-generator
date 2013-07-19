@@ -42,13 +42,13 @@ struct _PG_World
    /* 6 resulting heat map */
    Evas_Object *l[7];
    int width, length ,height;
-   /* two dimensional array of nodes */
-   Eina_List *nodes;
+   /* three dimensional array of nodes */
+   PG_Node **nodes;
 };
 
 struct _PG_Path
 {
-   Eina_List *nodes;
+   Eina_List *nodes_r;
    PG_Node_Rel *start, *end, *current;
 };
 
@@ -75,7 +75,7 @@ struct _PG_Node
    /* position */
    int x, y, z;
    /* the neighbours */
-   PG_Node *n[26];
+   PG_Node *n[8];
 };
 
 struct _PG_Node_Rel

@@ -1,4 +1,6 @@
 #include "pg_data.h"
+#include "pg_world.h"
+#include "pg_node.h"
 
 int
 pg_world_height_get(PG_World *world, int x, int y)
@@ -31,11 +33,61 @@ pg_world_new()
    world->length = 512;
    world->height = 512;
    
+   pg_world_create_nodes(world);
+
    return world;
 }
 
 PG_Node *
-pg_world_get_node(PG_World *world, int x, int y, int z)
+pg_world_node_get(PG_World *world, int x, int y)
 {
-   return NULL;
+   /* get the node from the pool */
+   return world->nodes[x + world->width * y];
+}
+
+void
+pg_world_create_nodes(PG_World *world)
+{
+   int i,j,k,x,y;
+   PG_Node *node;
+   /* allocate array */
+   world->nodes = malloc(world->width * world->length * world->height * sizeof(void *));
+
+   for(i=0; i < world->width; i++)
+   {
+      for(j=0; j < world->length; j++)
+      {
+         node = malloc(sizeof *node);
+         world->nodes[i + world->width * j] = node;
+         node->x = i;
+         node->y = j;
+      }
+   } 
+   for(i=0; i < world->width; i++)
+   {
+      for(j=0; j < world->length; j++)
+      {
+         for(k=0; k<8; k++)
+         {
+            node = world->nodes[i+world->width*j];
+            /* setup new coordinates changes */
+                 if(k==0){ x = i  ; y = j-1;}//north
+            else if(k==1){ x = i+1; y = j  ;}//east
+            else if(k==2){ x = i  ; y = j+1;}//south
+            else if(k==3){ x = i-1; y = j  ;}//west
+            else if(k==4){ x = i+1; y = j-1;}//north east
+            else if(k==5){ x = i-1; y = j-1;}//north west
+            else if(k==6){ x = i+1; y = j+1;}//south east
+            else if(k==7){ x = i-1; y = j+1;}//south west
+            /* skip the neighbour if it is out of bounds*/
+                 if(x > world->width-1) continue;
+            else if(x < 0) continue;
+            else if(y > world->length-1) continue;
+            else if(y < 0) continue;
+
+            node->n[k] = world->nodes[x+world->width*y];
+
+         }
+      }
+   }
 }

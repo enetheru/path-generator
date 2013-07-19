@@ -2,8 +2,11 @@
 #include "pg_data.h"
 #include "pg_world.h"
 #include "pg_display.h"
-#include "pg_event.h"
+#include "pg_path.h"
 #include "pg_path_finder.h"
+#include "pg_node.h"
+#include "pg_node_rel.h"
+#include "pg_event.h"
 
 
 /* globals */
