@@ -26,16 +26,25 @@ pg_world_layer_set(PG_World *world, Evas_Object *new, int id)
 PG_World *
 pg_world_new()
 {
-   int i;
-   PG_World *world = malloc(sizeof(PG_World));
-   for(i=0;i<7;i++)world->l[i] = NULL;
-   world->width = 512;
-   world->length = 512;
-   world->height = 512;
-   
-   pg_world_create_nodes(world);
+   int i, j, n;
+   PG_World *w = malloc(sizeof  *w);
+   for(i=0;i<7;i++)w->l[i] = NULL;
+   // FIXME, take these from the user interface
+   w->width = 512;
+   w->length = 512;
+   w->height = 512;
 
-   return world;
+   /* create grid of nodes the same size as our world */
+   w->nodes = malloc(w->width * w->height * sizeof *w->nodes);
+   for(i=0; i < w->width; i++)
+      for(j=0; j < w->length; j++)
+   {
+      n = i+ w->width * j;
+      w->nodes[n] = malloc(sizeof **w->nodes);
+      w->nodes[n]->x = i;
+      w->nodes[n]->y = j;
+   }
+   return w;
 }
 
 PG_Node *
@@ -43,52 +52,4 @@ pg_world_node_get(PG_World *world, int x, int y)
 {
    /* get the node from the pool */
    return world->nodes[x + world->width * y];
-}
-
-void
-pg_world_create_nodes(PG_World *world)
-{
-   int i,j,k,x,y;
-   PG_Node *node;
-   /* allocate array */
-   world->nodes = malloc(world->width * world->length * sizeof(void *));
-
-   for(i=0; i < world->width; i++)
-   {
-      for(j=0; j < world->length; j++)
-      {
-         node = malloc(sizeof *node);
-         world->nodes[i + world->width * j] = node;
-         node->x = i;
-         node->y = j;
-         //FIXME, give all the nodes a z value too
-      }
-   } 
-   for(i=0; i < world->width; i++)
-   {
-      for(j=0; j < world->length; j++)
-      {
-         for(k=0; k<8; k++)
-         {
-            node = world->nodes[i+world->width*j];
-            /* setup new coordinates changes */
-                 if(k==0){ x = i  ; y = j-1;}//north
-            else if(k==1){ x = i+1; y = j  ;}//east
-            else if(k==2){ x = i  ; y = j+1;}//south
-            else if(k==3){ x = i-1; y = j  ;}//west
-            else if(k==4){ x = i+1; y = j-1;}//north east
-            else if(k==5){ x = i-1; y = j-1;}//north west
-            else if(k==6){ x = i+1; y = j+1;}//south east
-            else if(k==7){ x = i-1; y = j+1;}//south west
-            /* skip the neighbour if it is out of bounds*/
-                 if(x > world->width-1) continue;
-            else if(x < 0) continue;
-            else if(y > world->length-1) continue;
-            else if(y < 0) continue;
-
-            node->n[k] = world->nodes[x+world->width*y];
-
-         }
-      }
-   }
 }

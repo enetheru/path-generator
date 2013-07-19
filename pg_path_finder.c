@@ -38,35 +38,42 @@ pg_path_finder_new(PG_Path *path, int x, int y)
    pf->heat_maxl = pf->map_maxl = pf->avoid_maxl = pf->climb_maxl = 255;
 
    /* create the node graph */
-   int i,j,k,l,m,u,v;
+   int i,j,k,l,m,u,v,n;
+   PG_World *w = pg_data.world;
    PG_Node_Rel *node;
 
-   k = pg_data.world->width * pg_data.world->length;
-   pf->all = malloc(k * sizeof (void *));
+   pf->all = malloc(w->width * w->length * sizeof *pf->all);
 
-   for(i=0; i < k; i++)
-      pf->all[k] = pg_node_rel_new(pg_data.world->nodes[k]);
-
-   for(i=0; i < k; i++)
+   for(i=0; i < w->width; i++)
+      for(j=0; j < w->length; j++)
    {
-      node = pf->all[k];
-      for(j=0; j<8; j++)
+      n = i+ w->width * j;
+      pf->all[n] = pg_node_rel_new(w->nodes[n]);
+   }
+
+   /* create neighbour relationships */
+   for(i=0; i < w->width; i++)
+      for(j=0; j < w->length; j++)
+   {
+      n = i + w->width * j;
+      for(k=0; k < 8; k++)
       {
          /* setup new coordinates changes */
-              if(j==0)l = i - pg_data.world->width;    //north
-         else if(j==1)l = i + 1;                       //east
-         else if(j==2)l = i + pg_data.world->width;    //south
-         else if(j==3)l = i - 1;                       //west
-         else if(j==4)l = i - pg_data.world->width + 1;//north east
-         else if(j==5)l = i - pg_data.world->width - 1;//north west
-         else if(j==6)l = i + pg_data.world->width + 1;//south east
-         else if(j==7)l = i + pg_data.world->width - 1;//south west
+              if(k==0){ x = i  ; y = j-1;}//north
+         else if(k==1){ x = i+1; y = j  ;}//east
+         else if(k==2){ x = i  ; y = j+1;}//south
+         else if(k==3){ x = i-1; y = j  ;}//west
+         else if(k==4){ x = i+1; y = j-1;}//north east
+         else if(k==5){ x = i-1; y = j-1;}//north west
+         else if(k==6){ x = i+1; y = j+1;}//south east
+         else if(k==7){ x = i-1; y = j+1;}//south west
          /* skip the neighbour if it is out of bounds*/
-         if(l < 0) continue;
-         if(l > k) continue;
-         if(l % pg_data.world->width == 0) continue;
-         if(l % pg_data.world->width == pg_data.world->width - 1)continue;
-         node->n[j] = pf->all[l];
+              if(x > w->width-1) continue;
+         else if(x < 0) continue;
+         else if(y > w->length-1) continue;
+         else if(y < 0) continue;
+
+         pf->all[n]->n[k] = w->nodes[x + w->width * y];
       }
    }
    return pf;
@@ -154,11 +161,12 @@ pg_path_finder_th_do(void *data, Ecore_Thread *th)
       for(i=0; i<d; i++)
       {
          fprintf(stderr, "bn=%p\n", best->n[i]);
-//         if(!best->n[i] || best->n[i]->state != 0) continue;
-//         pf->open = eina_list_append(pf->open, best->n[i]);
-//         best->n[i]->state = 1;
-//         best->n[i]->prev = best;
-//         best->n[i]->f = best->f + 1;
+         if(!best->n[i]) continue;
+         if(best->n[i]->state != 0) continue;
+         pf->open = eina_list_append(pf->open, best->n[i]);
+         best->n[i]->state = 1;
+         best->n[i]->prev = best;
+         best->n[i]->f = best->f + 1;
       }
    }
 }

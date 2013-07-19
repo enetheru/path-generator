@@ -17,7 +17,6 @@ struct _PG_Data
    /* evas smart object to display the data*/
    Evas *evas;
    Evas_Object *display;
-
    int path_count;
    int path_fade_count;
    int path_que_count;
@@ -77,7 +76,6 @@ struct _PG_Node
    /* position */
    int x, y, z;
    /* the neighbours */
-   PG_Node *n[8];
 };
 
 struct _PG_Node_Rel
