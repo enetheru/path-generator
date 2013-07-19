@@ -28,6 +28,7 @@ struct _PG_Data
    Ecore_Event_Handler *path_more;
    Ecore_Event_Handler *path_fade;
    Ecore_Event_Handler *sim_stop;
+   Ecore_Event_Handler *path_draw;
 };
 
 struct _PG_World
@@ -56,8 +57,9 @@ struct _PG_Path_Finder
 {
    PG_Path *path;
    PG_World *world;
-   Eina_List *open, *closed;
+   Eina_List *open;
    PG_Node_Rel *goal;
+   PG_Node_Rel **all;
 
    int iteration_count;
    int iteration_max;
@@ -82,12 +84,18 @@ struct _PG_Node_Rel
 {
    PG_Node *node;
    PG_Node_Rel *prev, *next;
+   PG_Node_Rel *n[8];
    /* g = total cost to get here */
    /* h = the perceived cost to the goal */
    /* f = g+h, used in selecting the best node */
    double f,g,h;
    /* state is either 0 none, 1 in open list, -1 in closed list*/
    int state;
+};
+
+typedef struct _evt_path Evt_Path;
+struct _evt_path{
+   PG_Path *path;
 };
 
 #endif /* PG_DATA_H */

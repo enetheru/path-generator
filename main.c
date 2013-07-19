@@ -6,12 +6,19 @@
 #include "pg_path_finder.h"
 #include "pg_node.h"
 #include "pg_node_rel.h"
-#include "pg_event.h"
 
 
 /* globals */
 PG_Data pg_data;
 
+/* to create more path searches */
+int _event_id_path_more = 0;
+/* for when the simulation is cancelled or finishes */
+int _event_id_sim_stop = 0;
+/* used to fade the heatmap */
+int _event_id_path_fade = 0;
+/* for drawing the path */
+int _event_id_path_draw = 0;
 
 static const char* ui_labels[] = {
    "ui,toggle_display", "ui,load_display", "Load Display Image",
@@ -22,6 +29,7 @@ static const char* ui_labels[] = {
    "ui,toggle_teleport", "ui,load_teleport", "Load Teleport Map",
 };
 
+#include "pg_event.h"
 #include "main_cb.h"
 
 EAPI_MAIN int
@@ -47,6 +55,9 @@ elm_main(int argc, char **argv)
 
    _event_id_path_fade = ecore_event_type_new();
    pg_data.path_fade = ecore_event_handler_add(_event_id_path_fade, _path_fade, NULL);
+
+   _event_id_path_draw = ecore_event_type_new();
+   pg_data.path_draw = ecore_event_handler_add(_event_id_path_draw, _path_draw, NULL);
 
    win = elm_win_add(NULL, "path-generator", ELM_WIN_BASIC);
    elm_win_title_set(win, "path-generator");

@@ -12,13 +12,15 @@ extern int _event_id_path_more;
 extern int _event_id_sim_stop;
 /* used to fade the heatmap */
 extern int _event_id_path_fade;
+/* used to draw the path */
+extern int _event_id_path_draw;
 
 
 PG_Path_Finder *
 pg_path_finder_new(PG_Path *path, int x, int y)
 {
    PG_Path_Finder *pf = malloc(sizeof(PG_Path_Finder));
-   pf->open = pf->closed = NULL;
+   pf->open = NULL;
    pf->path = path;
    pf->open = eina_list_append(pf->open, path->start);
    path->start->state = 1;
@@ -35,16 +37,49 @@ pg_path_finder_new(PG_Path *path, int x, int y)
    pf->heat_max = pf->map_max = pf->avoid_max = pf->climb_max = 255;
    pf->heat_maxl = pf->map_maxl = pf->avoid_maxl = pf->climb_maxl = 255;
 
+   /* create the node graph */
+   int i,j,k,l,m,u,v;
+   PG_Node_Rel *node;
+
+   k = pg_data.world->width * pg_data.world->length;
+   pf->all = malloc(k * sizeof (void *));
+
+   for(i=0; i < k; i++)
+      pf->all[k] = pg_node_rel_new(pg_data.world->nodes[k]);
+
+   for(i=0; i < k; i++)
+   {
+      node = pf->all[k];
+      for(j=0; j<8; j++)
+      {
+         /* setup new coordinates changes */
+              if(j==0)l = i - pg_data.world->width;    //north
+         else if(j==1)l = i + 1;                       //east
+         else if(j==2)l = i + pg_data.world->width;    //south
+         else if(j==3)l = i - 1;                       //west
+         else if(j==4)l = i - pg_data.world->width + 1;//north east
+         else if(j==5)l = i - pg_data.world->width - 1;//north west
+         else if(j==6)l = i + pg_data.world->width + 1;//south east
+         else if(j==7)l = i + pg_data.world->width - 1;//south west
+         /* skip the neighbour if it is out of bounds*/
+         if(l < 0) continue;
+         if(l > k) continue;
+         if(l % pg_data.world->width == 0) continue;
+         if(l % pg_data.world->width == pg_data.world->width - 1)continue;
+         node->n[j] = pf->all[l];
+      }
+   }
    return pf;
 }
 
 void
 pg_path_finder_del(PG_Path_Finder *pf)
 {
+   int i, j, k;
    PG_Node_Rel *node;
    eina_list_free(pf->open);
-   eina_list_free(pf->closed);
    pg_node_rel_del(pf->goal);
+   free(pf->all); 
    free(pf); 
 }
 
@@ -110,7 +145,6 @@ pg_path_finder_th_do(void *data, Ecore_Thread *th)
 
       /* move the best node to the closed list */
       pf->open = eina_list_remove(pf->open, best);
-      pf->closed = eina_list_append(pf->closed, best);
       best->state = -1;
 
       /* examine the neighbours */
@@ -119,13 +153,12 @@ pg_path_finder_th_do(void *data, Ecore_Thread *th)
 
       for(i=0; i<d; i++)
       {
-         if(!(best->node->n[i]))continue;
-         n = pg_node_rel_new(best->node->n[i]);
-         fprintf(stderr, "n(%i, %i)\n", n->node->x, n->node->y);
-         n->prev = best;
-         n->f = best->f+1;
-         pf->open = eina_list_append(pf->open, n);
-         n->state = 1;
+         fprintf(stderr, "bn=%p\n", best->n[i]);
+//         if(!best->n[i] || best->n[i]->state != 0) continue;
+//         pf->open = eina_list_append(pf->open, best->n[i]);
+//         best->n[i]->state = 1;
+//         best->n[i]->prev = best;
+//         best->n[i]->f = best->f + 1;
       }
    }
 }
@@ -157,6 +190,9 @@ pg_path_finder_th_end(void *data, Ecore_Thread *th)
       ecore_event_add(_event_id_path_fade, NULL, NULL, NULL);
       pg_data.path_fade_count = 0;
    }
+   Evt_Path *event_info = malloc(sizeof(Evt_Path));
+   event_info->path = th_data->path;
+   ecore_event_add(_event_id_path_draw, event_info, NULL, NULL);
    pg_path_finder_del(th_data);
 }
 

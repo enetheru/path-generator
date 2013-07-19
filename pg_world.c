@@ -51,7 +51,7 @@ pg_world_create_nodes(PG_World *world)
    int i,j,k,x,y;
    PG_Node *node;
    /* allocate array */
-   world->nodes = malloc(world->width * world->length * world->height * sizeof(void *));
+   world->nodes = malloc(world->width * world->length * sizeof(void *));
 
    for(i=0; i < world->width; i++)
    {
@@ -61,6 +61,7 @@ pg_world_create_nodes(PG_World *world)
          world->nodes[i + world->width * j] = node;
          node->x = i;
          node->y = j;
+         //FIXME, give all the nodes a z value too
       }
    } 
    for(i=0; i < world->width; i++)
