@@ -72,24 +72,27 @@ _path_fade(void *data, int type, void *event_info)
 static Eina_Bool
 _path_draw(void *data, int type, void *event_info)
 {
+   Evas_Object *image = image_generate_color(pg_data.evas, pg_data.world->width, pg_data.world->length, 0x00000000);
+   
    fprintf(stderr, "_path_draw\n");
    Evt_Path *evt_info = event_info;
    PG_Path *path = evt_info->path;
-   fprintf(stderr, "from (%i, %i,) to (%i, %i)\n",
-      path->start->node->x,
-      path->start->node->y,
-      path->end->node->x,
-      path->end->node->y);
+//   fprintf(stderr, "from (%i, %i,) to (%i, %i)\n",
+//      path->start->node->x, path->start->node->y,
+//      path->end->node->x, path->end->node->y);
 
    while(1)
    {
-      fprintf(stderr, "->(%i, %i)", path->current->node->x, path->current->node->y);
+  //    fprintf(stderr, "->(%i, %i)", path->current->node->x, path->current->node->y);
+      image_func_pixel(image, path->current->node->x, path->current->node->y, pixel_mix, 0xFF000000);
       if(path->current == path->start) {
          path->current = path->end;
          break;
       }
       path->current = path->current->prev;
    }
-   fprintf(stderr, "\n");
-   //FIXME
+//   fprintf(stderr, "\n");
+
+   pg_display_layer_set(pg_data.display, image, 6);
+   //FIXME actually draw something to an evas object 
 }

@@ -30,9 +30,9 @@ pg_world_new()
    PG_World *w = malloc(sizeof  *w);
    for(i=0;i<7;i++)w->l[i] = NULL;
    // FIXME, take these from the user interface
-   w->width = 16;
-   w->length = 16;
-   w->height = 16;
+   w->width = 512;
+   w->length = 512;
+   w->height = 512;
 
    /* create grid of nodes the same size as our world */
    w->nodes = malloc(w->width * w->height * sizeof *w->nodes);

@@ -31,7 +31,7 @@ pg_path_finder_new(PG_Path *path, int gx, int gy)
    pf->goal = pg_node_rel_new(pg_world_node_get(pg_data.world, gx, gy));
 
    pf->iteration_count = 0;
-   pf->iteration_max = 100;//FIXME get from interface
+   pf->iteration_max = 100000;//FIXME get from interface
    pf->diagonal_search = EINA_FALSE; //FIXME, get from interface
 
    // FIXME, get from interface */
@@ -98,23 +98,23 @@ pg_path_finder_del(PG_Path_Finder *pf)
    /* PG_Node_Rel *goal; - dont delete */
 
    /* PG_Node_Rel **all; - contents*/
-   for(i=0; i< pf->world->width; i++)
-      for(j=0; j<pf->world->length; j++)
-   {
+//   for(i=0; i< pf->world->width; i++)
+//      for(j=0; j<pf->world->length; j++)
+//   {
       /* selectively delete remaining nodes that arent in the path */
-      n = i + pf->world->width * j;
-      ok = EINA_TRUE;
-      while(1)
-      {
-         if(pf->path->current->node->x == i && pf->path->current->node->y == j)ok = EINA_FALSE;
-         if(pf->path->current == pf->path->start) {
-            pf->path->current = pf->path->end;
-            break;
-         }
-         pf->path->current = pf->path->current->prev;
-      }
-      if(ok)free(pf->all[n]);
-   }
+//      n = i + pf->world->width * j;
+//      ok = EINA_TRUE;
+//      while(1)
+//      {
+//         if(pf->path->current->node->x == i && pf->path->current->node->y == j)ok = EINA_FALSE;
+//         if(pf->path->current == pf->path->start) {
+//            pf->path->current = pf->path->end;
+//            break;
+//         }
+//         pf->path->current = pf->path->current->prev;
+//      }
+      //FIXME if(ok)free(pf->all[n]);
+//   }
    /* PG_Node_Rel **all; */
    free(pf->all); 
    free(pf); 
@@ -192,13 +192,17 @@ pg_path_finder_th_do(void *data, Ecore_Thread *th)
          pf->open = eina_list_append(pf->open, best->n[i]);
          best->n[i]->state = 1;
          best->n[i]->prev = best;
-         best->n[i]->f = best->f + 1;
+         best->n[i]->g = best->g + 0.9;
+         best->n[i]->h = pg_node_dist_manhat(
+            best->n[i]->node->x, best->n[i]->node->y,
+            pf->goal->node->x, pf->goal->node->y);
+         best->n[i]->f = best->n[i]->g + best->n[i]->h;
       }
    }
    fprintf(stderr, "iteration limit reached\n");
 }
 
-void // thread job finished - collect results and put in img obj
+void // thread job finished
 pg_path_finder_th_end(void *data, Ecore_Thread *th)
 {
    Evas_Object *ui;
@@ -224,13 +228,16 @@ pg_path_finder_th_end(void *data, Ecore_Thread *th)
       ecore_event_add(_event_id_path_fade, NULL, NULL, NULL);
       pg_data.path_fade_count = 0;
    }
+   /* create event data to pass the resulting path to a callback func */
    Evt_Path *event_info = malloc(sizeof(Evt_Path));
    event_info->path = th_data->path;
    ecore_event_add(_event_id_path_draw, event_info, NULL, NULL);
+
+   /* delete our path finder object */
    pg_path_finder_del(th_data);
 }
 
-void // if the thread is cancelled - free pix, keep obj tho
+void // if the thread is cancelled
 pg_path_finder_th_cancel(void *data, Ecore_Thread *th)
 {
    PG_Path_Finder *th_data = data;

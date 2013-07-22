@@ -79,7 +79,7 @@ pixel_mix(uint32_t a, uint32_t b, float strength)
    cb = ab * strength + bb * (strength * -1 + 1);
 
    c = ca <<24 | cr << 16 | cg << 8 | cb;
-   fprintf(stderr, "%8X * %0.1f + %8X * %0.1f = %8X\n", a, strength, b, strength * -1 + 1,  c);
+//   fprintf(stderr, "%8X * %0.1f + %8X * %0.1f = %8X\n", a, strength, b, strength * -1 + 1,  c);
    return c;
 }
 

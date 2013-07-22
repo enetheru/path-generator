@@ -6,6 +6,8 @@
 #include "pg_path_finder.h"
 #include "pg_node.h"
 #include "pg_node_rel.h"
+#include "r_image.h"
+#include "r_pixel.h"
 
 
 /* globals */
