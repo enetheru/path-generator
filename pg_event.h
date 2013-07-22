@@ -21,10 +21,10 @@ _path_more(void *data, int type, void *event_info)
       /* set random position to use as start location */
       x = rand() % pg_data.world->width;
       y = rand() % pg_data.world->length;
-      fprintf(stderr, "start location (%d, %d)\n", x, y);
 
       /* Create a new path */
       PG_Path *new_path = pg_path_new(x,y);
+
 
       /* set a goal */
       x = rand() % pg_data.world->width;
@@ -32,9 +32,10 @@ _path_more(void *data, int type, void *event_info)
 
       /* create a path finder */
       PG_Path_Finder *pf = pg_path_finder_new(new_path, x, y);
-      fprintf(stderr, "%p\n", pf);
-      fprintf(stderr, "%p\n", pf->open);
-      fprintf(stderr, "%i\n", eina_list_count(pf->open));
+      fprintf(stderr, "from(%d, %d) to(%d, %d)\n",
+         new_path->start->node->x,
+         new_path->start->node->y,
+         x, y);
 
       /* push of onto new thread to solve without blocking the interface */
       ecore_thread_run(
@@ -79,5 +80,16 @@ _path_draw(void *data, int type, void *event_info)
       path->start->node->y,
       path->end->node->x,
       path->end->node->y);
+
+   while(1)
+   {
+      fprintf(stderr, "->(%i, %i)", path->current->node->x, path->current->node->y);
+      if(path->current == path->start) {
+         path->current = path->end;
+         break;
+      }
+      path->current = path->current->prev;
+   }
+   fprintf(stderr, "\n");
    //FIXME
 }

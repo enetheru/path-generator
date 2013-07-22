@@ -18,4 +18,9 @@ pathgen-pathgen_path.o
 pathgen-pathgen_world.o
 pathgen-r_image.o
 stamp-h1
-*.swp
+pathgen-pg_display.o
+pathgen-pg_node.o
+pathgen-pg_node_rel.o
+pathgen-pg_path.o
+pathgen-pg_path_finder.o
+pathgen-pg_world.o

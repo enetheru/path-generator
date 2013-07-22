@@ -17,41 +17,49 @@ extern int _event_id_path_draw;
 
 
 PG_Path_Finder *
-pg_path_finder_new(PG_Path *path, int x, int y)
+pg_path_finder_new(PG_Path *path, int gx, int gy)
 {
+   int i,j,k,l,m,x,y,n;
+   PG_World *w = pg_data.world;
+
    PG_Path_Finder *pf = malloc(sizeof(PG_Path_Finder));
    pf->open = NULL;
    pf->path = path;
    pf->open = eina_list_append(pf->open, path->start);
    path->start->state = 1;
 
-   pf->goal = pg_node_rel_new(pg_world_node_get(pg_data.world,x,y));
+   pf->goal = pg_node_rel_new(pg_world_node_get(pg_data.world, gx, gy));
 
    pf->iteration_count = 0;
    pf->iteration_max = 100;//FIXME get from interface
    pf->diagonal_search = EINA_FALSE; //FIXME, get from interface
 
    // FIXME, get from interface */
-   pf->heat_minl = pf->map_minl = pf->avoid_minl = pf->climb_minl =0; 
-   pf->heat_min = pf->map_min = pf->avoid_min = pf->climb_min = 0;
-   pf->heat_max = pf->map_max = pf->avoid_max = pf->climb_max = 255;
+   pf->heat_minl = pf->map_minl = pf->avoid_minl = pf->climb_minl =   0; 
+   pf->heat_min  = pf->map_min  = pf->avoid_min  = pf->climb_min  =   0;
+   pf->heat_max  = pf->map_max  = pf->avoid_max  = pf->climb_max  = 255;
    pf->heat_maxl = pf->map_maxl = pf->avoid_maxl = pf->climb_maxl = 255;
 
-   /* create the node graph */
-   int i,j,k,l,m,u,v,n;
-   PG_World *w = pg_data.world;
-   PG_Node_Rel *node;
-
+   /* create the node relationship graph */
    pf->all = malloc(w->width * w->length * sizeof *pf->all);
-
    for(i=0; i < w->width; i++)
       for(j=0; j < w->length; j++)
    {
       n = i+ w->width * j;
+      if(i == gx && j == gy)
+      {
+         pf->all[n] = pf->goal;
+         continue;
+      }
+      if(i == path->start->node->x && j == path->start->node->y)
+      {
+         pf->all[n] = pf->path->start;
+         continue;
+      }
       pf->all[n] = pg_node_rel_new(w->nodes[n]);
    }
 
-   /* create neighbour relationships */
+   /* assign neighbour relationships */
    for(i=0; i < w->width; i++)
       for(j=0; j < w->length; j++)
    {
@@ -72,20 +80,42 @@ pg_path_finder_new(PG_Path *path, int x, int y)
          else if(x < 0) continue;
          else if(y > w->length-1) continue;
          else if(y < 0) continue;
-
-         pf->all[n]->n[k] = w->nodes[x + w->width * y];
+         pf->all[n]->n[k] = pf->all[x + w->width * y];
       }
    }
+
    return pf;
 }
 
 void
 pg_path_finder_del(PG_Path_Finder *pf)
 {
-   int i, j, k;
-   PG_Node_Rel *node;
-   eina_list_free(pf->open);
-   pg_node_rel_del(pf->goal);
+   int i, j, n;
+   Eina_Bool ok;
+   /* PG_Path *path; - dont delete */
+   /* PG_World *world; - dont delete */
+   /* Eina_List *open; */ eina_list_free(pf->open);
+   /* PG_Node_Rel *goal; - dont delete */
+
+   /* PG_Node_Rel **all; - contents*/
+   for(i=0; i< pf->world->width; i++)
+      for(j=0; j<pf->world->length; j++)
+   {
+      /* selectively delete remaining nodes that arent in the path */
+      n = i + pf->world->width * j;
+      ok = EINA_TRUE;
+      while(1)
+      {
+         if(pf->path->current->node->x == i && pf->path->current->node->y == j)ok = EINA_FALSE;
+         if(pf->path->current == pf->path->start) {
+            pf->path->current = pf->path->end;
+            break;
+         }
+         pf->path->current = pf->path->current->prev;
+      }
+      if(ok)free(pf->all[n]);
+   }
+   /* PG_Node_Rel **all; */
    free(pf->all); 
    free(pf); 
 }
@@ -127,28 +157,25 @@ pg_path_finder_th_do(void *data, Ecore_Thread *th)
    int i, d;
 
    PG_Path_Finder *pf = data;
-   fprintf(stderr, "%p\n", pf);
-   fprintf(stderr, "%p\n", pf->open);
-   fprintf(stderr, "%i\n", eina_list_count(pf->open));
 
    while(pf->iteration_count < pf->iteration_max)
    {
-      fprintf(stderr, "i=%i\n", pf->iteration_count);
       /* bail if no next best node */
       best = pg_path_finder_best_get(pf);
-      if(!best)
-      {
+      if(!best) {
          fprintf(stderr, "no best node\n");
          return;
       }
-      fprintf(stderr, "b=(%i, %i)\n", best->node->x, best->node->y);
 
       pf->iteration_count++;
       pf->path->end = best;
       pf->path->current = best;
 
       /* bail if we have reached our goal */
-      if(best->node == pf->goal->node)return;
+      if(best->node == pf->goal->node){
+         fprintf(stderr, "goal reached\n");
+         return;
+      }
 
       /* move the best node to the closed list */
       pf->open = eina_list_remove(pf->open, best);
@@ -160,7 +187,6 @@ pg_path_finder_th_do(void *data, Ecore_Thread *th)
 
       for(i=0; i<d; i++)
       {
-         fprintf(stderr, "bn=%p\n", best->n[i]);
          if(!best->n[i]) continue;
          if(best->n[i]->state != 0) continue;
          pf->open = eina_list_append(pf->open, best->n[i]);
@@ -169,12 +195,12 @@ pg_path_finder_th_do(void *data, Ecore_Thread *th)
          best->n[i]->f = best->f + 1;
       }
    }
+   fprintf(stderr, "iteration limit reached\n");
 }
 
 void // thread job finished - collect results and put in img obj
 pg_path_finder_th_end(void *data, Ecore_Thread *th)
 {
-   fprintf(stderr, "thread finish\n");
    Evas_Object *ui;
    PG_Path_Finder *th_data = data;
 

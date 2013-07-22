@@ -75,13 +75,13 @@ struct _PG_Node
 {
    /* position */
    int x, y, z;
-   /* the neighbours */
 };
 
 struct _PG_Node_Rel
 {
    PG_Node *node;
    PG_Node_Rel *prev, *next;
+   /* neighbouring nodes */
    PG_Node_Rel *n[8];
    /* g = total cost to get here */
    /* h = the perceived cost to the goal */
